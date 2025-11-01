@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.project
+
 // 1. Configure where to find PLUGINS themselves (e.g., com.android.application, kotlin-dsl).
 pluginManagement {
     repositories {
@@ -38,7 +40,11 @@ include(":secure-comm")
 include(":collab-canvas")
 include(":romtools")
 // Add your other feature modules here...
-
+include(":romtools")
+include(":secure-comm")
+include(":collab-canvas")
+include(":datavein-oracle-native")
+include(":colorblendr")
 // --- Core Modules ---
 include(":core:domain")
 include(":core:data")

@@ -1,7 +1,8 @@
 plugins {
     id("genesis.android.library")
-    id("com.google.devtools.ksp")
-    id("com.google.dagger.hilt.android")
+    id("com.google.devtools.ksp") version "2.3.0"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
+    id("com.google.dagger.hilt")
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 

@@ -1,6 +1,8 @@
 plugins {
     id("genesis.android.application")
     id("com.google.devtools.ksp") version "2.3.0"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
 
 }
 android {
@@ -73,4 +75,4 @@ dependencies {
     androidTestImplementation(libs.androidx.benchmark.junit4)
     androidTestImplementation(libs.androidx.test.uiautomator)
 }
-}
+

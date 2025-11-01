@@ -41,7 +41,7 @@ class GenesisApplicationPlugin : Plugin<Project> {
         with(target) {
             pluginManager.apply {
                 // Apply base Genesis conventions first
-                apply("genesis.android.base")
+                apply("com.android.base")
 
                 // Apply Android and Kotlin plugins
                 apply("com.android.application")

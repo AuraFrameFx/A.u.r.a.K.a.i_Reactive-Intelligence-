@@ -1,11 +1,11 @@
 plugins {
-    id("genesis.android.application")
+    id("genesis.android.application") // This likely applies the base configurations already
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
-    id("genesis.android.base")
-    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
+
+
 android {
     namespace = "dev.aurakai.auraframefx"
     compileSdk = 36
@@ -39,7 +39,6 @@ dependencies {
     implementation(project(":extendsyse"))
     implementation(project(":extendsysf"))
 
-    // Core AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.material)

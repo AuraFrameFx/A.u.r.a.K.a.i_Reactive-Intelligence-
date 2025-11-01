@@ -11,7 +11,7 @@ java {
 
 // These blocks MUST be at the top level, AFTER the java block.
 dependencies {
-    implementation("com.android.tools.build:gradle:9.0.0-alpha12")
+    implementation("com.android.tools.build:gradle:9.0.0-alpha13")
     implementation("com.google.dagger:hilt-android-gradle-plugin:2.57.2")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0-Beta2")
     implementation("com.google.gms:google-services:4.4.4")

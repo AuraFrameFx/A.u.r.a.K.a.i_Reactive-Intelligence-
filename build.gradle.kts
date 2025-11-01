@@ -2,8 +2,8 @@ val buildToolsVersion by extra("36.1.0-rc1")
 // ===== FORCE MODERN ANNOTATIONS & EXCLUDE OLD ONES =====
 plugins {
     `java-library`
-}
 
+}
 subprojects {
     configurations.all {
         resolutionStrategy {
@@ -26,4 +26,3 @@ subprojects {
     // Use Java 24 (supported by Kotlin) as the toolchain language version
     val javaToolchainVersion = 24
 }
-

@@ -1,9 +1,8 @@
 [versions]
 # Build Tools
-agp = "9.0.0-alpha12"
+agp = "9.0.0-alpha13"
 comGoogleGmsGoogleServicesGradlePlugin = "4.4.4"
 converterKotlinxSerialization = "3.0.0"
-converterKotlinxSerializationVersion = "1.0.0"
 gradle = "9.2.0"
 kotlin = "2.3.0-Beta2"
 ksp = "2.3.0"
@@ -19,7 +18,7 @@ work = "2.11.0"
 datastore = "1.1.7"
 securityCrypto = "1.1.0"
 roomKtx = "2.8.3"
-
+kotlinxSerialization = "1.9.0"
 # New versions
 fragment = "1.8.9"
 browser = "1.9.0"
@@ -47,7 +46,6 @@ ktor = "3.3.1"
 
 # Kotlin
 coroutines = "1.10.2"
-kotlinxSerialization = "1.9.0"
 kotlinxDatetime = "0.7.1-0.6.x-compat"
 # Dependency Injection
 hilt = "2.57.2"
@@ -102,7 +100,6 @@ compose-compiler = { group = "androidx.compose.compiler", name = "compiler", ver
 # Missing libsu
 com-google-gms-google-services-gradle-plugin = { module = "com.google.gms.google-services:com.google.gms.google-services.gradle.plugin", version.ref = "comGoogleGmsGoogleServicesGradlePlugin" }
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "converterKotlinxSerialization" }
-converter-kotlinx-serialization-v100 = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "converterKotlinxSerializationVersion" }
 libsu-io = { group = "com.github.topjohnwu.libsu", name = "io", version.ref = "libsu" }
 libsu-service = { group = "com.github.topjohnwu.libsu", name = "service", version.ref = "libsu" }
 
