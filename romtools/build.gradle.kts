@@ -52,7 +52,7 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
-
+    implementation("com.github.topjohnwu.libsu:io:6.0.0")
     implementation(libs.libsu.core)
     implementation(libs.libsu.io)
 

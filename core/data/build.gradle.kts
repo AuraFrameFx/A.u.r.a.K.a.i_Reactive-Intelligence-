@@ -16,6 +16,9 @@ android {
 dependencies {
     // Expose domain layer
     api(project(":core:domain"))
+    compileOnly(libs.xposed.api)
+    compileOnly(libs.yukihookapi)
+    implementation(libs.androidx.core.ktx)
 
     // Data layer dependencies
     implementation(libs.androidx.datastore.preferences)
@@ -30,3 +33,10 @@ dependencies {
 
     // Testing
 }
+("com.github.topjohnwu.libsu:core:6.0.0")
+("com.github.topjohnwu.libsu:io:6.0.0")
+("com.github.topjohnwu.libsu:service:6.0.0")
+("de.robv.android.xposed:api:82")
+("com.github.topjohnwu.libsu:core:6.0.0")
+("com.squareup.retrofit2:converter-kotlinx-serialization:1.0.0")
+com.squareup.okhttp3.logging-interceptor:${libs.versions.okhttp.get()}

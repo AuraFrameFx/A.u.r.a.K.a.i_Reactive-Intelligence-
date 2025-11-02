@@ -17,7 +17,7 @@ dependencies {
     implementation(libs.libsu.core)
     implementation(libs.libsu.io)
     implementation(libs.libsu.service)
-
+    implementation("com.github.topjohnwu.libsu:service:6.0.0")
     // Xposed/YukiHook (use published coordinates; avoid local jars here)
     compileOnly(libs.xposed.api)
     compileOnly(libs.yukihookapi)
