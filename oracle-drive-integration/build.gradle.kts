@@ -7,7 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
 }
 android {
-    namespace = "dev.aurakai.auraframefx.oracle-drive-intergration"
+    namespace = "dev.aurakai.auraframefx.oracledrive.integration"
     compileSdk = 36
 }
 dependencies {

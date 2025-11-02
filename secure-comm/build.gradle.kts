@@ -8,7 +8,7 @@ plugins {
 
 }
 android {
-    namespace = "dev.aurakai.auraframefx.secure-comm"
+    namespace = "dev.aurakai.auraframefx.securecomm"
     compileSdk = 36
 }
 dependencies {

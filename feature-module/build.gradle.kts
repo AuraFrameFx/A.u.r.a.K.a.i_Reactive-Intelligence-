@@ -7,7 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
 }
 android {
-    namespace = "dev.aurakai.auraframefx.feature-module"
+    namespace = "dev.aurakai.auraframefx.featuremodule"
     compileSdk = 36
 }
 dependencies {

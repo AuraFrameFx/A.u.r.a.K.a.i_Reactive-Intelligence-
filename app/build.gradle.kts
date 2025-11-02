@@ -5,6 +5,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -39,12 +40,15 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-// Root/system
+// Root/system utils
     implementation(libs.libsu.core)
+    implementation(libs.libsu.io)
+    implementation(libs.libsu.service)
 
 // Hooking (YukiHookAPI via KSP)
     implementation(libs.yuki.api)
     ksp(libs.yuki.processor)
+    compileOnly(libs.xposed.api) // stubs only; do not ship Xposed bridge
 
 // Firebase (via BOM)
     implementation(platform(libs.firebase.bom))
