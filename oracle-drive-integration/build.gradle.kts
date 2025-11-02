@@ -1,76 +1,29 @@
-// ⚠️ PLACEHOLDER MODULE - NO IMPLEMENTATION YET ⚠️
-//
-// This module is reserved for future Oracle Cloud Integration features.
-// See README.md for planned features and architecture.
-//
-// Status: Awaiting implementation (0 source files)
-// Documented: Yes (see README.md)
-// Remove this module if not implementing soon to reduce build time.
 plugins {
     id("com.android.library")
-    id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
-    id("org.jetbrains.kotlin.plugin.serialization")
+    id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
 }
-
 android {
-    namespace = "dev.aurakai.auraframefx.oracledriveintegration"
+    namespace = "dev.aurakai.auraframefx.oracle-drive-intergration"
     compileSdk = 36
-
 }
 dependencies {
+    api(libs.androidx.core.ktx) // if APIs leak types
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.material)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.timber)
+
+// If this library uses Compose UI:
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.material)
-    implementation(libs.material3)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.navigation.compose)
-    debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.material3)
 
-    ksp(libs.androidx.room.compiler)
-
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.datastore.core)
-
+// Hilt in library
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.kotlinx.datetime)
-    implementation(libs.coroutines)
-    implementation(libs.retrofit)
-    implementation(libs.okhttp)
-    implementation("com.squareup.retrofit2:converter-moshi:3.0.0")
-    implementation("com.squareup.retrofit2:converter-kotlinx-serialization:1.0.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:${libs.versions.okhttp.get()}")
-    implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.androidx.security.crypto)
-    implementation(libs.androidx.hilt.navigation)
-
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
-
-    implementation(libs.libsu.core)
-    implementation(libs.libsu.io)
-
-    implementation(libs.timber)
-
+// Compile-only for Xposed API (no runtime bundling)
     compileOnly(libs.xposed.api)
-    compileOnly(libs.yukihookapi)
-
-    coreLibraryDesugaring(libs.desugar.jdk.libs)
-
-    testImplementation(libs.junit.jupiter.api)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.hilt.android.testing)
-    androidTestImplementation(libs.androidx.benchmark.junit4)
-    androidTestImplementation(libs.androidx.test.uiautomator)
 }

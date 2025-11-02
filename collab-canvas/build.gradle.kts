@@ -1,84 +1,35 @@
 plugins {
-    id("com.android.library") version "9.0.0-alpha13" // This likely applies the base configurations already
+    id("com.android.library")
+    id("com.google.dagger.hilt.android")
+    id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
-    id("com.google.devtools.ksp") version "2.3.0"
-    id("com.google.dagger.hilt.android") version "2.57.2"
-    alias(libs.plugins.serialization)
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
 }
-
 android {
-    namespace = "dev.aurakai.auraframefx.collab_canvas"
-    compileSdk = 36
+    namespace = "dev.aurakai.auraframefx.collab-canvas.java"
+    compileSdk = libs.versions.compile.sdk.get().toInt()
     defaultConfig {
-        minSdk = 34
-
+        minSdk = libs.versions.min.sdk.get().toInt()
+        buildFeatures {
+            compose = true
+        }
+    }
 }
 dependencies {
-    // Module dependencies - depend on core modules only
-    implementation(project(":core:data"))
-    implementation(project(":core:ui"))
-    implementation(libs.libsu.core)
-    implementation(libs.libsu.io)
-    implementation(libs.libsu.core)
-
-    // Hooking/runtime-only compile-time APIs for modules that interact with Xposed/YukiHook
-    compileOnly(libs.yukihookapi)
-    compileOnly(libs.xposed.api)
-
+    api(libs.androidx.core.ktx) // if APIs leak types
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.material)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.timber)
+
+// If this library uses Compose UI:
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.material)
-    implementation(libs.material3)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.navigation.compose)
-    debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.material3)
 
-    ksp(libs.androidx.room.compiler)
-
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.datastore.core)
-
+// Hilt in library
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.kotlinx.datetime)
-    implementation(libs.coroutines)
-    implementation(libs.retrofit)
-    implementation(libs.okhttp)
-    implementation(libs.retrofit.converter.moshi)
-    implementation(libs.converter.kotlinx.serialization)
-    implementation(libs.okhttp.logging.interceptor)
-    implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.androidx.security.crypto)
-    implementation(libs.androidx.hilt.navigation)
-
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
-
-    implementation(libs.timber)
-
-    coreLibraryDesugaring(libs.desugar.jdk.libs)
-
-    testImplementation(libs.junit.jupiter.api)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.hilt.android.testing)
-    androidTestImplementation(libs.androidx.benchmark.junit4)
-    androidTestImplementation(libs.androidx.test.uiautomator)
-}
-
-tasks.register("collabStatus") {
-    group = "aegenesis"
-    doLast {
-        println("COLLAB CANVAS - Ready (Java 24 toolchain, unified).")
-    }
-}
+// Compile-only for Xposed API (no runtime bundling)
+    compileOnly(libs.xposed.api)
 }

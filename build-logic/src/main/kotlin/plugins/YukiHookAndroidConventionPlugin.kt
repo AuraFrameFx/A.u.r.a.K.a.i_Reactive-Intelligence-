@@ -17,6 +17,9 @@ class YukiHookAndroidConventionPlugin : Plugin<Project> {
 
             // Configure Android libraries for Yuki Hook
             pluginManager.withPlugin("com.android.library") {
+                extensions.configure<ApplicationExtension> {
+                    return@configure
+                }
             }
         }
     }

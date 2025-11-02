@@ -1,110 +1,69 @@
 plugins {
-    id("com.android.application") version "9.0.0-alpha13" // This likely applies the base configurations already
+    id("com.android.application")
+    id("com.google.dagger.hilt.android")
+    id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
-    alias(libs.plugins.ksp)
-    id("com.google.dagger.hilt.android") version "2.57.2"
-    alias(libs.plugins.serialization)
-    id("com.google.gms.google-services") version "4.4.4"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
 }
-
 
 android {
     namespace = "dev.aurakai.auraframefx"
-    compileSdk = 36
+    compileSdk = libs.versions.compile.sdk.get().toInt()
+    defaultConfig {
+        applicationId = "dev.aurakai.auraframefx"
+        minSdk = libs.versions.min.sdk.get().toInt()
+        targetSdk = libs.versions.target.sdk.get().toInt()
+        versionCode = 1
+        versionName = "0.1.0"
+    }
+    buildFeatures { compose = true }
 }
-
 dependencies {
-    implementation(libs.libsu.core)
-    implementation(libs.libsu.io)
-    implementation(libs.libsu.service)
-    implementation("com.github.topjohnwu.libsu:service:6.0.0")
-    // Xposed/YukiHook (use published coordinates; avoid local jars here)
-    compileOnly(libs.xposed.api)
-    compileOnly(libs.yukihookapi)
-    val composeBom = platform("androidx.compose:compose-bom:2024.06.00") // Use a recent BOM version
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
+// Compose
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.animation)
+    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.tooling.preview)
 
-    // Add Compose material, UI, and tooling dependencies
-    implementation(libs.androidx.ui)
-    implementation(libs.material3)
-    implementation(libs.androidx.activity.compose)
-    // Project modules
-    implementation(project(":core:data"))
-    implementation(project(":core:ui"))
-    implementation(project(":secure-comm"))
-    implementation(project(":collab-canvas"))
-    implementation(project(":extendsysa"))
-    implementation(project(":extendsysb"))
-    implementation(project(":extendsysc"))
-    implementation(project(":extendsysd"))
-    implementation(project(":extendsyse"))
-    implementation(project(":extendsysf"))
-
+// AndroidX core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.material)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    coreLibraryDesugaring(libs.desugar.jdk.libs)
-
-    // Compose
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    // Room
-    ksp(libs.androidx.room.compiler)
+// Hilt (KSP line is critical)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
-    // DataStore
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.datastore.core)
+// Root/system
+    implementation(libs.libsu.core)
 
-    // WorkManager
-    implementation(libs.androidx.work.runtime.ktx)
+// Hooking (YukiHookAPI via KSP)
+    implementation(libs.yuki.api)
+    ksp(libs.yuki.processor)
 
-    // Firebase
+// Firebase (via BOM)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics.ktx)
     implementation(libs.firebase.crashlytics.ktx)
-    implementation(libs.firebase.auth)
+    implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
 
-    // Networking
-    implementation(libs.retrofit)
+// Networking (pick one converter path; here kotlinx‑serialization)
     implementation(libs.okhttp)
-    implementation(libs.retrofit.converter.moshi)
-    implementation(libs.converter.kotlinx.serialization)
     implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
 
-    // Kotlin
+// Kotlin + utils
+    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.kotlinx.datetime)
-
-    // Dependency Injection
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.androidx.hilt.navigation)
-
-    // Utilities
     implementation(libs.timber)
-    implementation(libs.coil)
-    implementation(libs.com.google.gms.google.services.gradle.plugin)
+    implementation(libs.coil.compose)
     implementation(libs.lottie.compose)
-    implementation(libs.guava)
-    implementation(libs.xz)
-
-    // Xposed/Maven coordinates kept for compatibility
-    compileOnly(libs.xposed.api)
-    compileOnly(libs.yukihookapi)
-
-    // Testing
-    testImplementation(libs.junit)
-    testImplementation(libs.mockk)
 }
