@@ -7,7 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
 }
 android {
-    namespace = "dev.aurakai.auraframefx.collab-canvas.java"
+    namespace = "dev.aurakai.auraframefx.collabcanvas"
     compileSdk = libs.versions.compile.sdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.min.sdk.get().toInt()
