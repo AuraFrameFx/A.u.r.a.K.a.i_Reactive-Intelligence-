@@ -72,7 +72,7 @@ object GateConfigs {
         borderColor = Color(0xFF00FFFF), // Cyan
         glowColor = Color(0xFF00FFFF).copy(alpha = 0.6f),
         secondaryGlowColor = Color(0xFF0099FF).copy(alpha = 0.4f),
-        pixelArtUrl = "collab_canvas_studio.png", // Placeholder
+        pixelArtUrl = "gate_collab_canvas", // Drawable resource name
         description = "Access collaborative design environments. Share projects, iterate with team members, and create dynamic art together.",
         backgroundColor = Color(0xFF001520),
         route = "canvas"
@@ -145,32 +145,34 @@ object GateConfigs {
         borderColor = Color(0xFF00FF41), // Matrix Green
         glowColor = Color(0xFF00FF41).copy(alpha = 0.7f),
         secondaryGlowColor = Color(0xFF00FFFF).copy(alpha = 0.5f),
+        pixelArtUrl = "gate_secure_comm", // Drawable resource name
         description = "Enter Kai's domain. Hardware-backed encryption, secure messaging, and the shield that never sleeps.",
         backgroundColor = Color(0xFF001500),
         route = "secure_comm"
     )
 
-    // ProtoCore Gate - ROM Modification Lab
-    val protoCore = GateConfig(
-        moduleId = "proto-core",
-        title = "protocore",
+    // ROM Tools Gate - Retro Console Modification Lab
+    val romTools = GateConfig(
+        moduleId = "rom-tools",
+        title = "ROMTOOLS",
         titleStyle = GateTitleStyle(
             textStyle = TextStyle(
-                fontSize = 29.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.2.sp
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 3.sp
             ),
-            primaryColor = Color(0xFFFF4500), // Orange Red
-            secondaryColor = Color(0xFFFF6347), // Tomato
-            strokeColor = Color(0xFFFFD700), // Gold
-            glitchEffect = true,
+            primaryColor = Color(0xFFE60012), // Nintendo Red
+            secondaryColor = Color(0xFF6B5B95), // SNES Purple
+            strokeColor = Color(0xFF4A8C3F), // Game Boy Green
+            glitchEffect = false,
             pixelatedEffect = true
         ),
-        borderColor = Color(0xFFFF4500), // Orange Red
-        glowColor = Color(0xFFFF4500).copy(alpha = 0.7f),
-        secondaryGlowColor = Color(0xFFFF1493).copy(alpha = 0.5f),
-        description = "Advanced ROM tools. Flash, modify, and checkpoint your system with AI-powered safety nets.",
-        backgroundColor = Color(0xFF1A0000),
+        borderColor = Color(0xFFE60012), // Nintendo Red
+        glowColor = Color(0xFFE60012).copy(alpha = 0.8f),
+        secondaryGlowColor = Color(0xFF6B5B95).copy(alpha = 0.6f),
+        pixelArtUrl = "gate_romtools", // Drawable resource name
+        description = "Retro ROM modification lab. Cycle through NES, SNES, and Game Boy themes. Cartridge insertion animations and classic console UIs.",
+        backgroundColor = Color(0xFF0A0A0A),
         route = "rom_tools"
     )
 
@@ -193,6 +195,7 @@ object GateConfigs {
         borderColor = Color(0xFFFF00FF), // Magenta
         glowColor = Color(0xFFFF00FF).copy(alpha = 0.7f),
         secondaryGlowColor = Color(0xFF00FFFF).copy(alpha = 0.5f),
+        pixelArtUrl = "gate_chromacore", // Drawable resource name
         description = "Aura's color playground. Blend, mix, and create custom themes that respond to your mood.",
         backgroundColor = Color(0xFF1A001A),
         route = "chroma_core"
@@ -230,7 +233,7 @@ object GateConfigs {
         agentNexus,
         sphereGrid,
         secureComm,
-        protoCore,
+        romTools,
         chromaCore,
         fusionMode
     )
