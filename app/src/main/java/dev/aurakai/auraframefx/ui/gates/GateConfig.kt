@@ -150,27 +150,27 @@ object GateConfigs {
         route = "secure_comm"
     )
 
-    // ProtoCore Gate - ROM Modification Lab
-    val protoCore = GateConfig(
-        moduleId = "proto-core",
-        title = "protocore",
+    // ROM Tools Gate - Retro Console Modification Lab
+    val romTools = GateConfig(
+        moduleId = "rom-tools",
+        title = "ROMTOOLS",
         titleStyle = GateTitleStyle(
             textStyle = TextStyle(
-                fontSize = 29.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.2.sp
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 3.sp
             ),
-            primaryColor = Color(0xFFFF4500), // Orange Red
-            secondaryColor = Color(0xFFFF6347), // Tomato
-            strokeColor = Color(0xFFFFD700), // Gold
-            glitchEffect = true,
+            primaryColor = Color(0xFFE60012), // Nintendo Red
+            secondaryColor = Color(0xFF6B5B95), // SNES Purple
+            strokeColor = Color(0xFF4A8C3F), // Game Boy Green
+            glitchEffect = false,
             pixelatedEffect = true
         ),
-        borderColor = Color(0xFFFF4500), // Orange Red
-        glowColor = Color(0xFFFF4500).copy(alpha = 0.7f),
-        secondaryGlowColor = Color(0xFFFF1493).copy(alpha = 0.5f),
-        description = "Advanced ROM tools. Flash, modify, and checkpoint your system with AI-powered safety nets.",
-        backgroundColor = Color(0xFF1A0000),
+        borderColor = Color(0xFFE60012), // Nintendo Red
+        glowColor = Color(0xFFE60012).copy(alpha = 0.8f),
+        secondaryGlowColor = Color(0xFF6B5B95).copy(alpha = 0.6f),
+        description = "Retro ROM modification lab. Cycle through NES, SNES, and Game Boy themes. Cartridge insertion animations and classic console UIs.",
+        backgroundColor = Color(0xFF0A0A0A),
         route = "rom_tools"
     )
 
@@ -230,7 +230,7 @@ object GateConfigs {
         agentNexus,
         sphereGrid,
         secureComm,
-        protoCore,
+        romTools,
         chromaCore,
         fusionMode
     )

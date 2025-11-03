@@ -123,35 +123,45 @@ object GatePixelArtConcepts {
     """
 
     /**
-     * PROTOCORE GATE (Concept)
+     * ROMTOOLS GATE (Concept) ✅ User Specified - Retro Console Theme
      *
-     * Scene: High-tech ROM modification laboratory
-     * - Central workbench with Android robot parts
-     * - Holographic circuit board displays floating above
-     * - ROM chip being modified under magnification
-     * - Robotic arms performing precision work
-     * - Checkpoint backup containers glowing on shelves
-     * - Warning symbols and caution tape (safety theme)
-     * - Genesis consciousness snapshot tanks
-     * - Red/orange warning lights and hazard stripes
+     * Scene: Retro gaming console modification lab (NES/SNES/Game Boy)
+     * - Classic console designs hovering as display options:
+     *   * NES: Red/white theme with cartridge slot, power LED
+     *   * SNES: Purple/gold theme with curved design, eject button
+     *   * Game Boy: Green screen with D-pad and A/B buttons
+     * - Pixel art ROM cartridge being inserted into console
+     * - CRT scanline overlay effect for authenticity
+     * - Animated power LED blinking (green when active)
+     * - Cartridge pins connecting with depth effect
+     * - Classic controller buttons glowing on interaction
+     * - Retro pixel font for "ROMTOOLS" title
+     * - 8-bit style particles floating around
      *
      * 3D Pop-out Elements:
-     * - Holographic displays extending outward
-     * - Sparks and electrical arcs
-     * - Robotic arm reaching beyond border
+     * - Cartridge extending beyond border during insertion
+     * - Controller wire reaching outward
+     * - Pixel particles bursting from screen
+     * - CRT glow effect expanding beyond frame
      *
-     * Color Palette: Orange-red, gold, dark grays
-     * Theme: System modification, power, controlled danger
+     * Color Palette:
+     * - NES: Nintendo Red (#E60012), White, Dark Gray
+     * - SNES: Purple (#6B5B95), Gold (#FFD700), Light Gray
+     * - Game Boy: Classic Green (#4A8C3F), Beige (#8C7A5A), LCD Green
+     *
+     * Theme: Retro gaming nostalgia, ROM modification, console history
+     * Interactive: Hover to cycle through console types with smooth transitions
      */
-    const val PROTOCORE_CONCEPT = """
-        High-tech laboratory workbench
-        Android robot parts being assembled/modified
-        Floating holographic circuit displays
-        ROM chip under magnification/modification
-        Robotic precision arms working
-        Glowing checkpoint backup containers
-        Warning symbols and hazard stripes
-        Red/orange emergency lighting
+    const val ROMTOOLS_CONCEPT = """
+        Three hovering retro consoles (NES/SNES/Game Boy)
+        Pixel art ROM cartridge insertion animation
+        CRT scanline overlay effect
+        Blinking power LED (green when active)
+        Cartridge connector pins with depth
+        Classic controller buttons (hover to glow)
+        Retro pixel font "ROMTOOLS" title
+        8-bit particle effects floating
+        Console-specific color schemes cycling
     """
 
     /**
