@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlin.math.sin
 import kotlin.math.cos
+import kotlin.math.max
 
 /**
  * Gate card with hologram border, pixel art interior, and double-tap to enter
@@ -149,7 +150,7 @@ fun GateCard(
             Text(
                 text = "⚡ DOUBLE TAP TO ENTER ⚡",
                 style = config.titleStyle.textStyle.copy(fontSize = 10.sp),
-                color = config.borderColor.copy(alpha = pulseAlpha * 0.6f),
+                color = config.borderColor.copy(alpha = max(pulseAlpha * 0.6f, 0.3f)),
                 textAlign = TextAlign.Center
             )
         }
