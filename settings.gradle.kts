@@ -1,3 +1,5 @@
+// settings.gradle.kts
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -6,18 +8,45 @@ pluginManagement {
     }
 }
 
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        maven("https://jitpack.io")       // YukiHookAPI
-        maven("https://api.xposed.info/") // LSPosed (if needed)
+        maven {
+            url = uri("https://jitpack.io")
+            metadataSources {
+                artifact()
+                mavenPom()
+            }
+        }
+        maven {
+            url = uri("https://dl.google.com/dl/android/maven2/")
+            metadataSources {
+                artifact()
+                mavenPom()
+                }
+            }
+
+        // Dynamically add every module's libs/ directory as a file-based maven repository
+        // This discovers local jars placed in module/libs (including nested modules) and registers them so artifacts like
+        // de.robv.android.xposed:api and local JARs can be resolved.
+        val libsDirs = rootDir.walkTopDown().filter { it.isDirectory && java.io.File(it, "libs").exists() }.map { java.io.File(it, "libs") }.toSet()
+        libsDirs.forEach { libsDir ->
+            maven {
+                url = uri(libsDir.toURI())
+                metadataSources { artifact() }
+            }
+        }
+
+        // Also include the root libs folder if present (already covered above but keep for clarity)
+        val rootLibs = java.io.File(rootDir, "libs")
+        if (rootLibs.exists()) {
+            maven { url = uri(rootLibs.toURI()); metadataSources { artifact() } }
+        }
     }
 }
+
 
     rootProject.name = "Aurakai"
 // --- Application ---
@@ -46,6 +75,6 @@ dependencyResolutionManagement {
     include(":extendsysd")
     include(":extendsyse")
     include(":extendsysf")
-}
+
 
 // Note: Do NOT include ':build-logic' here. It is handled by includeBuild.

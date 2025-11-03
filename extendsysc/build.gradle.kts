@@ -25,7 +25,6 @@ dependencies {
     ksp(libs.hilt.compiler)
 
 // Compile-only for Xposed API (no runtime bundling)
-    compileOnly(libs.xposed.api)
 }
 
 

@@ -83,7 +83,7 @@
 
         <!-- Main Activity -->
         <activity
-            android:name="dev.aurakai.auraframefx.aura.ui.MainActivity"
+            android:name="dev.aurakai.auraframefx.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

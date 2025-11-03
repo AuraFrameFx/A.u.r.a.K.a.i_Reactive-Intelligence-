@@ -11,19 +11,27 @@ android {
     compileSdk = 36
 }
 dependencies {
+    // Include local libs directory for compileOnly dependencies
+    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    compileOnly(files("oracle-drive-integration/libs/api-82.jar"))
+    compileOnly(files("oracle-drive-integration/libs/api-82-sources.jar"))
+    
+    // Libsu for root operations
+    implementation(libs.libsu.core)
+    implementation(libs.libsu.io)
+    implementation(libs.libsu.service)
     api(libs.androidx.core.ktx) // if APIs leak types
     implementation(libs.androidx.appcompat)
     implementation(libs.timber)
 
-// If this library uses Compose UI:
+    // If this library uses Compose UI:
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
 
-// Hilt in library
+    // Hilt in library
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-// Compile-only for Xposed API (no runtime bundling)
-    compileOnly(libs.xposed.api)
+    // Xposed API and other compile-only dependencies
 }

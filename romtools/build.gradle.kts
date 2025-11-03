@@ -11,19 +11,32 @@ android {
     compileSdk = 36
 }
 dependencies {
-    api(libs.androidx.core.ktx) // if APIs leak types
+    // Include local JARs for Xposed API
+    compileOnly(files("romtools/libs/api-82.jar"))
+    compileOnly(files("romtools/libs/api-82-sources.jar"))
+    
+    // Libsu for root operations
+    implementation(libs.libsu.core)
+    implementation(libs.libsu.io)
+    implementation(libs.libsu.service)
+
+    // Core AndroidX dependencies
+    api(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.timber)
 
-// If this library uses Compose UI:
+    // Compose UI
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
+    implementation(libs.compose.ui.tooling.preview)
+    debugImplementation(libs.compose.ui.tooling)
 
-// Hilt in library
+    // Hilt for dependency injection
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-// Compile-only for Xposed API (no runtime bundling)
-    compileOnly(libs.xposed.api)
+    // Kotlin coroutines
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
 }

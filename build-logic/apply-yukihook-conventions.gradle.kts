@@ -60,12 +60,16 @@ subprojects { subproject ->
                 // Xposed Framework - YukiHookAPI (Standardized)
                 implementation(libs.bundles.xposed)
 
-                // Legacy Xposed API (compatibility)
-                implementation(files("${project.rootDir}/Libs/api-82.jar"))
-                implementation(files("${project.rootDir}/Libs/api-82-sources.jar"))
+                // Legacy Xposed API (compile only)
+                compileOnly(files("libs/api-82.jar"))
+                compileOnly(files("libs/api-82-sources.jar"))
 
                 // Core Android dependencies
                 implementation(libs.bundles.androidx.core)
+
+                // Kotlin coroutines
+                implementation(libs.kotlinx.coroutines.android)
+                implementation(libs.kotlinx.coroutines.core)
 
                 // Testing
                 testImplementation(libs.junit)
