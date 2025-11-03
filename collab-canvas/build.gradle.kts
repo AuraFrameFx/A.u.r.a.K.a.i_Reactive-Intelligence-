@@ -18,8 +18,8 @@ android {
 }
 dependencies {
     // Include local JARs for Xposed API
-    compileOnly(files("collab-canvas/libs/api-82.jar"))
-    compileOnly(files("collab-canvas/libs/api-82-sources.jar"))
+    compileOnly(files("libs/api-82.jar"))
+    compileOnly(files("libs/api-82-sources.jar"))
     
     // Libsu for root operations
     implementation(libs.libsu.core)

@@ -30,6 +30,9 @@ sealed class NavDestination(val route: String, val title: String, val icon: Imag
     // Gate Navigation - Module Selection Hub
     object Gates : NavDestination("gates", "Gates", null)
 
+    // Journal PDA - Retro Gaming Wellness Hub
+    object JournalPDA : NavDestination("journal_pda", "Journal", null)
+
     companion object {
         val bottomNavItems = listOf(Home, AgentNexus, AiChat, Canvas, Settings)
         val gamificationScreens = listOf(AgentNexus, SphereGrid, FusionMode, Consciousness, Evolution)

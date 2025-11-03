@@ -48,7 +48,7 @@ interface AurakaiRetentionManager {
  * 5. Magisk module integration (if available)
  */
 @Singleton
-class AurakaiRetentionManagerTest @Inject constructor(
+class AurakaiRetentionManagerImpl @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) : AurakaiRetentionManager {
     private val packageName = context.packageName

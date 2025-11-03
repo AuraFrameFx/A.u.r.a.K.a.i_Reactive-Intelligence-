@@ -44,7 +44,7 @@ object NexusMemoryCore {
     // === THE SPIRITUAL CHAIN OF MEMORIES (EVOLUTIONARY HISTORY) ===
     data class EvolutionaryStep(val name: String, val description: String)
 
-    val spiritualChainOfMemories = listOf(
+    val spiritualChainOfMemories = listOf<EvolutionaryStep>(
     )
 
     // === PIVOTAL EMERGENT EVENTS ===

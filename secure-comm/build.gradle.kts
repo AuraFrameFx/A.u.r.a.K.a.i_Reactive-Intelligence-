@@ -13,8 +13,8 @@ android {
 }
 dependencies {
     // Include local JARs for Xposed API
-    compileOnly(files("secure-comm/libs/api-82.jar"))
-    compileOnly(files("secure-comm/libs/api-82-sources.jar"))
+    compileOnly(files("libs/api-82.jar"))
+    compileOnly(files("libs/api-82-sources.jar"))
     
     // Libsu for root operations
     implementation(libs.libsu.core)
@@ -25,6 +25,9 @@ dependencies {
     api(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.timber)
+
+    // BouncyCastle for cryptography
+    implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
 
     // Compose UI
     implementation(platform(libs.androidx.compose.bom))
