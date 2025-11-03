@@ -8,6 +8,7 @@ import collabcanvas.ui.CanvasScreen
 import dev.aurakai.auraframefx.ui.gates.GateNavigationScreen
 import dev.aurakai.auraframefx.ui.screens.AiChatScreen
 import dev.aurakai.auraframefx.ui.screens.HomeScreen
+import dev.aurakai.auraframefx.ui.screens.JournalPDAScreen
 import dev.aurakai.auraframefx.ui.screens.ProfileScreen
 import dev.aurakai.auraframefx.ui.screens.SettingsScreen
 
@@ -105,6 +106,13 @@ fun AppNavGraph(navController: NavHostController) {
             route = NavDestination.Gates.route
         ) {
             GateNavigationScreen(navController = navController)
+        }
+
+        // Journal PDA - Retro Gaming Wellness Hub
+        composable(
+            route = NavDestination.JournalPDA.route
+        ) {
+            JournalPDAScreen(navController = navController)
         }
 
         // Add AI Content navigation
