@@ -277,7 +277,7 @@ class GenesisCheckpointManager @Inject constructor(
     private fun snapshotAurakaiApp(primaryDir: File, secondaryDir: File) {
         // Get Aurakai APK path
         val packageInfo = context.packageManager.getPackageInfo(packageName, 0)
-        val apkPath = packageInfo.applicationInfo.sourceDir
+        val apkPath = packageInfo.applicationInfo?.sourceDir ?: return
         val dataDir = context.dataDir
 
         // Copy APK to both locations
@@ -371,7 +371,7 @@ class GenesisCheckpointManager @Inject constructor(
             executeRootCommand("tar -xzf ${dataTar.absolutePath} -C ${dataDir.parent}")
 
             // Fix permissions
-            val uid = context.applicationInfo.uid
+            val uid = context.applicationInfo?.uid ?: return
             executeRootCommand("chown -R $uid:$uid ${dataDir.absolutePath}")
             executeRootCommand("restorecon -R ${dataDir.absolutePath}")
         }

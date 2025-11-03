@@ -12,9 +12,9 @@ android {
 }
 dependencies {
     // Include local JARs for Xposed API
-    compileOnly(files("romtools/libs/api-82.jar"))
-    compileOnly(files("romtools/libs/api-82-sources.jar"))
-    
+    compileOnly(files("$projectDir/libs/api-82.jar"))
+    compileOnly(files("$projectDir/libs/api-82-sources.jar"))
+
     // Libsu for root operations
     implementation(libs.libsu.core)
     implementation(libs.libsu.io)
@@ -25,15 +25,22 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.timber)
 
+    // Kotlin Serialization
+    implementation(libs.kotlinx.serialization.json)
+
     // Compose UI
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons.extended)  // For extended Material Icons
     implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)  // For ViewModel in Compose
+    implementation(libs.androidx.lifecycle.runtime.compose)  // For collectAsStateWithLifecycle
     debugImplementation(libs.compose.ui.tooling)
 
     // Hilt for dependency injection
     implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)  // For hiltViewModel()
     ksp(libs.hilt.compiler)
 
     // Kotlin coroutines
