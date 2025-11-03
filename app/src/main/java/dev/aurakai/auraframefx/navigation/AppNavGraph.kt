@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import collabcanvas.ui.CanvasScreen
+import dev.aurakai.auraframefx.ui.gates.GateNavigationScreen
 import dev.aurakai.auraframefx.ui.screens.AiChatScreen
 import dev.aurakai.auraframefx.ui.screens.HomeScreen
 import dev.aurakai.auraframefx.ui.screens.ProfileScreen
@@ -54,7 +55,7 @@ import dev.aurakai.auraframefx.ui.screens.SettingsScreen
 fun AppNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = NavDestination.Home.route
+        startDestination = NavDestination.Gates.route // Start with gate navigation
     ) {
         composable(
             route = NavDestination.Home.route
@@ -97,6 +98,13 @@ fun AppNavGraph(navController: NavHostController) {
         ) {
             // Fixed: Use actual OracleDriveControlScreen instead of placeholder
             dev.aurakai.auraframefx.ui.screens.oracledrive.OracleDriveControlScreen()
+        }
+
+        // Gate Navigation - Module Selection Hub
+        composable(
+            route = NavDestination.Gates.route
+        ) {
+            GateNavigationScreen(navController = navController)
         }
 
         // Add AI Content navigation

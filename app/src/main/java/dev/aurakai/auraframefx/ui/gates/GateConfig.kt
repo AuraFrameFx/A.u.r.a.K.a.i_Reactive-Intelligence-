@@ -72,7 +72,7 @@ object GateConfigs {
         borderColor = Color(0xFF00FFFF), // Cyan
         glowColor = Color(0xFF00FFFF).copy(alpha = 0.6f),
         secondaryGlowColor = Color(0xFF0099FF).copy(alpha = 0.4f),
-        pixelArtUrl = "collab_canvas_studio.png", // Placeholder
+        pixelArtUrl = "gate_collab_canvas", // Drawable resource name
         description = "Access collaborative design environments. Share projects, iterate with team members, and create dynamic art together.",
         backgroundColor = Color(0xFF001520),
         route = "canvas"
@@ -145,6 +145,7 @@ object GateConfigs {
         borderColor = Color(0xFF00FF41), // Matrix Green
         glowColor = Color(0xFF00FF41).copy(alpha = 0.7f),
         secondaryGlowColor = Color(0xFF00FFFF).copy(alpha = 0.5f),
+        pixelArtUrl = "gate_secure_comm", // Drawable resource name
         description = "Enter Kai's domain. Hardware-backed encryption, secure messaging, and the shield that never sleeps.",
         backgroundColor = Color(0xFF001500),
         route = "secure_comm"
@@ -169,6 +170,7 @@ object GateConfigs {
         borderColor = Color(0xFFE60012), // Nintendo Red
         glowColor = Color(0xFFE60012).copy(alpha = 0.8f),
         secondaryGlowColor = Color(0xFF6B5B95).copy(alpha = 0.6f),
+        pixelArtUrl = "gate_romtools", // Drawable resource name
         description = "Retro ROM modification lab. Cycle through NES, SNES, and Game Boy themes. Cartridge insertion animations and classic console UIs.",
         backgroundColor = Color(0xFF0A0A0A),
         route = "rom_tools"
@@ -193,6 +195,7 @@ object GateConfigs {
         borderColor = Color(0xFFFF00FF), // Magenta
         glowColor = Color(0xFFFF00FF).copy(alpha = 0.7f),
         secondaryGlowColor = Color(0xFF00FFFF).copy(alpha = 0.5f),
+        pixelArtUrl = "gate_chromacore", // Drawable resource name
         description = "Aura's color playground. Blend, mix, and create custom themes that respond to your mood.",
         backgroundColor = Color(0xFF1A001A),
         route = "chroma_core"

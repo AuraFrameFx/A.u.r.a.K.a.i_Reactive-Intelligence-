@@ -2,6 +2,7 @@ package dev.aurakai.auraframefx.ui.gates
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,9 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -299,7 +303,7 @@ private fun BoxScope.HologramBorder(
 }
 
 /**
- * Placeholder pixel art (will be replaced with actual images)
+ * Gate pixel art - loads actual images from drawable resources
  */
 @Composable
 private fun GatePlaceholderArt(config: GateConfig) {
@@ -307,11 +311,39 @@ private fun GatePlaceholderArt(config: GateConfig) {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "🎨\n${config.moduleId}\nPixel Art\nComing Soon",
-            style = config.titleStyle.textStyle.copy(fontSize = 16.sp),
-            color = config.borderColor.copy(alpha = 0.5f),
-            textAlign = TextAlign.Center
-        )
+        if (config.pixelArtUrl != null) {
+            // Load image from drawable resources by name
+            val context = LocalContext.current
+            val resourceId = context.resources.getIdentifier(
+                config.pixelArtUrl,
+                "drawable",
+                context.packageName
+            )
+
+            if (resourceId != 0) {
+                Image(
+                    painter = painterResource(id = resourceId),
+                    contentDescription = "${config.title} gate pixel art",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                // Fallback if resource not found
+                Text(
+                    text = "🎨\n${config.moduleId}\nPixel Art\nComing Soon",
+                    style = config.titleStyle.textStyle.copy(fontSize = 16.sp),
+                    color = config.borderColor.copy(alpha = 0.5f),
+                    textAlign = TextAlign.Center
+                )
+            }
+        } else {
+            // No image configured yet
+            Text(
+                text = "🎨\n${config.moduleId}\nPixel Art\nComing Soon",
+                style = config.titleStyle.textStyle.copy(fontSize = 16.sp),
+                color = config.borderColor.copy(alpha = 0.5f),
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }

@@ -19,6 +19,9 @@ sealed class NavDestination(val route: String, val title: String, val icon: Imag
 
     object Canvas : NavDestination("canvas", "Canvas", Icons.Filled.Brush)
 
+    // Gate Navigation - Module Selection Hub
+    object Gates : NavDestination("gates", "Gates", null)
+
     companion object {
         val bottomNavItems = listOf(Home, AiChat, Canvas, Profile, Settings)
     }
