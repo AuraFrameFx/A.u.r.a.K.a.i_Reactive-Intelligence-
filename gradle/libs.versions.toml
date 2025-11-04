@@ -194,7 +194,7 @@ leakcanary-android = { group = "com.squareup.leakcanary", name = "leakcanary-and
 lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
-# Root/System
+# System & Root
 libsu-core = { group = "com.github.topjohnwu.libsu", name = "core", version.ref = "libsu" }
 libsu-io = { group = "com.github.topjohnwu.libsu", name = "io", version.ref = "libsu" }
 libsu-service = { group = "com.github.topjohnwu.libsu", name = "service", version.ref = "libsu" }
