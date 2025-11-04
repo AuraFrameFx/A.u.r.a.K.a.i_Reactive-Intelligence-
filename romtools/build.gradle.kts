@@ -41,7 +41,7 @@ dependencies {
     // Hilt for dependency injection
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)  // For hiltViewModel()
-    ksp(libs.hilt.compiler)
+    ksp(libs.hilt.compiler) 1
 
     // Kotlin coroutines
     implementation(libs.kotlinx.coroutines.android)
