@@ -11,11 +11,10 @@ android {
     compileSdk = 36
 }
 dependencies {
-    // Include local libs directory for compileOnly dependencies
-    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    compileOnly(files("oracle-drive-integration/libs/api-82.jar"))
-    compileOnly(files("oracle-drive-integration/libs/api-82-sources.jar"))
-    
+    // Include local libs directory for compileOnly dependencies (module-local)
+    compileOnly(files("$projectDir/libs/api-82.jar"))
+    compileOnly(files("$projectDir/libs/api-82-sources.jar"))
+
     // Libsu for root operations
     implementation(libs.libsu.core)
     implementation(libs.libsu.io)

@@ -25,7 +25,8 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
-
+    compileOnly(files("$projectDir/libs/api-82.jar"))
+    compileOnly(files("$projectDir/libs/api-82-sources.jar"))
 // Hilt in library
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

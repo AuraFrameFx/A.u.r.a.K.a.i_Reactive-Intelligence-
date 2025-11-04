@@ -34,6 +34,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     ksp(libs.androidx.room.compiler)
 

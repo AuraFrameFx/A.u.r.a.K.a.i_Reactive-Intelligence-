@@ -1,5 +1,3 @@
-import com.android.aaptcompiler.parseLayoutDirection
-
 plugins {
     id("com.android.application")
     id("com.google.dagger.hilt.android")
@@ -79,9 +77,8 @@ dependencies {
     implementation(libs.libsu.io)
     implementation(libs.libsu.service)
 
-    // Xposed Framework API (compile only from local JARs)
-    compileOnly(files("app/libs/api-82.jar"))
-    compileOnly(files("app/libs/api-82-sources.jar"))
+    compileOnly(files("$projectDir/libs/api-82.jar"))
+    compileOnly(files("$projectDir/libs/api-82-sources.jar"))
 // Networking (pick one converter path; here kotlinx‑serialization)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
@@ -96,4 +93,29 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
     implementation(libs.lottie.compose)
+
+    // Add Moshi & Retrofit Moshi converter (required by NetworkModule)
+    implementation("com.squareup.moshi:moshi:1.15.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+    ksp("com.squareup.moshi:moshi-kotlin-codegen:1.15.0")
+
+    // Hilt Work integration (provides HiltWorkerFactory)
+    implementation("androidx.hilt:hilt-work:1.0.0")
+
+// Internal project modules - ensure app has access to shared code and generated types
+    implementation(project(":core-module"))
+    implementation(project(":core:common"))
+    implementation(project(":core:domain"))
+    implementation(project(":core:data"))
+    implementation(project(":core:ui"))
+    implementation(project(":feature-module"))
+    implementation(project(":secure-comm"))
+    implementation(project(":romtools"))
+    implementation(project(":colorblendr"))
+    implementation(project(":list"))
+    implementation(project(":oracle-drive-integration"))
+    implementation(project(":collab-canvas"))
+    implementation(project(":datavein-oracle-native"))
+
 }

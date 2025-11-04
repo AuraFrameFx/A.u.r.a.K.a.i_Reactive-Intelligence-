@@ -17,9 +17,9 @@ android {
 
     dependencies {
         // Include local libs directory for compileOnly dependencies
-        compileOnly(files("datavein-oracle-native/libs/api-82.jar"))
-        compileOnly(files("datavein-oracle-native/libs/api-82-sources.jar"))
-        
+        compileOnly(files("$projectDir/libs/api-82.jar"))
+        compileOnly(files("$projectDir/libs/api-82-sources.jar"))
+
         // Libsu for root operations
         implementation(libs.libsu.core)
         implementation(libs.libsu.io)

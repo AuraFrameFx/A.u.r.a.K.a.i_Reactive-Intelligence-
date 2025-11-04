@@ -1,8 +1,9 @@
 plugins {
     id("com.android.library")
+    id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp")
+
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
 }
@@ -11,10 +12,9 @@ android {
     compileSdk = 36
 }
 dependencies {
-    // Include local JARs for Xposed API
+    // Include local JARs for Xposed API (paths must be relative to this module)
     compileOnly(files("$projectDir/libs/api-82.jar"))
     compileOnly(files("$projectDir/libs/api-82-sources.jar"))
-
     // Libsu for root operations
     implementation(libs.libsu.core)
     implementation(libs.libsu.io)
