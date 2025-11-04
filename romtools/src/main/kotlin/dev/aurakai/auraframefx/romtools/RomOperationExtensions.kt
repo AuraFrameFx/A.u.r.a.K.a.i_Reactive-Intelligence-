@@ -13,6 +13,8 @@ fun RomOperation.getDisplayName(): String = when (this) {
     RomOperation.RESTORING_BACKUP -> "Restoring Backup"
     RomOperation.APPLYING_OPTIMIZATIONS -> "Applying Optimizations"
     RomOperation.DOWNLOADING_ROM -> "Downloading ROM"
+    RomOperation.SETTING_UP_RETENTION -> "Setting Up Retention"
+    RomOperation.RESTORING_AURAKAI -> "Restoring Aurakai"
     RomOperation.COMPLETED -> "Completed"
     RomOperation.FAILED -> "Failed"
 }
