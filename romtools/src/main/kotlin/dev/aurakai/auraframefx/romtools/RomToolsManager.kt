@@ -425,7 +425,10 @@ val version: String,
 val androidVersion: String,
 val downloadUrl: String,
 val size: Long,
-val checksum: String
+val checksum: String,
+val description: String = "",
+val maintainer: String = "",
+val releaseDate: Long = 0L
 )
 
 data class DownloadProgress(

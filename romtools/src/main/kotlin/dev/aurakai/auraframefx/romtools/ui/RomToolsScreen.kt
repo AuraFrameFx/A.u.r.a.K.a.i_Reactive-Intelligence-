@@ -8,13 +8,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.align
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -46,7 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.aurakai.auraframefx.romtools.BackupInfo
@@ -70,14 +67,7 @@ fun RomToolsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                colors = listOf(
-                    Color(0xFF0A0A0A),
-                    Color(0xFF1A1A1A),
-                    Color(0xFF0A0A0A)
-                )
-            )
-    )
+            .background(Color(0xFF0A0A0A))
     ) {
         // Top App Bar
         TopAppBar(
@@ -162,46 +152,56 @@ private fun MainContent(
         }
 
         // ROM Tools Action Cards
-        RomToolActionCard(
-            action = action,
-            isEnabled = action.isEnabled(romToolsState.capabilities),
-            onClick = {
+        getRomToolsActions().forEach { action ->
+            item {
+                RomToolActionCard(
+                    action = action,
+                    isEnabled = action.isEnabled(romToolsState.capabilities),
+                    onClick = {
+                        // TODO: Handle ROM tool action click
+                    }
+                )
             }
-        )
-    }
-
-    // Available ROMs Section
-    if (romToolsState.availableRoms.isNotEmpty()) {
-        item {
-            Text(
-                text = "Available ROMs",
-                color = Color(0xFFFF6B35),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
         }
 
-        AvailableRomCard(rom = rom)
-    }
-}
+        // Available ROMs Section
+        if (romToolsState.availableRoms.isNotEmpty()) {
+            item {
+                Text(
+                    text = "Available ROMs",
+                    color = Color(0xFFFF6B35),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
 
-// Backups Section
-if (romToolsState.backups.isNotEmpty()) {
-    item {
-        Text(
-            text = "Backups",
-            color = Color(0xFFFF6B35),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-    }
+            romToolsState.availableRoms.forEach { rom ->
+                item {
+                    AvailableRomCard(rom = rom)
+                }
+            }
+        }
 
-    BackupCard(backup = backup)
-}
-}
-}
+        // Backups Section
+        if (romToolsState.backups.isNotEmpty()) {
+            item {
+                Text(
+                    text = "Backups",
+                    color = Color(0xFFFF6B35),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+
+            romToolsState.backups.forEach { backup ->
+                item {
+                    BackupCard(backup = backup)
+                }
+            }
+        }
+    }
 }
 
 @Preview
@@ -409,6 +409,7 @@ private fun OperationProgressCard(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
+                text = operation.operation.getDisplayName(),
                 color = Color(0xFFFF6B35),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
@@ -416,6 +417,7 @@ private fun OperationProgressCard(
 
             // LinearProgressIndicator expects a Float for progress (not a lambda)
             LinearProgressIndicator(
+                progress = { operation.progress / 100f },
                 modifier = Modifier.fillMaxWidth(),
                 color = Color(0xFFFF6B35),
                 trackColor = Color(0xFF444444)
@@ -629,6 +631,8 @@ fun dev.aurakai.auraframefx.romtools.RomOperation.getDisplayName(): String {
         dev.aurakai.auraframefx.romtools.RomOperation.RESTORING_BACKUP -> "Restoring Backup"
         dev.aurakai.auraframefx.romtools.RomOperation.APPLYING_OPTIMIZATIONS -> "Applying Optimizations"
         dev.aurakai.auraframefx.romtools.RomOperation.DOWNLOADING_ROM -> "Downloading ROM"
+        dev.aurakai.auraframefx.romtools.RomOperation.SETTING_UP_RETENTION -> "Setting Up Retention"
+        dev.aurakai.auraframefx.romtools.RomOperation.RESTORING_AURAKAI -> "Restoring Aurakai"
         dev.aurakai.auraframefx.romtools.RomOperation.COMPLETED -> "Completed"
         dev.aurakai.auraframefx.romtools.RomOperation.FAILED -> "Failed"
     }
