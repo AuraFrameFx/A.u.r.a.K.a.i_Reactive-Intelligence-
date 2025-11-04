@@ -15,6 +15,11 @@ android {
             compose = true
         }
     }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_24
+        targetCompatibility = JavaVersion.VERSION_24
+    }
 }
 dependencies {
     // Include local JARs for Xposed API

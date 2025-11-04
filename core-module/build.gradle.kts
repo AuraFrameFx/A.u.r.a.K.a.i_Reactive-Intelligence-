@@ -16,6 +16,12 @@ android {
             compose = true
         }
     }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_24
+        targetCompatibility = JavaVersion.VERSION_24
+    }
+
     dependencies {
         api(libs.androidx.core.ktx) // if APIs leak types
         implementation(libs.androidx.appcompat)

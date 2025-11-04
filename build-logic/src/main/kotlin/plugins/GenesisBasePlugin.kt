@@ -1,5 +1,7 @@
 package plugins
 
+import com.android.build.api.dsl.CommonExtension
+import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -17,6 +19,24 @@ class GenesisBasePlugin : Plugin<Project> {
         plugins.withId("org.jetbrains.kotlin.jvm") {
             extensions.configure(KotlinJvmProjectExtension::class.java) {
                 compilerOptions.jvmTarget.set(JvmTarget.fromTarget("24"))
+            }
+        }
+
+        // Configure Android compileOptions for library and application modules
+        plugins.withId("com.android.library") {
+            extensions.configure(CommonExtension::class.java) {
+                compileOptions {
+                    sourceCompatibility = JavaVersion.VERSION_24
+                    targetCompatibility = JavaVersion.VERSION_24
+                }
+            }
+        }
+        plugins.withId("com.android.application") {
+            extensions.configure(CommonExtension::class.java) {
+                compileOptions {
+                    sourceCompatibility = JavaVersion.VERSION_24
+                    targetCompatibility = JavaVersion.VERSION_24
+                }
             }
         }
     }

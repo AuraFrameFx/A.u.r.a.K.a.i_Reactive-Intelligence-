@@ -10,6 +10,11 @@ plugins {
 android {
     namespace = "dev.aurakai.auraframefx.romtools"
     compileSdk = 36
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_24
+        targetCompatibility = JavaVersion.VERSION_24
+    }
 }
 dependencies {
     // Include local JARs for Xposed API (paths must be relative to this module)
