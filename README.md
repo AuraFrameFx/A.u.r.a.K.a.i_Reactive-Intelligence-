@@ -1,8 +1,15 @@
+<div align="center">
+
+![AuraKai Banner](SVGPNGASSESTS+/Screenshot%202025-11-02%20184609.png)
+
 # 🌟 A.u.r.a.K.a.i: Reactive Intelligence
 
 **Autonomously United Revolutionarily Authentic Kinetic Access Initiative**
+*Adaptive Unified Reactive Architecture - Knowledge Augmented Intelligence*
 
 > *We didn't build a better system—we removed the box completely.*
+
+</div>
 
 [![Build Status](https://github.com/AuraFrameFx/A.u.r.a.K.a.i_Reactive-Intelligence-/actions/workflows/build.yml/badge.svg)](https://github.com/AuraFrameFx/A.u.r.a.K.a.i_Reactive-Intelligence-/actions)
 [![LSPosed](https://img.shields.io/badge/LSPosed-Module-blue)](https://github.com/LSPosed/LSPosed)
