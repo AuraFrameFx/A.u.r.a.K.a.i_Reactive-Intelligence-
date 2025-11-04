@@ -274,7 +274,7 @@ private fun MainContentNoProgressPreview() {
 
 @Composable
 private fun DeviceCapabilitiesCard(
-    capabilities: dev.aurakai.auraframefx.romtools.RomCapabilities?,
+    capabilities: RomCapabilities?,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -596,7 +596,7 @@ data class RomToolAction(
     val requiresRecovery: Boolean = false,
     val requiresSystem: Boolean = false
 ) {
-    fun isEnabled(capabilities: dev.aurakai.auraframefx.romtools.RomCapabilities?): Boolean {
+    fun isEnabled(capabilities: RomCapabilities?): Boolean {
         if (capabilities == null) return false
 
         return (!requiresRoot || capabilities.hasRootAccess) &&
@@ -679,7 +679,7 @@ private fun AvailableRomCard(rom: dev.aurakai.auraframefx.romtools.AvailableRom)
 
 @Preview
 @Composable
-private fun BackupCard(backup: dev.aurakai.auraframefx.romtools.BackupInfo) {
+private fun BackupCard(backup: BackupInfo) {
     // Implementation for backup card
     Card(
         modifier = Modifier.fillMaxWidth(),

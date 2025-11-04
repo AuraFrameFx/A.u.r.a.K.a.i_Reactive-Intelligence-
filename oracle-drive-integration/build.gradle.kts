@@ -1,8 +1,7 @@
 plugins {
-    id("com.android.library")
-    id("com.google.dagger.hilt.android")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp")
+    id("com.android.library") version "9.0.0-alpha13"
+    id("com.google.dagger.hilt.android") version "2.57.2"
+    id("com.google.devtools.ksp") version "2.3.0"
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
 }
@@ -13,7 +12,8 @@ android {
 dependencies {
     // Include local libs directory for compileOnly dependencies (module-local)
     compileOnly(files("$projectDir/libs/api-82.jar"))
-    compileOnly(files("$projectDir/libs/api-82-sources.jar"))
+    ksp("com.github.LSPosed.YukiHookAPI:yuApiClient:1.3.1")
+
 
     // Libsu for root operations
     implementation(libs.libsu.core)

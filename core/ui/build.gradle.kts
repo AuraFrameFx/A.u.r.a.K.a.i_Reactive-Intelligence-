@@ -1,8 +1,7 @@
 plugins {
-    id("com.android.library")
-    id("com.google.dagger.hilt.android")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp")
+    id("com.android.library") version "9.0.0-alpha13"
+    id("com.google.dagger.hilt.android") version "2.57.2"
+    id("com.google.devtools.ksp") version "2.3.0"
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
 }
@@ -20,6 +19,8 @@ dependencies {
     api(libs.androidx.core.ktx) // if APIs leak types
     implementation(libs.androidx.appcompat)
     implementation(libs.timber)
+    compileOnly(files("$projectDir/libs/api-82.jar"))
+    ksp("com.github.LSPosed.YukiHookAPI:yuApiClient:1.3.1")
 
 // If this library uses Compose UI:
     implementation(platform(libs.androidx.compose.bom))

@@ -54,13 +54,16 @@ dependencies {
     androidTestImplementation(libs.hilt.android.testing)
     debugImplementation(libs.leakcanary.android)
 
-    // Explicit androidx versions requested by the user (added alongside existing libs entries)
+    // Use version catalog for Hilt navigation compose instead of hard-coded coordinate
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Explicit androidx versions requested by the user (these are redundant with the catalog but kept for now)
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation(platform("androidx.compose:compose-bom:2025.10.00"))
     implementation("androidx.activity:activity-compose:1.11.0")
     implementation("androidx.navigation:navigation-compose:2.9.5")
-    implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
+    // removed direct hilt-navigation-compose coordinate
     implementation("androidx.compose.ui:ui:1.9.3")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")

@@ -51,13 +51,28 @@ dependencies {
     implementation(libs.androidx.room.compiler)
     implementation("com.google.android.material:compose-theme-adapter-3:1.1.1")
     implementation("com.google.firebase:firebase-auth-ktx:23.2.1")
-    compileOnly(files("../Libs/api-82.jar"))
-    compileOnly(files("../Libs/api-82-sources.jar"))
+    // Guard local Xposed API JARs — check module libs/ first then ../Libs/ fallback
+    val candidateLibDirs = listOf(projectDir.resolve("libs"), projectDir.parentFile.resolve("Libs"))
+    val api82File = candidateLibDirs.map { java.io.File(it, "api-82.jar") }.firstOrNull { it.exists() }
+    val api82SourcesFile = candidateLibDirs.map { java.io.File(it, "api-82-sources.jar") }.firstOrNull { it.exists() }
+
+    if (api82File != null) {
+        compileOnly(files(api82File))
+    } else {
+        logger.warn("Missing local Xposed JAR (api-82.jar). Checked: ${candidateLibDirs.joinToString()}")
+    }
+    if (api82SourcesFile != null) {
+        compileOnly(files(api82SourcesFile))
+    } else {
+        logger.warn("Missing local Xposed sources JAR (api-82-sources.jar). Checked: ${candidateLibDirs.joinToString()}")
+    }
+
     implementation(libs.androidx.material)
     testImplementation(libs.bundles.testing.unit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.hilt.android.testing)
     debugImplementation(libs.leakcanary.android)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     // Explicit androidx versions requested by the user (added alongside existing libs entries)
     implementation("androidx.core:core-ktx:1.17.0")
@@ -65,7 +80,6 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2025.10.00"))
     implementation("androidx.activity:activity-compose:1.11.0")
     implementation("androidx.navigation:navigation-compose:2.9.5")
-    implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
     implementation("androidx.compose.ui:ui:1.9.3")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")

@@ -19,3 +19,18 @@ class GenesisApplicationPlugin : Plugin<Project> {
         apply("com.google.gms.google-services")        // keep last
     }
 }
+plugins.withId("org.jetbrains.kotlin.android") {
+    extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension> {
+        compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget("24"))
+    }
+}
+plugins.withId("org.jetbrains.kotlin.jvm") {
+    extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension> {
+        compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget("24"))
+    }
+}
+buildFeatures { compose = true }
+// You might also need a composeOptions block
+composeOptions {
+    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
+}

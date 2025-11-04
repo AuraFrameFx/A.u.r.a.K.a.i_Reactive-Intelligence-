@@ -1,11 +1,11 @@
 plugins {
-    id("com.android.application")
-    id("com.google.dagger.hilt.android")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp")
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
+    id("com.android.application") version "9.0.0-alpha13"
+    id("com.google.dagger.hilt.android") version "2.57.2"
+    id("com.google.devtools.ksp") version "2.3.0"
+
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
-    id("com.google.gms.google-services")
+    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
+
 }
 
 android {
@@ -18,10 +18,16 @@ android {
         versionCode = 1
         versionName = "0.1.0"
     }
-    buildFeatures { compose = true }
 }
 dependencies {
 // Compose
+    // Hooking & reflection libraries — use version-catalog aliases where possible
+    compileOnly(libs.xposed.api)
+    implementation(libs.yukihookapi.api)
+    implementation(libs.kavaref.core)
+    implementation(libs.kavaref.extension)
+    // If using YukiHook ksp-xposed processor (only for Xposed module usage)
+    ksp(libs.yukihookapi.ksp.xposed)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
@@ -34,7 +40,8 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
-
+    // Use KSP for Room compiler (KSP plugin is applied at the top of this build script)
+    ksp(libs.androidx.room.compiler)
 // Hilt (KSP line is critical)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
@@ -44,41 +51,31 @@ dependencies {
     implementation(libs.libsu.io)
     implementation(libs.libsu.service)
     implementation(libs.compose.ui.graphics) // use version-catalog entry
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.room.compiler)
+
+
     implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.datastore.core)
-    implementation(libs.androidx.security.crypto)
-    implementation(libs.desugar.jdk.libs)
-    implementation(libs.leakcanary.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.core)
+    implementation(libs.androidx.security.crypto)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+    implementation(libs.leakcanary.android)
+
 
     // Kotlin datetime
     implementation(libs.kotlinx.datetime)
 
-    // Lifecycle components
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-
-    // Firebase dependencies with explicit versions
-    implementation(libs.firebase.analytics.ktx)
-    implementation(libs.firebase.crashlytics.ktx)
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.firestore.ktx)
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.crashlytics)
+    // Firebase dependencies
+    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
-    implementation(libs.libsu.core)
-    implementation(libs.libsu.io)
-    implementation(libs.libsu.service)
 
-    compileOnly(files("$projectDir/libs/api-82.jar"))
-    compileOnly(files("$projectDir/libs/api-82-sources.jar"))
 // Networking (pick one converter path; here kotlinx‑serialization)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
@@ -94,15 +91,6 @@ dependencies {
     implementation(libs.coil.svg)
     implementation(libs.lottie.compose)
 
-    // Add Moshi & Retrofit Moshi converter (required by NetworkModule)
-    implementation("com.squareup.moshi:moshi:1.15.0")
-    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
-    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
-    ksp("com.squareup.moshi:moshi-kotlin-codegen:1.15.0")
-
-    // Hilt Work integration (provides HiltWorkerFactory)
-    implementation("androidx.hilt:hilt-work:1.0.0")
-
 // Internal project modules - ensure app has access to shared code and generated types
     implementation(project(":core-module"))
     implementation(project(":core:common"))
@@ -117,5 +105,6 @@ dependencies {
     implementation(project(":oracle-drive-integration"))
     implementation(project(":collab-canvas"))
     implementation(project(":datavein-oracle-native"))
+    implementation(project(":romtools"))
 
 }

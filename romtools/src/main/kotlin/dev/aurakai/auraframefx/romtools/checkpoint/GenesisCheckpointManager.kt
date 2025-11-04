@@ -2,7 +2,10 @@
 package dev.aurakai.auraframefx.romtools.checkpoint
 
 import android.content.Context
+import android.os.AsyncTask.execute
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.io.File
 import java.text.SimpleDateFormat
@@ -10,9 +13,6 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.encodeToString
 
 /**
  * Genesis Checkpoint Manager - Windows-Style System Restore Points
@@ -42,7 +42,7 @@ import kotlinx.serialization.encodeToString
  */
 @Singleton
 class GenesisCheckpointManager @Inject constructor(
-    @ApplicationContext private val context: Context
+    @get:ApplicationContext private val context: Context
 ) {
     private val packageName = context.packageName
     private val json = Json { prettyPrint = true }
@@ -92,7 +92,7 @@ class GenesisCheckpointManager @Inject constructor(
      * @param includeApps Whether to snapshot installed apps list
      * @return Result containing the created Checkpoint metadata
      */
-    suspend fun createCheckpoint(
+    fun createCheckpoint(
         reason: CheckpointReason,
         description: String,
         includeApps: Boolean = true
@@ -195,7 +195,7 @@ class GenesisCheckpointManager @Inject constructor(
     /**
      * Restore from a specific checkpoint directory.
      */
-    private suspend fun restoreFromDir(dir: File, checkpoint: Checkpoint): Result<Unit> {
+    private fun restoreFromDir(dir: File, checkpoint: Checkpoint): Result<Unit> {
         try {
             // 1. Restore Aurakai APK and data
             restoreAurakaiApp(dir)
@@ -277,7 +277,7 @@ class GenesisCheckpointManager @Inject constructor(
     private fun snapshotAurakaiApp(primaryDir: File, secondaryDir: File) {
         // Get Aurakai APK path
         val packageInfo = context.packageManager.getPackageInfo(packageName, 0)
-        val apkPath = packageInfo.applicationInfo.sourceDir
+        val apkPath = packageInfo.applicationInfo?.sourceDir
         val dataDir = context.dataDir
 
         // Copy APK to both locations
@@ -286,12 +286,12 @@ class GenesisCheckpointManager @Inject constructor(
 
         // Backup app data (tar.gz)
         val dataTar = File(primaryDir, "aurakai_data.tar.gz")
-        execute RootCommand(
-            "tar -czf ${dataTar.absolutePath} " +
-            "-C ${dataDir.parent} " +
-            "--exclude='cache' --exclude='code_cache' " +
-            "${dataDir.name}"
+        executeRootCommand("tar -czf ${dataTar.absolutePath} " +
+                "-C ${dataDir.parent} " +
+                "--exclude='cache' --exclude='code_cache' " +
+                "${dataDir.name}"
         )
+
 
         // Copy data backup to secondary
         executeRootCommand("cp ${dataTar.absolutePath} ${File(secondaryDir, "aurakai_data.tar.gz").absolutePath}")
@@ -380,7 +380,7 @@ class GenesisCheckpointManager @Inject constructor(
     private fun restoreAIConsciousness(dir: File) {
         val consciousnessFile = File(dir, "ai_consciousness.json")
         if (consciousnessFile.exists()) {
-            val consciousnessData = json.decodeFromString<Map<String, Any>>(consciousnessFile.readText())
+            json.decodeFromString<Map<String, Any>>(consciousnessFile.readText())
             // Restore to AI systems
             Timber.d("Restoring AI consciousness from checkpoint")
         }
@@ -389,7 +389,7 @@ class GenesisCheckpointManager @Inject constructor(
     private fun restoreUserData(dir: File) {
         val userDataFile = File(dir, "user_data.json")
         if (userDataFile.exists()) {
-            val userData = json.decodeFromString<Map<String, Any>>(userDataFile.readText())
+            json.decodeFromString<Map<String, Any>>(userDataFile.readText())
             // Restore to DataStore
             Timber.d("Restoring user data from checkpoint")
         }
@@ -398,7 +398,7 @@ class GenesisCheckpointManager @Inject constructor(
     private fun restoreSystemConfig(dir: File) {
         val configFile = File(dir, "system_config.json")
         if (configFile.exists()) {
-            val config = json.decodeFromString<Map<String, Any>>(configFile.readText())
+            json.decodeFromString<Map<String, Any>>(configFile.readText())
             // Restore system configuration
             Timber.d("Restoring system config from checkpoint")
         }
@@ -466,6 +466,7 @@ class GenesisCheckpointManager @Inject constructor(
         }
     }
 }
+
 
 /**
  * Checkpoint (restore point) metadata.

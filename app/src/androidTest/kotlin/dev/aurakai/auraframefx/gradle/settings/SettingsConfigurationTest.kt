@@ -3,7 +3,7 @@ package settings
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.io.File
 
 /**
