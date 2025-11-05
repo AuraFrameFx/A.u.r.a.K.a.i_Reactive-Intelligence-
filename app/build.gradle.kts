@@ -18,6 +18,12 @@ android {
         versionCode = 1
         versionName = "0.1.0"
     }
+
+    lint {
+        baseline = file("lint-baseline.xml")
+        abortOnError = true
+        checkReleaseBuilds = false
+    }
 }
 dependencies {
 // Compose
