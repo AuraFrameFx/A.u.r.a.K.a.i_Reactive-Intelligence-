@@ -11,6 +11,14 @@ import timber.log.Timber
  * Monitors and responds to system integrity violations and security threats.
  */
 class IntegrityViolationReceiver : BroadcastReceiver() {
+    /**
+     * Handles incoming integrity-violation broadcasts by logging the detected violation type.
+     *
+     * Extracts the "violation_type" string extra from the provided Intent and logs a warning; if the Intent or extra is missing, logs "unknown".
+     *
+     * @param context The receiver Context; may be null.
+     * @param intent The broadcast Intent carrying a "violation_type" extra; may be null.
+     */
     override fun onReceive(context: Context?, intent: Intent?) {
         val violationType = intent?.getStringExtra("violation_type") ?: "unknown"
         Timber.w("Integrity violation detected: $violationType")
