@@ -69,7 +69,7 @@ fun InteractiveModuleCard(
     onClick: () -> Unit = {}
 ) {
     // Calculate proximity
-    val proximity = remember(characterPosition) {
+    val proximity = remember(characterPosition, character, cardPosition) {
         characterPosition?.let {
             calculateProximity(cardPosition, it, character ?: dev.aurakai.auraframefx.embodiment.Character.AURA)
         }
@@ -219,8 +219,8 @@ fun DataParticleEffect(
         mutableStateOf(generateDataParticles(20))
     }
 
-    LaunchedEffect(Unit) {
-        while (true) {
+    LaunchedEffect(color) {
+        while (isActive) {  // Explicit lifecycle check
             delay(50)
             particles = particles.map { it.update() }
         }
@@ -370,14 +370,18 @@ fun DataStreamBetweenCards(
         mutableStateOf(generateStreamParticles(fromPosition, toPosition, 15))
     }
 
-    LaunchedEffect(active) {
+    // Reset particles when active changes or positions change
+    LaunchedEffect(active, fromPosition, toPosition) {
         if (active) {
-            while (true) {
+            streamParticles = generateStreamParticles(fromPosition, toPosition, 15)
+            while (isActive) {
                 delay(50)
                 streamParticles = streamParticles.map {
                     it.updateAlongPath(fromPosition, toPosition)
                 }
             }
+        } else {
+            streamParticles = emptyList()  // Clear particles when inactive
         }
     }
 

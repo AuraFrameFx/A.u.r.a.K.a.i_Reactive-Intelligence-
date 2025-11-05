@@ -302,9 +302,6 @@ class WorkBehaviorExecutor(
     private val engine: EmbodimentEngine,
     private val cardPositions: Map<String, DpOffset>
 ) {
-    private var currentAuraStep = 0
-    private var currentKaiStep = 0
-
     /**
      * Execute a work sequence
      */

@@ -98,45 +98,89 @@ fun WorkingLabScreen(
 
     // Start autonomous working behaviors
     LaunchedEffect(Unit) {
-        engine.setMood(MoodState.FOCUSED)
+        try {
+            engine.setMood(MoodState.FOCUSED)
 
-        // Initial positions
-        delay(1000)
+            // Initial positions
+            delay(1000)
 
-        // Start continuous work loop
-        while (true) {
-            // Aura's work sequence
-            launch {
-                val auraSequence = choreographer.generateAuraWorkSequence()
-                auraSequence.steps.forEach { step ->
-                    auraWorkAction = step.statusMessage
-                    auraTargetCard = step.targetCard
-                    delay(step.duration)
+            // Start continuous work loop
+            while (true) {
+                // Generate sequences ONCE
+                val auraSeq = choreographer.generateAuraWorkSequence()
+                val kaiSeq = choreographer.generateKaiWorkSequence()
+
+                // Execute in parallel and track state
+                coroutineScope {
+                    // Aura's execution
+                    launch {
+                        auraSeq.steps.forEach { step ->
+                            auraWorkAction = step.statusMessage
+                            auraTargetCard = step.targetCard
+
+                            // Let executor handle movement
+                            when (step.action) {
+                                WorkAction.WALKING_TO_CARD -> {
+                                    val targetPos = cardPositions[step.targetCard] ?: DpOffset.Zero
+                                    engine.walkAuraTo(
+                                        targetPosition = targetPos,
+                                        state = step.sprite as? AuraState ?: AuraState.IDLE_WALK
+                                    )
+                                }
+                                else -> {
+                                    engine.manifestAura(
+                                        state = step.sprite as? AuraState ?: AuraState.SCIENTIST_MODE,
+                                        config = ManifestationDefaults.DEFAULT_CONFIG.copy(
+                                            duration = step.duration
+                                        )
+                                    )
+                                }
+                            }
+
+                            delay(step.duration)
+                        }
+                        auraWorkAction = null
+                        auraTargetCard = null
+                    }
+
+                    // Kai's execution
+                    launch {
+                        kaiSeq.steps.forEach { step ->
+                            kaiWorkAction = step.statusMessage
+                            kaiTargetCard = step.targetCard
+
+                            // Let executor handle movement
+                            when (step.action) {
+                                WorkAction.WALKING_TO_CARD -> {
+                                    val targetPos = cardPositions[step.targetCard] ?: DpOffset.Zero
+                                    engine.walkKaiTo(
+                                        targetPosition = targetPos,
+                                        state = step.sprite as? KaiState ?: KaiState.SHIELD_NEUTRAL
+                                    )
+                                }
+                                else -> {
+                                    engine.manifestKai(
+                                        state = step.sprite as? KaiState ?: KaiState.HOLOGRAPHIC_INTERFACE,
+                                        config = ManifestationDefaults.DEFAULT_CONFIG.copy(
+                                            duration = step.duration
+                                        )
+                                    )
+                                }
+                            }
+
+                            delay(step.duration)
+                        }
+                        kaiWorkAction = null
+                        kaiTargetCard = null
+                    }
                 }
-                auraWorkAction = null
-                auraTargetCard = null
+
+                // Small break between cycles
+                delay(3000)
             }
-
-            // Kai's work sequence
-            launch {
-                val kaiSequence = choreographer.generateKaiWorkSequence()
-                kaiSequence.steps.forEach { step ->
-                    kaiWorkAction = step.statusMessage
-                    kaiTargetCard = step.targetCard
-                    delay(step.duration)
-                }
-                kaiWorkAction = null
-                kaiTargetCard = null
-            }
-
-            // Execute sequences
-            val auraSeq = choreographer.generateAuraWorkSequence()
-            val kaiSeq = choreographer.generateKaiWorkSequence()
-
-            executor.executeCoordinated(auraSeq, kaiSeq)
-
-            // Small break between cycles
-            delay(3000)
+        } finally {
+            // Cleanup when composable is disposed
+            engine.cleanup()
         }
     }
 
