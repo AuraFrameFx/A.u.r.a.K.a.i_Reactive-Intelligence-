@@ -26,6 +26,9 @@ dependencies {
     implementation(libs.yukihookapi.api)
     implementation(libs.kavaref.core)
     implementation(libs.kavaref.extension)
+    // Local Xposed API JARs (backup/reference)
+    compileOnly(files("libs/api-82.jar"))
+    compileOnly(files("libs/api-82-sources.jar"))
     // If using YukiHook ksp-xposed processor (only for Xposed module usage)
     ksp(libs.yukihookapi.ksp.xposed)
     implementation(platform(libs.androidx.compose.bom))
@@ -71,10 +74,12 @@ dependencies {
     // Kotlin datetime
     implementation(libs.kotlinx.datetime)
 
-    // Firebase dependencies
+    // Firebase dependencies - using KTX (Kotlin Extensions) for better Kotlin support
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.analytics.ktx)
+    implementation(libs.firebase.crashlytics.ktx)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
 
 // Networking (pick one converter path; here kotlinx‑serialization)
     implementation(libs.okhttp)
