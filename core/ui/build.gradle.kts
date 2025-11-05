@@ -20,7 +20,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.timber)
     compileOnly(files("$projectDir/libs/api-82.jar"))
-    ksp("com.github.LSPosed.YukiHookAPI:yuApiClient:1.3.1")
+    ksp("com.highcapable.yukihookapi:ksp-xposed:1.3.1")
 
 // If this library uses Compose UI:
     implementation(platform(libs.androidx.compose.bom))

@@ -25,7 +25,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
     compileOnly(files("$projectDir/libs/api-82.jar"))
-    ksp("com.github.LSPosed.YukiHookAPI:yuApiClient:1.3.1")
+    ksp("com.highcapable.yukihookapi:ksp-xposed:1.3.1")
 
 // Hilt in library
     implementation(libs.hilt.android)

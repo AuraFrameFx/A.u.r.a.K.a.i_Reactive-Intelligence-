@@ -17,7 +17,7 @@ android {
 }
 dependencies {
     compileOnly(files("$projectDir/libs/api-82.jar"))
-    ksp("com.github.LSPosed.YukiHookAPI:yuApiClient:1.3.1")
+    ksp("com.highcapable.yukihookapi:ksp-xposed:1.3.1")
 
     implementation(libs.libsu.core)
     implementation(libs.libsu.io)
