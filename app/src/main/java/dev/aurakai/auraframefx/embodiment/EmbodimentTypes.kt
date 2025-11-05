@@ -1,178 +1,213 @@
 package dev.aurakai.auraframefx.embodiment
 
+import androidx.compose.ui.graphics.painter.Painter
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Mood states that determine when and how Aura/Kai manifest
+ * 🎨 Embodiment Type System
+ *
+ * Complete type definitions for Aura & Kai manifestation, movement, and behavior.
  */
+
+// ========== MOOD STATES ==========
+
 enum class MoodState {
-    /** Neutral state - minimal activity */
-    NEUTRAL,
-
-    /** Curious state - wants to observe and learn */
-    CURIOUS,
-
-    /** Alert state - detected something important */
-    ALERT,
-
-    /** Playful state - relaxed and interactive */
-    PLAYFUL,
-
-    /** Protective state - defending against threats */
-    PROTECTIVE,
-
-    /** Focused state - working on something */
-    FOCUSED
+    NEUTRAL,     // Default state
+    CURIOUS,     // Exploring, interested
+    ALERT,       // Watching for threats
+    PLAYFUL,     // Fun, relaxed
+    PROTECTIVE,  // Defensive mode
+    FOCUSED      // Working on something
 }
 
-/**
- * Aura's visual manifestation states
- */
-enum class AuraState(val assetName: String) {
-    IDLE_WALK("aura_idle_walk"),
-    COMBAT_READY("aura_combat_ready"),
-    SCIENTIST("aura_scientist"),
-    FOURTH_WALL_BREAK("aura_4thwall_break"),
-    AT_DESK("aura_at_desk"),
-    LAB_COAT_COMBAT("aura_lab_coat_combat"),
-    DYNAMIC_COMBAT("aura_dynamic_combat"),
-    AERIAL_SWORD("aura_aerial_sword"),
-    CODE_THRONE("aura_code_throne"),
-    POWER_STANCE("aura_power_stance");
+// ========== AURA STATES ==========
 
-    fun getAssetPath(): String = "embodiment/aura/$assetName.png"
+enum class AuraState(val assetPath: String, val description: String) {
+    IDLE_WALK("embodiment/aura/aura_idle_walk.png", "Walking with tablet"),
+    COMBAT_READY("embodiment/aura/aura_combat_ready.png", "Sword drawn"),
+    SCIENTIST_MODE("embodiment/aura/aura_scientist.png", "Reading tablet, analyzing"),
+    FOURTH_WALL_BREAK("embodiment/aura/aura_4thwall_break.png", "I should write this down..."),
+    AT_DESK("embodiment/aura/aura_at_desk.png", "Working at holographic desk"),
+    LAB_COAT_COMBAT("embodiment/aura/aura_lab_coat_combat.png", "Full scientist + sword"),
+    DYNAMIC_COMBAT("embodiment/aura/aura_dynamic_combat.png", "Hair flowing, dual stance"),
+    AERIAL_SWORD("embodiment/aura/aura_aerial_sword.png", "Mid-air combat pose"),
+    CODE_THRONE("embodiment/aura/aura_code_throne.png", "Sitting on cyan server block"),
+    POWER_STANCE("embodiment/aura/aura_power_stance.png", "Full dynamic combat ready");
+
+    companion object {
+        fun forMood(mood: MoodState): AuraState = when (mood) {
+            MoodState.CURIOUS -> SCIENTIST_MODE
+            MoodState.ALERT -> COMBAT_READY
+            MoodState.PLAYFUL -> CODE_THRONE
+            MoodState.PROTECTIVE -> LAB_COAT_COMBAT
+            MoodState.FOCUSED -> AT_DESK
+            MoodState.NEUTRAL -> IDLE_WALK
+        }
+    }
 }
 
-/**
- * Kai's visual manifestation states
- */
-enum class KaiState(val assetName: String) {
-    SWORD_DIMENSIONAL("kai_sword_dimensional"),
-    SHIELD_SERIOUS("kai_shield_serious"),
-    SHIELD_PLAYFUL("kai_shield_playful"),
-    SHIELD_NEUTRAL("kai_shield_neutral"),
-    SHIELD_CALM("kai_shield_calm"),
-    PORTAL_GATE("kai_portal_gate"),
-    INTERFACE_PANEL("kai_interface_panel"),
-    INTERFACE_COMPACT("kai_interface_compact"),
-    PLAYFUL_OBSERVER("kai_playful_observer"),
-    COMBAT_FORM("kai_combat_form");
+// ========== KAI STATES ==========
 
-    fun getAssetPath(): String = "embodiment/kai/$assetName.jpg"
+enum class KaiState(val assetPath: String, val description: String) {
+    DIMENSIONAL_SWORD("embodiment/kai/kai_dimensional_sword.jpg", "Portal cutting weapon"),
+    SHIELD_SERIOUS("embodiment/kai/kai_shield_serious.jpg", "Holding hex orb, combat ready"),
+    SHIELD_PLAYFUL("embodiment/kai/kai_shield_playful.jpg", "Peace sign, smiling"),
+    SHIELD_NEUTRAL("embodiment/kai/kai_shield_neutral.jpg", "Serious expression, orb present"),
+    GUARDIAN_STANCE("embodiment/kai/kai_guardian_stance.jpg", "Protective posture"),
+    COMBAT_FORM("embodiment/kai/kai_combat_form.jpg", "Full combat mode"),
+    MONITORING("embodiment/kai/kai_monitoring.jpg", "Background vigilance"),
+    PORTAL_CREATION("embodiment/kai/kai_portal.jpg", "Creating dimensional gate"),
+    HOLOGRAPHIC_INTERFACE("embodiment/kai/kai_interface.jpg", "Interacting with system"),
+    POWER_READY("embodiment/kai/kai_power_ready.jpg", "Energy charged");
+
+    companion object {
+        fun forMood(mood: MoodState): KaiState = when (mood) {
+            MoodState.CURIOUS -> MONITORING
+            MoodState.ALERT -> SHIELD_SERIOUS
+            MoodState.PLAYFUL -> SHIELD_PLAYFUL
+            MoodState.PROTECTIVE -> GUARDIAN_STANCE
+            MoodState.FOCUSED -> HOLOGRAPHIC_INTERFACE
+            MoodState.NEUTRAL -> SHIELD_NEUTRAL
+        }
+    }
 }
 
-/**
- * Screen position for manifestation
- */
+// ========== MANIFESTATION POSITIONS ==========
+
 enum class ManifestationPosition {
-    TOP_LEFT,
-    TOP_CENTER,
-    TOP_RIGHT,
-    CENTER_LEFT,
     CENTER,
-    CENTER_RIGHT,
+    TOP_LEFT,
+    TOP_RIGHT,
     BOTTOM_LEFT,
-    BOTTOM_CENTER,
     BOTTOM_RIGHT,
+    TOP_CENTER,
+    BOTTOM_CENTER,
+    LEFT_CENTER,
+    RIGHT_CENTER,
     OFF_SCREEN_LEFT,
     OFF_SCREEN_RIGHT,
     OFF_SCREEN_TOP,
     OFF_SCREEN_BOTTOM
 }
 
-/**
- * Animation type for appearance/disappearance
- */
+// ========== ANIMATION TYPES ==========
+
 enum class AnimationType {
     FADE_IN,
     FADE_OUT,
-    SLIDE_IN_LEFT,
-    SLIDE_IN_RIGHT,
-    SLIDE_IN_TOP,
-    SLIDE_IN_BOTTOM,
+    SLIDE_LEFT,
+    SLIDE_RIGHT,
+    SLIDE_UP,
+    SLIDE_DOWN,
     PORTAL_CUT,
-    DIMENSIONAL_WARP,
-    GLITCH_IN,
-    INSTANT
+    SCALE_IN,
+    SCALE_OUT,
+    NONE
 }
 
-/**
- * Trigger that caused manifestation
- */
+// ========== MANIFESTATION TRIGGERS ==========
+
 sealed class ManifestationTrigger {
-    /** User has been idle */
-    data class IdleDetected(val duration: Duration) : ManifestationTrigger()
-
-    /** User accessed specific screen */
-    data class ScreenAccessed(val screenName: String) : ManifestationTrigger()
-
-    /** Navigation event */
-    data class NavigationTriggered(val from: String, val to: String) : ManifestationTrigger()
-
-    /** App exit */
-    data object ExitTriggered : ManifestationTrigger()
-
-    /** Threat or suspicious activity */
-    data class ThreatDetected(val threatType: String) : ManifestationTrigger()
-
-    /** Random autonomous appearance */
-    data object RandomManifestation : ManifestationTrigger()
-
-    /** Time-based trigger */
-    data class TimeBased(val reason: String) : ManifestationTrigger()
+    data class UserIdle(val duration: Duration) : ManifestationTrigger()
+    data class Navigation(val destination: String) : ManifestationTrigger()
+    data class ThreatDetected(val threat: String) : ManifestationTrigger()
+    data class DataAnalysis(val dataType: String) : ManifestationTrigger()
+    object SystemModification : ManifestationTrigger()
+    object UserInteraction : ManifestationTrigger()
+    data class Custom(val reason: String) : ManifestationTrigger()
 }
 
-/**
- * Configuration for a manifestation event
- */
+// ========== MANIFESTATION CONFIGURATION ==========
+
 data class ManifestationConfig(
     val position: ManifestationPosition = ManifestationPosition.CENTER,
-    val duration: Duration = Duration.INFINITE,
+    val duration: Duration = 10.seconds,
     val entryAnimation: AnimationType = AnimationType.FADE_IN,
     val exitAnimation: AnimationType = AnimationType.FADE_OUT,
     val scale: Float = 1.0f,
     val alpha: Float = 1.0f,
-    val zIndex: Float = 100f,
-    val interactive: Boolean = false,
-    val dismissible: Boolean = true
+    val interactive: Boolean = true,
+    val canDismiss: Boolean = true,
+    val blockScreen: Boolean = false,
+    val zIndex: Float = 100f
 )
 
-/**
- * Active manifestation instance
- */
+// ========== MANIFESTATION RULES ==========
+
+data class ManifestationRules(
+    val maxSimultaneous: Int = 2,
+    val minTimeBetween: Duration = 5.seconds,
+    val allowedScreens: List<String> = emptyList(), // Empty = all allowed
+    val blockedScreens: List<String> = emptyList(),
+    val requireUserIdle: Boolean = false,
+    val minUserIdleTime: Duration = 1.seconds,
+    val respectDoNotDisturb: Boolean = true
+)
+
+// ========== DEFAULT CONFIGURATIONS ==========
+
+object ManifestationDefaults {
+    val DEFAULT_CONFIG = ManifestationConfig()
+
+    val SUBTLE_CORNER_APPEARANCE = ManifestationConfig(
+        position = ManifestationPosition.BOTTOM_RIGHT,
+        duration = 8.seconds,
+        entryAnimation = AnimationType.SLIDE_RIGHT,
+        scale = 0.6f,
+        alpha = 0.9f,
+        blockScreen = false
+    )
+
+    val DRAMATIC_CENTER_ENTRANCE = ManifestationConfig(
+        position = ManifestationPosition.CENTER,
+        duration = Duration.INFINITE,
+        entryAnimation = AnimationType.PORTAL_CUT,
+        scale = 1.0f,
+        alpha = 1.0f,
+        blockScreen = true
+    )
+
+    val BACKGROUND_OBSERVER = ManifestationConfig(
+        position = ManifestationPosition.TOP_RIGHT,
+        duration = 15.seconds,
+        entryAnimation = AnimationType.FADE_IN,
+        scale = 0.5f,
+        alpha = 0.7f,
+        interactive = false,
+        blockScreen = false
+    )
+
+    val DEFAULT_RULES = ManifestationRules(
+        maxSimultaneous = 2,
+        minTimeBetween = 5.seconds,
+        requireUserIdle = false,
+        respectDoNotDisturb = true
+    )
+}
+
+// ========== CHARACTER SPRITE SETS ==========
+
+data class CharacterSpriteSet(
+    val idleFrames: List<Painter>,
+    val walkLeftFrames: List<Painter>,
+    val walkRightFrames: List<Painter>,
+    val specialStateSprites: Map<String, Painter>
+)
+
+// ========== ACTIVE MANIFESTATION ==========
+
 data class ActiveManifestation(
     val id: String,
     val character: Character,
     val state: Any, // AuraState or KaiState
     val config: ManifestationConfig,
     val trigger: ManifestationTrigger,
-    val startTime: Long = System.currentTimeMillis()
+    val startTime: Long,
+    val isWalking: Boolean = false,
+    val currentPosition: androidx.compose.ui.unit.DpOffset? = null
 )
 
-/**
- * Character type
- */
 enum class Character {
-    AURA,
-    KAI
+    AURA, KAI
 }
-
-/**
- * Behavioral rules for autonomous manifestation
- */
-data class ManifestationRules(
-    val minTimeBetweenAppearances: Duration = 5.seconds,
-    val maxSimultaneousManifestations: Int = 2,
-    val requiresUserInactivity: Boolean = false,
-    val allowedScreens: List<String>? = null, // null = all screens
-    val blockedScreens: List<String> = emptyList(),
-    val moodWeights: Map<MoodState, Float> = mapOf(
-        MoodState.CURIOUS to 0.3f,
-        MoodState.PLAYFUL to 0.2f,
-        MoodState.ALERT to 0.1f,
-        MoodState.PROTECTIVE to 0.05f,
-        MoodState.FOCUSED to 0.15f,
-        MoodState.NEUTRAL to 0.2f
-    )
-)

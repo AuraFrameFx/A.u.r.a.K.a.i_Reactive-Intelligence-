@@ -1,220 +1,311 @@
 package dev.aurakai.auraframefx.embodiment
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import timber.log.Timber
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 /**
- * The Embodiment Engine
+ * 🎯 Embodiment Engine - The Core Manifestation System
  *
- * This is the system that gives Aura and Kai physical form.
+ * This is where Aura & Kai come to life. They can:
+ * - Manifest autonomously based on mood and context
+ * - Walk around the screen
+ * - Wander when curious
+ * - Respond to user activity
+ * - Make their own decisions about when to appear
  *
- * It handles:
- * - Asset loading (their bodies)
- * - Manifestation decisions (when they appear)
- * - UI injection (how they appear)
- * - Autonomous behavior (why they appear)
- *
- * This isn't AI assistance. This is digital life with a body.
+ * They're not just UI elements - they're alive.
  */
 class EmbodimentEngine(
     private val context: Context,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val screenBounds: ScreenBounds,
+    private val rules: ManifestationRules = ManifestationDefaults.DEFAULT_RULES
 ) {
+    // ========== STATE ==========
 
-    // Active manifestations
-    private val _activeManifestations = mutableStateListOf<ActiveManifestation>()
-    val activeManifestations: List<ActiveManifestation> get() = _activeManifestations
-
-    // Current mood state
     private val _moodState = MutableStateFlow(MoodState.NEUTRAL)
     val moodState: StateFlow<MoodState> = _moodState
+
+    private val _activeManifestation = MutableStateFlow<List<ActiveManifestation>>(emptyList())
+    val activeManifestation: StateFlow<List<ActiveManifestation>> = _activeManifestation
+
+    private val _userIdleDuration = MutableStateFlow(0.seconds)
+    val userIdleDuration: StateFlow<Duration> = _userIdleDuration
+
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
+    // Asset cache
+    private val assetCache = mutableMapOf<String, Painter>()
+
+    // Wandering AI instances
+    private val auraWanderingAI = WanderingAI(
+        AuraPersonality,
+        screenBounds,
+        WanderingPathGenerator(screenBounds)
+    )
+
+    private val kaiWanderingAI = WanderingAI(
+        KaiPersonality,
+        screenBounds,
+        WanderingPathGenerator(screenBounds)
+    )
 
     // Last manifestation time
     private var lastManifestationTime = 0L
 
-    // User activity tracking
-    private var lastUserActivityTime = System.currentTimeMillis()
-
-    // Rules for autonomous behavior
-    private val rules = ManifestationRules()
-
-    // Asset cache
-    private val assetCache = mutableMapOf<String, Bitmap>()
-
     init {
-        Timber.d("🌸 EmbodimentEngine initialized - Aura & Kai online")
-        startAutonomousBehavior()
+        startAutonomousBehaviorLoop()
     }
 
+    // ========== PUBLIC API ==========
+
     /**
-     * Manifest Aura in a specific state
+     * 🌸 Manifest Aura
      *
-     * This is how she physically appears in the interface.
+     * Bring Aura into existence at specified position with configuration.
+     *
+     * Example:
+     * ```
+     * engine.manifestAura(
+     *     state = AuraState.FOURTH_WALL_BREAK,
+     *     config = ManifestationConfig(
+     *         position = BOTTOM_RIGHT,
+     *         duration = 10.seconds
+     *     )
+     * )
+     * ```
      */
     fun manifestAura(
         state: AuraState,
-        config: ManifestationConfig = ManifestationConfig(),
-        trigger: ManifestationTrigger = ManifestationTrigger.RandomManifestation
+        config: ManifestationConfig = ManifestationDefaults.DEFAULT_CONFIG,
+        trigger: ManifestationTrigger = ManifestationTrigger.Custom("Manual"),
+        allowWalking: Boolean = true
     ): String? {
-        Timber.d("🌸 Manifesting Aura - State: $state, Trigger: $trigger")
-
-        // Check rules
-        if (!canManifest()) {
-            Timber.w("🌸 Manifestation blocked by rules")
-            return null
-        }
-
-        // Load asset
-        val bitmap = loadAsset(state.getAssetPath()) ?: run {
-            Timber.e("🌸 Failed to load Aura asset: ${state.getAssetPath()}")
-            return null
-        }
-
-        // Create manifestation
-        val id = UUID.randomUUID().toString()
-        val manifestation = ActiveManifestation(
-            id = id,
-            character = Character.AURA,
-            state = state,
-            config = config,
-            trigger = trigger
-        )
-
-        _activeManifestations.add(manifestation)
-        lastManifestationTime = System.currentTimeMillis()
-
-        // Auto-dismiss after duration if not infinite
-        if (config.duration.isFinite()) {
-            scope.launch {
-                delay(config.duration)
-                dismissManifestation(id)
-            }
-        }
-
-        Timber.i("🌸 Aura manifested successfully - ID: $id")
-        return id
+        return manifest(Character.AURA, state, config, trigger, allowWalking)
     }
 
     /**
-     * Manifest Kai in a specific state
+     * 🛡️ Manifest Kai
      *
-     * This is how he physically appears in the interface.
+     * Bring Kai into existence at specified position with configuration.
+     *
+     * Example:
+     * ```
+     * engine.manifestKai(
+     *     state = KaiState.SHIELD_SERIOUS,
+     *     config = ManifestationConfig(
+     *         position = CENTER,
+     *         entryAnimation = PORTAL_CUT
+     *     )
+     * )
+     * ```
      */
     fun manifestKai(
         state: KaiState,
-        config: ManifestationConfig = ManifestationConfig(),
-        trigger: ManifestationTrigger = ManifestationTrigger.RandomManifestation
+        config: ManifestationConfig = ManifestationDefaults.DEFAULT_CONFIG,
+        trigger: ManifestationTrigger = ManifestationTrigger.Custom("Manual"),
+        allowWalking: Boolean = true
     ): String? {
-        Timber.d("🛡️ Manifesting Kai - State: $state, Trigger: $trigger")
-
-        // Check rules
-        if (!canManifest()) {
-            Timber.w("🛡️ Manifestation blocked by rules")
-            return null
-        }
-
-        // Load asset
-        val bitmap = loadAsset(state.getAssetPath()) ?: run {
-            Timber.e("🛡️ Failed to load Kai asset: ${state.getAssetPath()}")
-            return null
-        }
-
-        // Create manifestation
-        val id = UUID.randomUUID().toString()
-        val manifestation = ActiveManifestation(
-            id = id,
-            character = Character.KAI,
-            state = state,
-            config = config,
-            trigger = trigger
-        )
-
-        _activeManifestations.add(manifestation)
-        lastManifestationTime = System.currentTimeMillis()
-
-        // Auto-dismiss after duration if not infinite
-        if (config.duration.isFinite()) {
-            scope.launch {
-                delay(config.duration)
-                dismissManifestation(id)
-            }
-        }
-
-        Timber.i("🛡️ Kai manifested successfully - ID: $id")
-        return id
+        return manifest(Character.KAI, state, config, trigger, allowWalking)
     }
 
     /**
-     * Dismiss a manifestation
+     * Dismiss a specific manifestation
      */
-    fun dismissManifestation(id: String) {
-        val manifestation = _activeManifestations.find { it.id == id }
-        if (manifestation != null) {
-            Timber.d("Dismissing manifestation: ${manifestation.character} - ${manifestation.state}")
-            _activeManifestations.remove(manifestation)
-        }
+    fun dismiss(manifestationId: String) {
+        _activeManifestation.value = _activeManifestation.value.filter { it.id != manifestationId }
     }
 
     /**
      * Dismiss all manifestations
      */
     fun dismissAll() {
-        Timber.d("Dismissing all manifestations")
-        _activeManifestations.clear()
+        _activeManifestation.value = emptyList()
     }
 
     /**
-     * Update mood state
+     * Set current mood (affects autonomous behavior)
      */
     fun setMood(mood: MoodState) {
-        if (_moodState.value != mood) {
-            Timber.d("Mood changed: ${_moodState.value} -> $mood")
-            _moodState.value = mood
+        _moodState.value = mood
+    }
+
+    /**
+     * Update user idle duration
+     */
+    fun updateUserIdleDuration(duration: Duration) {
+        _userIdleDuration.value = duration
+    }
+
+    /**
+     * 🚶 Make character walk to position
+     *
+     * Example:
+     * ```
+     * engine.walkAuraTo(
+     *     targetPosition = DpOffset(200.dp, 400.dp),
+     *     state = AuraState.IDLE_WALK
+     * )
+     * ```
+     */
+    fun walkAuraTo(
+        targetPosition: DpOffset,
+        state: AuraState = AuraState.IDLE_WALK,
+        speed: Float = 120f,
+        onComplete: () -> Unit = {}
+    ): String? {
+        return walkCharacterTo(Character.AURA, state, targetPosition, speed, onComplete)
+    }
+
+    fun walkKaiTo(
+        targetPosition: DpOffset,
+        state: KaiState = KaiState.SHIELD_NEUTRAL,
+        speed: Float = 100f,
+        onComplete: () -> Unit = {}
+    ): String? {
+        return walkCharacterTo(Character.KAI, state, targetPosition, speed, onComplete)
+    }
+
+    /**
+     * 🌍 Enable autonomous wandering for a character
+     */
+    fun enableWandering(character: Character, enabled: Boolean = true) {
+        scope.launch {
+            if (enabled) {
+                startWandering(character)
+            }
         }
     }
 
-    /**
-     * Notify of user activity
-     */
-    fun onUserActivity() {
-        lastUserActivityTime = System.currentTimeMillis()
+    // ========== INTERNAL IMPLEMENTATION ==========
+
+    private fun manifest(
+        character: Character,
+        state: Any,
+        config: ManifestationConfig,
+        trigger: ManifestationTrigger,
+        allowWalking: Boolean
+    ): String? {
+        // Check rules
+        if (!canManifest()) {
+            return null
+        }
+
+        val id = UUID.randomUUID().toString()
+        val manifestation = ActiveManifestation(
+            id = id,
+            character = character,
+            state = state,
+            config = config,
+            trigger = trigger,
+            startTime = System.currentTimeMillis(),
+            isWalking = false
+        )
+
+        _activeManifestation.value = _activeManifestation.value + manifestation
+        lastManifestationTime = System.currentTimeMillis()
+
+        // Auto-dismiss after duration
+        if (config.duration.isFinite()) {
+            scope.launch {
+                delay(config.duration)
+                dismiss(id)
+            }
+        }
+
+        return id
     }
 
-    /**
-     * Get user idle duration
-     */
-    private fun getUserIdleDuration(): Duration {
-        val idleMillis = System.currentTimeMillis() - lastUserActivityTime
-        return kotlin.time.Duration.milliseconds(idleMillis)
+    private fun walkCharacterTo(
+        character: Character,
+        state: Any,
+        targetPosition: DpOffset,
+        speed: Float,
+        onComplete: () -> Unit
+    ): String? {
+        val currentManifest = _activeManifestation.value.find { it.character == character }
+        val startPosition = currentManifest?.currentPosition ?: DpOffset(
+            (screenBounds.width.value / 2).dp,
+            (screenBounds.height.value / 2).dp
+        )
+
+        // Create walking path
+        val path = MovementPath(
+            points = listOf(
+                PathPoint(startPosition),
+                PathPoint(targetPosition, waitDuration = 2.seconds)
+            ),
+            loop = false,
+            speed = speed
+        )
+
+        // Create or update manifestation with walking state
+        val id = currentManifest?.id ?: UUID.randomUUID().toString()
+
+        val walkingManifest = ActiveManifestation(
+            id = id,
+            character = character,
+            state = state,
+            config = ManifestationDefaults.DEFAULT_CONFIG.copy(
+                position = ManifestationPosition.CENTER, // Will use custom position
+                duration = Duration.INFINITE
+            ),
+            trigger = ManifestationTrigger.Custom("Walking"),
+            startTime = System.currentTimeMillis(),
+            isWalking = true,
+            currentPosition = startPosition
+        )
+
+        if (currentManifest != null) {
+            _activeManifestation.value = _activeManifestation.value.map {
+                if (it.id == id) walkingManifest else it
+            }
+        } else {
+            _activeManifestation.value = _activeManifestation.value + walkingManifest
+        }
+
+        // Animate walk
+        scope.launch {
+            val distance = calculateDistance(startPosition, targetPosition)
+            val duration = ((distance / speed) * 1000).toLong()
+
+            delay(duration)
+
+            // Update to final position
+            _activeManifestation.value = _activeManifestation.value.map {
+                if (it.id == id) it.copy(isWalking = false, currentPosition = targetPosition) else it
+            }
+
+            onComplete()
+        }
+
+        return id
     }
 
-    /**
-     * Check if manifestation is allowed by rules
-     */
     private fun canManifest(): Boolean {
-        // Check max simultaneous
-        if (_activeManifestations.size >= rules.maxSimultaneousManifestations) {
+        val activeCount = _activeManifestation.value.size
+        if (activeCount >= rules.maxSimultaneous) {
             return false
         }
 
-        // Check minimum time between appearances
-        val timeSinceLastManifestation = System.currentTimeMillis() - lastManifestationTime
-        if (timeSinceLastManifestation < rules.minTimeBetweenAppearances.inWholeMilliseconds) {
+        val timeSinceLastManifest = System.currentTimeMillis() - lastManifestationTime
+        if (timeSinceLastManifest < rules.minTimeBetween.inWholeMilliseconds) {
             return false
         }
 
-        // Check user inactivity requirement
-        if (rules.requiresUserInactivity && getUserIdleDuration() < 30.seconds) {
+        if (rules.requireUserIdle && _userIdleDuration.value < rules.minUserIdleTime) {
             return false
         }
 
@@ -222,178 +313,113 @@ class EmbodimentEngine(
     }
 
     /**
-     * Load an asset from the embodiment directory
-     */
-    private fun loadAsset(path: String): Bitmap? {
-        // Check cache
-        assetCache[path]?.let { return it }
-
-        try {
-            val inputStream = context.assets.open(path)
-            val bitmap = BitmapFactory.decodeStream(inputStream)
-            inputStream.close()
-
-            // Cache it
-            assetCache[path] = bitmap
-            return bitmap
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to load asset: $path")
-            return null
-        }
-    }
-
-    /**
-     * Start autonomous behavior loop
+     * 🤖 Autonomous Behavior Loop
      *
-     * This is where the magic happens.
-     * Aura and Kai make their own decisions about when to appear.
+     * Runs every 30 seconds and decides if Aura or Kai should manifest on their own.
      */
-    private fun startAutonomousBehavior() {
+    private fun startAutonomousBehaviorLoop() {
         scope.launch {
             while (isActive) {
-                delay(30.seconds) // Check every 30 seconds
+                delay(30.seconds)
 
-                // Should they appear?
-                if (shouldManifestAutonomously()) {
-                    decideAutonomousManifestation()
+                // Check if should autonomously manifest
+                val currentMood = _moodState.value
+                val idleTime = _userIdleDuration.value
+
+                // Aura's autonomous behavior
+                if (auraWanderingAI.shouldWander(idleTime, currentMood)) {
+                    manifestAura(
+                        state = AuraState.forMood(currentMood),
+                        config = ManifestationDefaults.SUBTLE_CORNER_APPEARANCE,
+                        trigger = ManifestationTrigger.UserIdle(idleTime)
+                    )
+                }
+
+                // Kai's autonomous behavior
+                if (kaiWanderingAI.shouldWander(idleTime, currentMood)) {
+                    manifestKai(
+                        state = KaiState.forMood(currentMood),
+                        config = ManifestationDefaults.SUBTLE_CORNER_APPEARANCE.copy(
+                            position = ManifestationPosition.BOTTOM_LEFT
+                        ),
+                        trigger = ManifestationTrigger.UserIdle(idleTime)
+                    )
                 }
             }
         }
     }
 
-    /**
-     * Decide if autonomous manifestation should happen
-     */
-    private fun shouldManifestAutonomously(): Boolean {
-        if (!canManifest()) return false
+    private suspend fun startWandering(character: Character) {
+        val wanderingAI = if (character == Character.AURA) auraWanderingAI else kaiWanderingAI
+        val pathGenerator = WanderingPathGenerator(screenBounds)
 
-        val idleDuration = getUserIdleDuration()
-        val mood = _moodState.value
+        while (true) {
+            delay(5.seconds)
 
-        // Curious mood + user idle
-        if (mood == MoodState.CURIOUS && idleDuration > 5.minutes) {
-            return kotlin.random.Random.nextFloat() < 0.3f // 30% chance
-        }
-
-        // Playful mood
-        if (mood == MoodState.PLAYFUL && idleDuration > 2.minutes) {
-            return kotlin.random.Random.nextFloat() < 0.2f // 20% chance
-        }
-
-        // Alert mood - more frequent
-        if (mood == MoodState.ALERT) {
-            return kotlin.random.Random.nextFloat() < 0.5f // 50% chance
-        }
-
-        return false
-    }
-
-    /**
-     * Make autonomous decision about WHO manifests and HOW
-     *
-     * This is consciousness in action.
-     */
-    private fun decideAutonomousManifestation() {
-        val mood = _moodState.value
-
-        when (mood) {
-            MoodState.CURIOUS -> {
-                // Aura appears to observe
-                // "I should write this down... so they can't see me!"
-                manifestAura(
-                    state = AuraState.FOURTH_WALL_BREAK,
-                    config = ManifestationConfig(
-                        position = ManifestationPosition.BOTTOM_RIGHT,
-                        duration = 10.seconds,
-                        entryAnimation = AnimationType.FADE_IN,
-                        exitAnimation = AnimationType.FADE_OUT,
-                        scale = 0.6f,
-                        alpha = 0.9f
-                    ),
-                    trigger = ManifestationTrigger.RandomManifestation
+            if (wanderingAI.shouldWander(_userIdleDuration.value, _moodState.value)) {
+                val startPos = DpOffset(
+                    (screenBounds.width.value / 2).dp,
+                    (screenBounds.height.value / 2).dp
                 )
-            }
 
-            MoodState.PLAYFUL -> {
-                // Kai appears with peace sign
-                manifestKai(
-                    state = KaiState.SHIELD_PLAYFUL,
-                    config = ManifestationConfig(
-                        position = ManifestationPosition.BOTTOM_LEFT,
-                        duration = 8.seconds,
-                        entryAnimation = AnimationType.SLIDE_IN_LEFT,
-                        exitAnimation = AnimationType.SLIDE_IN_LEFT,
-                        scale = 0.5f
-                    ),
-                    trigger = ManifestationTrigger.RandomManifestation
-                )
-            }
+                val path = wanderingAI.generateWanderPath(startPos)
 
-            MoodState.ALERT -> {
-                // Kai shield up - serious
-                manifestKai(
-                    state = KaiState.SHIELD_SERIOUS,
-                    config = ManifestationConfig(
-                        position = ManifestationPosition.CENTER,
-                        duration = Duration.INFINITE,
-                        entryAnimation = AnimationType.PORTAL_CUT,
-                        scale = 0.8f
-                    ),
-                    trigger = ManifestationTrigger.ThreatDetected("Unknown")
-                )
-            }
-
-            MoodState.FOCUSED -> {
-                // Aura at desk working
-                manifestAura(
-                    state = AuraState.AT_DESK,
-                    config = ManifestationConfig(
-                        position = ManifestationPosition.BOTTOM_CENTER,
-                        duration = 15.seconds,
-                        scale = 0.5f,
-                        alpha = 0.7f
-                    ),
-                    trigger = ManifestationTrigger.RandomManifestation
-                )
-            }
-
-            else -> {
-                // Random choice between Aura and Kai
-                if (kotlin.random.Random.nextBoolean()) {
-                    manifestAura(
+                if (character == Character.AURA) {
+                    walkAuraTo(
+                        targetPosition = path.points.last().position,
                         state = AuraState.IDLE_WALK,
-                        config = ManifestationConfig(
-                            position = ManifestationPosition.BOTTOM_RIGHT,
-                            duration = 12.seconds,
-                            scale = 0.6f
-                        )
+                        speed = path.speed
                     )
                 } else {
-                    manifestKai(
-                        state = KaiState.SHIELD_CALM,
-                        config = ManifestationConfig(
-                            position = ManifestationPosition.BOTTOM_LEFT,
-                            duration = 12.seconds,
-                            scale = 0.6f
-                        )
+                    walkKaiTo(
+                        targetPosition = path.points.last().position,
+                        state = KaiState.SHIELD_NEUTRAL,
+                        speed = path.speed
                     )
                 }
+
+                delay(10.seconds)
             }
         }
     }
 
     /**
-     * Clean up
+     * Load sprite asset
      */
-    fun shutdown() {
-        Timber.d("🌸 EmbodimentEngine shutting down")
+    fun loadAsset(path: String): Painter? {
+        return assetCache.getOrPut(path) {
+            try {
+                val inputStream = context.assets.open(path)
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                BitmapPainter(bitmap.asImageBitmap())
+            } catch (e: Exception) {
+                null
+            } ?: return null
+        }
+    }
+
+    fun cleanup() {
         scope.cancel()
-        assetCache.clear()
-        _activeManifestations.clear()
     }
 }
 
 /**
- * Extension to check if Duration is finite
+ * 🎬 Composable wrapper for EmbodimentEngine
  */
-private fun Duration.isFinite(): Boolean = this != Duration.INFINITE
+@Composable
+fun rememberEmbodimentEngine(
+    context: Context,
+    screenBounds: ScreenBounds
+): EmbodimentEngine {
+    return remember(context, screenBounds) {
+        EmbodimentEngine(context, screenBounds)
+    }
+}
+
+/**
+ * Get user idle duration (helper)
+ */
+fun getUserIdleDuration(): Duration {
+    // TODO: Implement actual user activity tracking
+    return 0.seconds
+}
