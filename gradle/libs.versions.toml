@@ -73,7 +73,7 @@ lifecycleRuntimeLivedata = "2.6.2"
 lifecycleRuntimeSavedstate = "2.6.2"
 lifecycleRuntimeRxjava3 = "2.6.2"
 lifecycleRuntimeReactive = "2.6.2"
-
+moshiCodegen = "1.0.0"
 roomRuntime = "2.6.1"
 roomCompiler = "2.6.1"
 roomKtx = "2.6.1"
@@ -88,7 +88,6 @@ leakcanary = "2.14"
 lottie = "6.7.1"
 material = "1.13.0"
 timber = "5.0.1"
-androidxNavigationComposeGradlePlugin = "2.9.5"
 # System & Root
 libsu = "6.0.0"
 xposed = "82"
@@ -152,7 +151,7 @@ moshi-kotlin = { group = "com.squareup.moshi", name = "moshi-kotlin", version.re
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
-yuApiClient = { group = "highcapable.yukihookapi.api", name = "yukihookapi", version.ref = "yuApiClient"}
+moshi-kotlin-codegen = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", version.ref = "moshiCodegen" }
 
 # Yukihook / KavaRef / Xposed mappings
 yukihookapi-api = { module = "com.highcapable.yukihookapi:api", version.ref = "yukihookapi" }
