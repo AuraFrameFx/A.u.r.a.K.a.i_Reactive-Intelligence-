@@ -18,7 +18,6 @@ dependencies {
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.hilt.gradle.plugin)
     compileOnly(libs.ksp.gradle.plugin)
-    compileOnly(libs.google.services.plugin)
 }
 // ═══════════════════════════════════════════════════════════════════════════
 // Binary Kotlin Class Plugins Registration

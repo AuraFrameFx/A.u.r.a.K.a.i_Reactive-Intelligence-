@@ -1,13 +1,16 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // Feature Module - Feature implementations
 // ═══════════════════════════════════════════════════════════════════════════
-plugins {
+
+olugins {
     id("genesis.android.library")
 }
 
 android {
-    namespace = "dev.aurakai.auraframefx.featuremodule"
+    namespace = "dev.aurakai.auraframefx.feature.module"
 }
+include(":libs.versions.toml")
+includeBuild(":build-logic")
 
 dependencies {
     // ═══════════════════════════════════════════════════════════════════════
