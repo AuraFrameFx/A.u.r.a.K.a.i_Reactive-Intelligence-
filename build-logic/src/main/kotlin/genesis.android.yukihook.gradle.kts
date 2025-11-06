@@ -4,7 +4,8 @@
 
 plugins {
     // KSP is required for YukiHook annotation processing
-    alias(libs.plugins.ksp)
+    // Note: Use plugin ID directly in convention plugins, not alias()
+    id("com.google.devtools.ksp")
 }
 
 // Add YukiHook and Xposed specific dependencies

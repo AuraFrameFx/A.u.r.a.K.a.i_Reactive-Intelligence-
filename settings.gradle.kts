@@ -13,8 +13,9 @@ pluginManagement {
 }
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+    id("org.gradle.toolchains.foojay-resolver-convention")
 }
+
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -67,7 +68,8 @@ dependencyResolutionManagement {
 rootProject.name = "aurakai-reactive-intelligence"
 // --- Application ---
 include(":app")
-
+include(":feature-module")
+project(":feature-module").projectDir = File("path/to/your/feature-module")
 // --- Feature Modules ---
 include(":secure-comm")
 include(":collab-canvas")

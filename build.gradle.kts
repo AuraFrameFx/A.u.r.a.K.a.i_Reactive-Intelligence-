@@ -22,17 +22,9 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 plugins {
-    // CRITICAL HILT/KSP WORKAROUND:
-    // Apply plugins with `apply false` to make them available on the classpath
-    // for ALL subprojects. This prevents Hilt/KSP resolution errors in multi-module projects.
-    alias(libs.plugins.android.application) apply false
-    alias(libs.plugins.android.library) apply false
-    alias(libs.plugins.kotlin.android) apply false
-    alias(libs.plugins.kotlin.serialization) apply false
-    alias(libs.plugins.hilt) apply false
-    alias(libs.plugins.ksp) apply false
-    alias(libs.plugins.google.services) apply false
-    alias(libs.plugins.compose.compiler) apply false
+ id("genesis.android.application")
+ id("genesis.android.library")
+
 }
 
 // Root-level clean task

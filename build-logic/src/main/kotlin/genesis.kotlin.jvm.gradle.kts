@@ -2,7 +2,8 @@
 // Use this for domain/data layers with no Android framework dependencies
 
 plugins {
-    alias(libs.plugins.kotlin.jvm)
+    // Note: Use kotlin() DSL or plugin ID directly in convention plugins, not alias()
+    kotlin("jvm")
 }
 
 // No 'android' block needed!

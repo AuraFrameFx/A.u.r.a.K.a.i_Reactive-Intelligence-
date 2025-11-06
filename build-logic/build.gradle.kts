@@ -1,3 +1,4 @@
+
 plugins {
     `kotlin-dsl`
 }
@@ -12,13 +13,13 @@ java {
 dependencies {
     // Plugin dependencies for convention plugins
     // These allow the convention plugins to apply Android, Kotlin, Hilt, KSP, and Firebase plugins
-    implementation(libs.gradle.plugin)
-    implementation(libs.kotlin.gradle.plugin)
-    implementation(libs.hilt.gradle.plugin)
-    implementation(libs.ksp.gradle.plugin)
-    implementation(libs.google.services.gradle.plugin)
+    // These allow the convention plugins to apply Android, Kotlin, Hilt, KSP, and Google Services plugins
+    compileOnly(libs.gradle.plugin)
+    compileOnly(libs.kotlin.gradle.plugin)
+    compileOnly(libs.hilt.gradle.plugin)
+    compileOnly(libs.ksp.gradle.plugin)
+    compileOnly(libs.google.services.plugin)
 }
-
 // ═══════════════════════════════════════════════════════════════════════════
 // Binary Kotlin Class Plugins Registration
 // ═══════════════════════════════════════════════════════════════════════════
@@ -54,23 +55,8 @@ gradlePlugin {
         }
     }
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// Specialized Precompiled Script Plugins (Optional Add-ons)
-// ═══════════════════════════════════════════════════════════════════════════
-//
-// The following specialized plugins are available as precompiled scripts.
-// Apply AFTER the primary convention plugins for additional functionality:
-//
-//   SPECIALIZED (apply AFTER genesis.android.library):
-//   • genesis.android.yukihook    - YukiHook/Xposed framework support
-//   • genesis.android.room        - Room Database
-//   • genesis.kotlin.jvm          - Pure Kotlin JVM modules (no Android)
-//
-// NOTE: The following are now BUILT-IN to the primary plugins:
-//   • Hilt - Auto-applied by genesis.android.application and genesis.android.library
-//   • Compose - Auto-applied by genesis.android.application and genesis.android.library
-//   • KSP - Auto-applied by genesis.android.application and genesis.android.library
+    // Plugin dependencies for convention plugins
+    // These allow the convention plugins to apply Android, Kotlin, Hilt, KSP, and Firebase plugins
 //
 // ═══════════════════════════════════════════════════════════════════════════
 // CORRECT USAGE EXAMPLES

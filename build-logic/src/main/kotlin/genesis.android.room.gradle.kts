@@ -3,7 +3,8 @@
 
 plugins {
     // Room requires KSP for code generation
-    alias(libs.plugins.ksp)
+    // Note: Use plugin ID directly in convention plugins, not alias()
+    id("com.google.devtools.ksp")
 }
 
 // Configure Room schema directory for database migrations

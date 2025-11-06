@@ -8,13 +8,13 @@ agp = "9.0.0-alpha13"
 androidApplication = "9.0.0-alpha13"
 androidLibrary = "9.0.0-alpha13"
 androidTest = "9.0.0-alpha13"
-
+foojayresolver = "1.0.0"
 # Gradle - Latest: 9.2.0
 gradle = "9.2.0"
-
+foojayResolver = "1.0.0"
 # Google Services Plugin
-googleServices = "4.4.2"
-
+googleServices = "4.4.4"
+gradleCore = "1.0.0"
 # Dagger Hilt - Latest: 2.57.2 (minor update from 2.57.1)
 hilt = "2.57.2"
 
@@ -208,7 +208,8 @@ kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-p
 hilt-gradle-plugin = { group = "com.google.dagger", name = "hilt-android-gradle-plugin", version.ref = "hilt" }
 ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "symbol-processing-gradle-plugin", version.ref = "ksp" }
 google-services-gradle-plugin = { group = "com.google.gms", name = "google-services", version.ref = "googleServices" }
-
+gradle-core = { group = "org.gradle", name = "gradle-core", version.ref = "gradleCore" }
+foojayresolver = { group = "org.gradle.toolchains.foojay-resolver-convention", name = "foojay-resolver", version.ref = "foojayResolver" }
 # ============================================================================
 # AndroidX & Jetpack
 # ============================================================================
@@ -250,6 +251,7 @@ firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+firebase-storage = { module = "com.google.firebase:firebase-storage" }
 
 # ============================================================================
 # Hilt (Dependency Injection)
@@ -301,15 +303,6 @@ libsu-io = { group = "com.github.topjohnwu.libsu", name = "io", version.ref = "l
 libsu-service = { group = "com.github.topjohnwu.libsu", name = "service", version.ref = "libsu" }
 
 # Firebase dependencies with explicit versions and KTX variants
-firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
-firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analytics-ktx", version.ref = "firebaseAnalyticsKtx" }
-firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
-firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx", version.ref = "firebaseCrashlyticsKtx" }
-firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
-firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
-firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
-firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
-firebase-bom = { module = "com.google.firebase:firebase-bom", name = "firebaseBom", version.ref = "firebaseBom" }
 
 # KavaRef - Reflection utilities for YukiHook (hosted on HighCapable Maven)
 kavaref-core = { module = "com.highcapable.kavaref:kavaref-core", version.ref = "kavaref" }
@@ -325,7 +318,15 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 
+# ============================================================================
+# Xposed & Hooking
+# ============================================================================
+# Xposed API (original, provided by LSPosed)
+xposed-api = { group = "de.robv.android.xposed", name = "api", version.ref = "xposed" }
+yukihookapi-api = { group = "com.highcapable.yukihookapi", name = "api", version.ref = "yukihookapi" }
+yukihookapi-ksp = { group = "com.highcapable.yukihookapi", name = "ksp", version.ref = "yukihookapi" }
 [bundles]
+
 # ============================================================================
 # Library Bundles
 # ============================================================================
