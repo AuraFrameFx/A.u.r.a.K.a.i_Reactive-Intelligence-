@@ -1,67 +1,62 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// ROM Tools Module - System and ROM modification utilities
+// ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("com.android.library") version "9.0.0-alpha13"
-    id("com.google.dagger.hilt.android") version "2.57.2"
-    id("com.google.devtools.ksp") version "2.3.0"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
-
+    id("genesis.android.library")
 }
+
 android {
     namespace = "dev.aurakai.auraframefx.romtools"
-    compileSdk = 36
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_24
-        targetCompatibility = JavaVersion.VERSION_24
-    }
+    // Java 24 compileOptions are set by genesis.android.base
 }
+
 dependencies {
-    compileOnly(files("$projectDir/libs/api-82.jar"))
-    ksp("com.highcapable.yukihookapi:ksp-xposed:1.3.1")
+    // ═══════════════════════════════════════════════════════════════════════
+    // AUTO-PROVIDED by genesis.android.library:
+    // - androidx-core-ktx, appcompat, timber
+    // - Hilt (android + compiler via KSP)
+    // - Coroutines (core + android)
+    // - Compose enabled by default
+    // - Java 24 bytecode target
+    // ═══════════════════════════════════════════════════════════════════════
 
+    // Expose core KTX as API
+    api(libs.androidx.core.ktx)
 
-    // Libsu for root operations
-    implementation(libs.libsu.core)
-    implementation(libs.libsu.io)
-    implementation(libs.libsu.service)
+    // Compose UI
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons.extended)
+    implementation(libs.compose.ui.tooling.preview)
+    debugImplementation(libs.compose.ui.tooling)
 
-    // Core AndroidX dependencies
-    api(libs.androidx.core.ktx) // if APIs leak types
-    implementation(libs.androidx.appcompat)
-    implementation(libs.timber)
-
-    // Compose / Lifecycle / Navigation / Hilt integrations (single declarations)
+    // Compose / Lifecycle / Navigation / Hilt integrations
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
 
-    // Work
+    // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
 
     // Kotlin Serialization
     implementation(libs.kotlinx.serialization.json)
 
-    // Compose UI
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.compose.ui)
-    implementation(libs.compose.material3)
-    implementation(libs.compose.material.icons.extended)  // For extended Material Icons
-    implementation(libs.compose.ui.tooling.preview)
-    debugImplementation(libs.compose.ui.tooling)
+    // Root/System Operations
+    implementation(libs.libsu.core)
+    implementation(libs.libsu.io)
+    implementation(libs.libsu.service)
 
-    // Hilt for dependency injection
-    implementation(libs.hilt.android)
-    implementation(libs.androidx.hilt.navigation.compose)  // For hiltViewModel()
-    ksp(libs.hilt.compiler)
+    // Xposed API (compile-only, not bundled in APK)
+    compileOnly(files("$projectDir/libs/api-82.jar"))
 
-    // Kotlin coroutines
-    implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.coroutines.core)
+    // YukiHook API Code Generation (Xposed framework)
+    ksp(libs.yukihookapi.ksp.xposed)
 }
 
-// Force a single annotations artifact to avoid duplicate-class errors seen in the build logs.
+// Force a single annotations artifact to avoid duplicate-class errors
 configurations.all {
     resolutionStrategy {
         force("org.jetbrains:annotations:23.0.0")

@@ -1,57 +1,49 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// Collaborative Canvas Module - Real-time collaborative drawing/whiteboard
+// ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("com.android.library") version "9.0.0-alpha13"
-    id("com.google.dagger.hilt.android") version "2.57.2"
-    id("com.google.devtools.ksp") version "2.3.0"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
+    id("genesis.android.library")
 }
+
 android {
     namespace = "dev.aurakai.auraframefx.collabcanvas"
-    compileSdk = libs.versions.compile.sdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.min.sdk.get().toInt()
-        buildFeatures {
-            compose = true
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_24
-        targetCompatibility = JavaVersion.VERSION_24
-    }
+    // Java 24 compileOptions and Compose are set by genesis.android.base
 }
+
 dependencies {
-    compileOnly(files("$projectDir/libs/api-82.jar"))
-    ksp("com.highcapable.yukihookapi:ksp-xposed:1.3.1")
+    // ═══════════════════════════════════════════════════════════════════════
+    // AUTO-PROVIDED by genesis.android.library:
+    // - androidx-core-ktx, appcompat, timber
+    // - Hilt (android + compiler via KSP)
+    // - Coroutines (core + android)
+    // - Compose enabled by default
+    // - Java 24 bytecode target
+    // ═══════════════════════════════════════════════════════════════════════
 
-    // Libsu for root operations
-    implementation(libs.libsu.core)
-    implementation(libs.libsu.io)
-    implementation(libs.libsu.service)
-
-    // Core AndroidX dependencies
+    // Expose core KTX as API
     api(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.timber)
 
     // Compose UI
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
-    implementation(libs.compose.material.icons.extended)  // For Material Icons
+    implementation(libs.compose.material.icons.extended)
     implementation(libs.compose.ui.tooling.preview)
     debugImplementation(libs.compose.ui.tooling)
-
-    // Hilt for dependency injection
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
 
     // Networking
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
     implementation("com.google.code.gson:gson:2.11.0")
 
-    // Kotlin coroutines
-    implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.coroutines.core)
+    // Root/System Operations
+    implementation(libs.libsu.core)
+    implementation(libs.libsu.io)
+    implementation(libs.libsu.service)
+
+    // Xposed API (compile-only, not bundled in APK)
+    compileOnly(files("$projectDir/libs/api-82.jar"))
+
+    // YukiHook API Code Generation (Xposed framework)
+    ksp(libs.yukihookapi.ksp.xposed)
 }

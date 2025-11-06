@@ -11,11 +11,12 @@ java {
 
 dependencies {
     // Plugin dependencies for convention plugins
-    // These allow the convention plugins to apply Android, Kotlin, Hilt, and KSP plugins
+    // These allow the convention plugins to apply Android, Kotlin, Hilt, KSP, and Firebase plugins
     implementation(libs.gradle.plugin)
     implementation(libs.kotlin.gradle.plugin)
     implementation(libs.hilt.gradle.plugin)
     implementation(libs.ksp.gradle.plugin)
+    implementation(libs.google.services.gradle.plugin)
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -55,33 +56,21 @@ gradlePlugin {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ⚠️ DEPRECATED: Old Precompiled Script Plugins
+// Specialized Precompiled Script Plugins (Optional Add-ons)
 // ═══════════════════════════════════════════════════════════════════════════
 //
-// The following precompiled script plugins (.gradle.kts files) are DEPRECATED
-// and should NO LONGER be used directly in modules:
-//
-//   DEPRECATED (DO NOT USE):
-//   • genesis.android.application.gradle.kts - Use genesis.android.application instead
-//   • genesis.android.library.gradle.kts     - Use genesis.android.library instead
-//   • genesis.android.base.gradle.kts        - Auto-applied by application/library plugins
-//
-// These files will be removed in a future version.
-//
-// ═══════════════════════════════════════════════════════════════════════════
-// Specialized Precompiled Script Plugins (Still Available)
-// ═══════════════════════════════════════════════════════════════════════════
-//
-// The following specialized plugins are still available as precompiled scripts:
+// The following specialized plugins are available as precompiled scripts.
+// Apply AFTER the primary convention plugins for additional functionality:
 //
 //   SPECIALIZED (apply AFTER genesis.android.library):
 //   • genesis.android.yukihook    - YukiHook/Xposed framework support
 //   • genesis.android.room        - Room Database
 //   • genesis.kotlin.jvm          - Pure Kotlin JVM modules (no Android)
 //
-// ⚠️ The following plugins are now INCLUDED in the main plugins and should NOT be applied separately:
-//   • genesis.android.hilt        - Included in genesis.android.application and genesis.android.library
-//   • genesis.android.compose     - Included in genesis.android.application and genesis.android.library
+// NOTE: The following are now BUILT-IN to the primary plugins:
+//   • Hilt - Auto-applied by genesis.android.application and genesis.android.library
+//   • Compose - Auto-applied by genesis.android.application and genesis.android.library
+//   • KSP - Auto-applied by genesis.android.application and genesis.android.library
 //
 // ═══════════════════════════════════════════════════════════════════════════
 // CORRECT USAGE EXAMPLES

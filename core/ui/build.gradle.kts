@@ -1,36 +1,34 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// Core UI Module - Shared UI components and Compose utilities
+// ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("com.android.library") version "9.0.0-alpha13"
-    id("com.google.dagger.hilt.android") version "2.57.2"
-    id("com.google.devtools.ksp") version "2.3.0"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
+    id("genesis.android.library")
 }
+
 android {
     namespace = "dev.aurakai.auraframefx.core.ui"
-    compileSdk = libs.versions.compile.sdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.min.sdk.get().toInt()
-        buildFeatures {
-            compose = true
-        }
-    }
 }
 
 dependencies {
-    api(libs.androidx.core.ktx) // if APIs leak types
-    implementation(libs.androidx.appcompat)
-    implementation(libs.timber)
-    compileOnly(files("$projectDir/libs/api-82.jar"))
-    ksp("com.highcapable.yukihookapi:ksp-xposed:1.3.1")
+    // ═══════════════════════════════════════════════════════════════════════
+    // AUTO-PROVIDED by genesis.android.library:
+    // - androidx-core-ktx, appcompat
+    // - Hilt (android + compiler via KSP)
+    // - Timber, Coroutines
+    // - Compose enabled by default
+    // ═══════════════════════════════════════════════════════════════════════
 
-// If this library uses Compose UI:
+    // Expose core KTX as API (types leak to consumers)
+    api(libs.androidx.core.ktx)
+
+    // Compose UI
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
 
-// Hilt in library
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+    // Xposed API (compile-only, not bundled in APK)
+    compileOnly(files("$projectDir/libs/api-82.jar"))
 
-// Compile-only for Xposed API (no runtime bundling)
+    // YukiHook API Code Generation (Xposed framework)
+    ksp(libs.yukihookapi.ksp.xposed)
 }

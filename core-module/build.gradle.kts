@@ -1,40 +1,30 @@
-﻿plugins {
-    id("com.android.library") version "9.0.0-alpha13"
-    id("com.google.dagger.hilt.android") version "2.57.2"
-    id("com.google.devtools.ksp") version "2.3.0"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
+// ═══════════════════════════════════════════════════════════════════════════
+// Core Module - Central core module
+// ═══════════════════════════════════════════════════════════════════════════
+plugins {
+    id("genesis.android.library")
 }
 
 android {
     namespace = "dev.aurakai.auraframefx.coremodule"
-    compileSdk = libs.versions.compile.sdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.min.sdk.get().toInt()
-        buildFeatures {
-            compose = true
-        }
-    }
+    // Java 24 compileOptions are set by genesis.android.base
+}
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_24
-        targetCompatibility = JavaVersion.VERSION_24
-    }
+dependencies {
+    // ═══════════════════════════════════════════════════════════════════════
+    // AUTO-PROVIDED by genesis.android.library:
+    // - androidx-core-ktx, appcompat
+    // - Hilt (android + compiler via KSP)
+    // - Timber, Coroutines
+    // - Compose enabled by default
+    // - Java 24 bytecode target
+    // ═══════════════════════════════════════════════════════════════════════
 
-    dependencies {
-        api(libs.androidx.core.ktx) // if APIs leak types
-        implementation(libs.androidx.appcompat)
-        implementation(libs.timber)
+    // Expose core KTX as API (types leak to consumers)
+    api(libs.androidx.core.ktx)
 
-// If this library uses Compose UI:
-        implementation(platform(libs.androidx.compose.bom))
-        implementation(libs.compose.ui)
-        implementation(libs.compose.material3)
-
-// Hilt in library
-        implementation(libs.hilt.android)
-        ksp(libs.hilt.compiler)
-
-// Compile-only for Xposed API (no runtime bundling)
-    }
+    // Compose UI
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.material3)
 }
