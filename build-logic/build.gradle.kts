@@ -4,7 +4,8 @@ plugins {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        // UPDATED: Java 25 toolchain for development environment
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
@@ -18,36 +19,94 @@ dependencies {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Precompiled Script Plugins
+// Binary Kotlin Class Plugins Registration
 // ═══════════════════════════════════════════════════════════════════════════
 //
-// All convention plugins are now precompiled script plugins (.gradle.kts files).
-// They are automatically registered by Gradle - no manual registration needed!
+// These are the PRIMARY convention plugins that modules should use.
+// They are Kotlin class plugins (not precompiled scripts) for maximum control
+// over plugin application order.
 //
-// The file name becomes the plugin ID:
-//   genesis.android.application.gradle.kts → id("genesis.android.application")
+gradlePlugin {
+    plugins {
+        // Primary application plugin - for :app module
+        register("genesisAndroidApplication") {
+            id = "genesis.android.application"
+            implementationClass = "plugins.GenesisApplicationPlugin"
+            displayName = "Genesis Android Application Plugin"
+            description = "Applies Android Application plugin with Hilt, KSP, Compose, Serialization, and Firebase"
+        }
+
+        // Primary library plugin - for all library modules
+        register("genesisAndroidLibrary") {
+            id = "genesis.android.library"
+            implementationClass = "plugins.GenesisLibraryPlugin"
+            displayName = "Genesis Android Library Plugin"
+            description = "Applies Android Library plugin with Hilt, Compose, and KSP"
+        }
+
+        // Base configuration plugin - applied automatically by application and library plugins
+        register("genesisAndroidBase") {
+            id = "genesis.android.base"
+            implementationClass = "plugins.GenesisBasePlugin"
+            displayName = "Genesis Android Base Plugin"
+            description = "Foundational configuration for all Android modules (SDK versions, Kotlin, dependencies)"
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ⚠️ DEPRECATED: Old Precompiled Script Plugins
+// ═══════════════════════════════════════════════════════════════════════════
 //
-// Available Plugins:
+// The following precompiled script plugins (.gradle.kts files) are DEPRECATED
+// and should NO LONGER be used directly in modules:
 //
-//   FOUNDATIONAL:
-//   • genesis.android.base        - Base Android configuration (SDK, Kotlin, deps)
+//   DEPRECATED (DO NOT USE):
+//   • genesis.android.application.gradle.kts - Use genesis.android.application instead
+//   • genesis.android.library.gradle.kts     - Use genesis.android.library instead
+//   • genesis.android.base.gradle.kts        - Auto-applied by application/library plugins
 //
-//   APPLICATION & LIBRARY:
-//   • genesis.android.application - For the :app module (includes Hilt, Compose, Services)
-//   • genesis.android.library     - For Android library modules
-//   • genesis.kotlin.jvm          - For pure Kotlin JVM modules (no Android)
+// These files will be removed in a future version.
 //
-//   COMPOSABLE (mix and match):
-//   • genesis.android.hilt        - Hilt dependency injection
-//   • genesis.android.compose     - Jetpack Compose UI
+// ═══════════════════════════════════════════════════════════════════════════
+// Specialized Precompiled Script Plugins (Still Available)
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// The following specialized plugins are still available as precompiled scripts:
+//
+//   SPECIALIZED (apply AFTER genesis.android.library):
+//   • genesis.android.yukihook    - YukiHook/Xposed framework support
 //   • genesis.android.room        - Room Database
-//   • genesis.android.yukihook    - YukiHook/Xposed framework
+//   • genesis.kotlin.jvm          - Pure Kotlin JVM modules (no Android)
 //
-// Example Usage:
+// ⚠️ The following plugins are now INCLUDED in the main plugins and should NOT be applied separately:
+//   • genesis.android.hilt        - Included in genesis.android.application and genesis.android.library
+//   • genesis.android.compose     - Included in genesis.android.application and genesis.android.library
+//
+// ═══════════════════════════════════════════════════════════════════════════
+// CORRECT USAGE EXAMPLES
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// For :app module:
+//   plugins {
+//       id("genesis.android.application")  // All-in-one: Android, Hilt, KSP, Compose, Serialization, Firebase
+//   }
+//
+// For standard library module:
+//   plugins {
+//       id("genesis.android.library")  // All-in-one: Android, Hilt, Compose, KSP
+//   }
+//
+// For YukiHook/Xposed module:
+//   plugins {
+//       id("genesis.android.library")   // Base library with Hilt, Compose, KSP
+//       id("genesis.android.yukihook")  // Add YukiHook/Xposed support
+//   }
+//
+// For Room database module:
 //   plugins {
 //       id("genesis.android.library")  // Base library
-//       id("genesis.android.compose")  // Add Compose UI
-//       id("genesis.android.hilt")     // Add Hilt DI
+//       id("genesis.android.room")     // Add Room Database
 //   }
 //
 // ═══════════════════════════════════════════════════════════════════════════
