@@ -1,42 +1,40 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// Oracle Drive - Core Data Layer
+// ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("com.android.library") version "9.0.0-alpha13" // This likely applies the base configurations already
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
-    id("com.google.devtools.ksp") version "2.3.0"
-    id("com.google.dagger.hilt.android") version "2.57.2"
-    alias(libs.plugins.serialization)
+    id("genesis.android.library")
 }
-
 
 android {
     namespace = "dev.aurakai.auraframefx.core.data"
-    compileSdk = 36
-
 }
 
 dependencies {
     // Expose domain layer
-    api(project(":core:domain"))
-    compileOnly(libs.xposed.api)
-    compileOnly(libs.yukihookapi)
-    implementation(libs.androidx.core.ktx)
+    api(project(":oracledrive:core:domain"))
+
+    // Common utilities
+    implementation(project(":oracledrive:core:common"))
 
     // Data layer dependencies
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore.core)
 
-    // Hilt - required when alias(libs.plugins.hilt) is applied
+    // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-    // Common utilities
-    implementation(project(":core:common"))
+    // Root/System Operations
+    implementation(libs.libsu.core)
+    implementation(libs.libsu.io)
+    implementation(libs.libsu.service)
 
-    // Testing
+    // Networking
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
 
-    implementation("com.github.topjohnwu.libsu:core:6.0.0")
-    implementation("com.github.topjohnwu.libsu:io:6.0.0")
-    implementation("com.github.topjohnwu.libsu:service:6.0.0")
-    compileOnly("de.robv.android.xposed:api:82")
-    implementation("com.squareup.retrofit2:converter-kotlinx-serialization:1.0.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:${libs.versions.okhttp.get()}")
+    // Xposed/YukiHook (compile-only)
+    compileOnly(libs.xposed.api)
+    compileOnly(libs.yukihookapi.api)
 }

@@ -6,72 +6,94 @@
 // Status: Awaiting implementation (0 source files)
 // Documented: Yes (see README.md)
 // Remove this module if not implementing soon to reduce build time.
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Oracle Drive - Integration Module
+// ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("com.android.library")
-    id("com.google.devtools.ksp")
-    id("com.google.dagger.hilt.android")
-    id("org.jetbrains.kotlin.plugin.serialization")
+    id("genesis.android.library")
 }
 
 android {
     namespace = "dev.aurakai.auraframefx.oracledriveintegration"
-    compileSdk = 36
-
 }
+
 dependencies {
+    // Core Android
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.material)
-    implementation(libs.androidx.core.ktx)
+
+    // Lifecycle
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.material)
-    implementation(libs.material3)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+    debugImplementation(libs.compose.ui.tooling)
+
+    // Navigation
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Room
     ksp(libs.androidx.room.compiler)
 
+    // DataStore
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore.core)
 
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-
+    // Kotlin
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.datetime)
-    implementation(libs.coroutines)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+
+    // Networking
     implementation(libs.retrofit)
     implementation(libs.okhttp)
-    implementation("com.squareup.retrofit2:converter-moshi:3.0.0")
-    implementation("com.squareup.retrofit2:converter-kotlinx-serialization:1.0.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:${libs.versions.okhttp.get()}")
-    implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.androidx.security.crypto)
-    implementation(libs.androidx.hilt.navigation)
+    implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.retrofit.converter.moshi)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
 
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // Security
+    implementation(libs.androidx.security.crypto)
+
+    // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
 
+    // Root/System Operations
     implementation(libs.libsu.core)
     implementation(libs.libsu.io)
 
+    // Logging
     implementation(libs.timber)
 
+    // Xposed/YukiHook (compile-only)
     compileOnly(libs.xposed.api)
-    compileOnly(libs.yukihookapi)
+    compileOnly(libs.yukihookapi.api)
+    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
+    // Desugaring
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-    testImplementation(libs.junit.jupiter.api)
+    // Testing
+    testImplementation(libs.junit.jupiter)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.hilt.android.testing)
-    androidTestImplementation(libs.androidx.benchmark.junit4)
-    androidTestImplementation(libs.androidx.test.uiautomator)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.benchmark.junit4)
 }

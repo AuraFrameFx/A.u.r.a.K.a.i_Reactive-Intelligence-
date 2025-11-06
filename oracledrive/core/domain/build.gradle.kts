@@ -1,91 +1,90 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// Oracle Drive - Core Domain Layer (Business Logic)
+// ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("com.android.library") version "9.0.0-alpha13" // This likely applies the base configurations already
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
-    id("com.google.devtools.ksp") version "2.3.0"
-    id("com.google.dagger.hilt.android") version "2.57.2"
-    alias(libs.plugins.serialization)
+    id("genesis.android.library")
 }
 
 android {
     namespace = "dev.aurakai.auraframefx.core.domain"
-    compileSdk = 36
-
 }
 
-
 dependencies {
-    // Pure business logic, no Android dependencies
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(project(":core:common"))
-    // Testing
+    // Common utilities
+    implementation(project(":oracledrive:core:common"))
 
-    // Utilities and extensions
+    // Core Android
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.security.crypto)
 
-    // --- Jetpack Compose (versions are managed by the BOM from the convention plugin) ---
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.material3) // Standardize on Material 3 for Compose
-    implementation(libs.androidx.navigation.compose)
-    debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+    debugImplementation(libs.compose.ui.tooling)
 
-    // --- Lifecycle ---
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+
+    // Lifecycle
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    // --- Hilt (plugin applied by `genesis.android.library`) ---
+    // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    implementation(libs.androidx.hilt.navigation.compose) // Ensure this alias points to the compose version
+    implementation(libs.androidx.hilt.navigation.compose)
 
-    // --- Room (KSP is applied by convention plugin) ---
+    // Room
     ksp(libs.androidx.room.compiler)
 
-    // --- DataStore ---
+    // DataStore
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore.core)
 
-    // --- Coroutines & Serialization ---
+    // Kotlin
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.datetime)
 
-    // --- Networking ---
-    implementation(libs.retrofit) // Assuming you have clearer aliases
+    // Networking
+    implementation(libs.retrofit)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
-    // Standardize on one converter. kotlinx.serialization is the modern default.
     implementation(libs.retrofit.converter.kotlinx.serialization)
 
-    // --- Firebase ---
+    // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
 
-    // --- Background Work ---
+    // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
 
-    // --- Utilities (Logging, Root) ---
-    implementation(libs.timber)
+    // Security
+    implementation(libs.androidx.security.crypto)
+
+    // Root/System
     implementation(libs.libsu.core)
     implementation(libs.libsu.io)
 
-    // --- Hooking Frameworks (Compile Only) ---
+    // Logging
+    implementation(libs.timber)
+
+    // Xposed/YukiHook (compile-only)
     compileOnly(libs.xposed.api)
-    compileOnly(libs.yukihookapi)
+    compileOnly(libs.yukihookapi.api)
 
-
-    // --- Desugaring (Enabled by convention plugin) ---
+    // Desugaring
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-    // --- Testing ---
-    testImplementation(libs.junit.jupiter.api)
+    // Testing
+    testImplementation(libs.junit.jupiter)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.hilt.android.testing)
-    androidTestImplementation(libs.androidx.benchmark.junit4)
-    androidTestImplementation(libs.androidx.test.uiautomator)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.benchmark.junit4)
 }
