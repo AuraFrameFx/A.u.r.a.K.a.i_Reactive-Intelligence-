@@ -17,8 +17,8 @@ plugins {
     // 4. Apply KSP for code generation (used by Hilt, Room, Moshi)
     id("com.google.devtools.ksp")
 
-    // 5. Apply the Kotlin Serialization plugin
-    id("org.jetbrains.kotlin.plugin.serialization")
+    // 5. Apply the Kotlin Serialization plugin using kotlin() DSL
+    kotlin("plugin.serialization")
 
     // 6. Apply Compose Compiler plugin
     id("org.jetbrains.kotlin.plugin.compose")
