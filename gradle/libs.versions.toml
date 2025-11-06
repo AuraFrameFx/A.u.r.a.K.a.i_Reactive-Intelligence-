@@ -329,7 +329,7 @@ system-root = [
     "libsu-io",
     "libsu-service",
     "xposed-api",
-    "yukihookapi"
+    "yukihookapi-api"
 ]
 
 [plugins]
