@@ -148,7 +148,7 @@ guava = "33.5.0-android"
 leakcanary = "2.14"
 
 # Lottie Compose - Latest: 6.6.9
-lottie = "6.6.9"
+lottie = "6.7.1"
 
 # Material Components - Latest stable: 1.13.0, Alpha: 1.14.0-alpha06
 material = "1.13.0"
