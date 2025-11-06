@@ -17,7 +17,7 @@ plugins {
     // 4. Apply KSP for code generation (used by Hilt, Room, Moshi)
     id("com.google.devtools.ksp")
 
-    // 5. Apply the Kotlin Serialization plugin (version managed in pluginManagement)
+    // 5. Apply the Kotlin Serialization plugin
     id("org.jetbrains.kotlin.plugin.serialization")
 
     // 6. Apply Compose Compiler plugin
@@ -61,28 +61,13 @@ android {
         buildConfig = true
     }
 
-    // Configure the Compose compiler
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
-    }
+    // Note: composeOptions {} is DEPRECATED with Kotlin 2.0+
+    // Compose compiler is now built-in via org.jetbrains.kotlin.plugin.compose
 }
 
 // Add dependencies that every application module needs
 dependencies {
-    dependencies {
-        // Plugin dependencies for convention plugins
-        // These allow the convention plugins to apply Android, Kotlin, Hilt, KSP, and Firebase plugins
-        implementation(libs.gradle.plugin)
-        -    implementation(libs.kotlin.gradle.plugin)
-        -    implementation(libs.hilt.gradle.plugin)
-        -    implementation(libs.ksp.gradle.plugin)
-        -    implementation(libs.google.services.plugin)
-        +    compileOnly(libs.gradle.plugin)
-        +    compileOnly(libs.kotlin.gradle.plugin)
-        +    compileOnly(libs.hilt.gradle.plugin)
-        +    compileOnly(libs.ksp.gradle.plugin)
-        +    compileOnly(libs.google.services.plugin)
-            // Hilt
+    // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
