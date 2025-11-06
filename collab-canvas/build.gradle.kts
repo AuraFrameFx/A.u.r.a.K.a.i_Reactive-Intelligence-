@@ -34,7 +34,7 @@ dependencies {
     // Networking
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
-    implementation("com.google.code.gson:gson:2.11.0")
+    implementation("com.google.code.gson:gson:2.13.2")
 
     // Root/System Operations
     implementation(libs.libsu.core)
