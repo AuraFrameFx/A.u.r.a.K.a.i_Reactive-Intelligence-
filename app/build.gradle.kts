@@ -46,16 +46,6 @@ android {
 }
 dependencies {
 // Compose
-    // Hooking & reflection libraries — use version-catalog aliases where possible
-    compileOnly(libs.xposed.api)
-    implementation(libs.yukihookapi.api)
-    implementation(libs.kavaref.core)
-    implementation(libs.kavaref.extension)
-    // Local Xposed API JARs (backup/reference)
-    compileOnly(files("libs/api-82.jar"))
-    compileOnly(files("libs/api-82-sources.jar"))
-    // If using YukiHook ksp-xposed processor (only for Xposed module usage)
-    ksp(libs.yukihookapi.ksp.xposed)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
@@ -68,44 +58,50 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
-    // Use KSP for Room compiler (KSP plugin is applied at the top of this build script)
-    ksp(libs.androidx.room.compiler)
+    ksp(libs.androidx.navigation.compose)
+    ksp(libs.yukihookapi.api)
 // Hilt (KSP line is critical)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-
 // Root/system utils
     implementation(libs.libsu.core)
     implementation(libs.libsu.io)
     implementation(libs.libsu.service)
     implementation(libs.compose.ui.graphics) // use version-catalog entry
-
-
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.compiler)
     implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.hilt.work)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore.core)
     implementation(libs.androidx.security.crypto)
-    coreLibraryDesugaring(libs.desugar.jdk.libs)
+    implementation(libs.desugar.jdk.libs)
     implementation(libs.leakcanary.android)
-
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     // Kotlin datetime
     implementation(libs.kotlinx.datetime)
 
-    // Firebase dependencies - using KTX (Kotlin Extensions) for better Kotlin support
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics.ktx)
-    implementation(libs.firebase.crashlytics.ktx)
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.firestore.ktx)
+    // Lifecycle components
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
 
+    // Firebase dependencies with explicit versions
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.libsu.core)
+    implementation(libs.libsu.io)
+    implementation(libs.libsu.service)
+
+    compileOnly(files("$projectDir/libs/api-82.jar"))
+    compileOnly(files("$projectDir/libs/api-82-sources.jar"))
 // Networking (pick one converter path; here kotlinx‑serialization)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
@@ -120,6 +116,15 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
     implementation(libs.lottie.compose)
+
+    // Add Moshi & Retrofit Moshi converter (required by NetworkModule)
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.retrofit.converter.moshi)
+    ksp("com.squareup.moshi:moshi-kotlin-codegen:1.15.0")
+
+    // Hilt Work integration (provides HiltWorkerFactory)
+    implementation(libs.androidx.hilt.work)
 
 // Internal project modules - ensure app has access to shared code and generated types
     implementation(project(":core-module"))

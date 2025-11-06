@@ -74,7 +74,7 @@ lifecycleRuntimeLivedata = "2.6.2"
 lifecycleRuntimeSavedstate = "2.6.2"
 lifecycleRuntimeRxjava3 = "2.6.2"
 lifecycleRuntimeReactive = "2.6.2"
-
+moshiCodegen = "1.0.0"
 roomRuntime = "2.6.1"
 roomCompiler = "2.6.1"
 roomKtx = "2.6.1"
@@ -89,7 +89,6 @@ leakcanary = "2.14"
 lottie = "6.7.1"
 material = "1.13.0"
 timber = "5.0.1"
-androidxNavigationComposeGradlePlugin = "2.9.5"
 # System & Root
 libsu = "6.0.0"
 xposed = "82"
@@ -161,9 +160,6 @@ hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", v
 
 # Yukihook / KavaRef / Xposed mappings
 yukihookapi-api = { module = "com.highcapable.yukihookapi:api", version.ref = "yukihookapi" }
-yukihookapi-ksp-xposed = { module = "com.highcapable.yukihookapi:ksp-xposed", version.ref = "yukihookapi" }
-kavaref-core = { module = "com.highcapable.kavaref:kavaref-core", version.ref = "kavaref" }
-kavaref-extension = { module = "com.highcapable.kavaref:kavaref-extension", version.ref = "kavaref" }
 
 # Ensure xposed api alias exists (keeps backward compatibility)
 xposed-api = { module = "de.robv.android.xposed:api", version.ref = "xposed" }
@@ -200,6 +196,7 @@ timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "tim
 libsu-core = { group = "com.github.topjohnwu.libsu", name = "core", version.ref = "libsu" }
 libsu-io = { group = "com.github.topjohnwu.libsu", name = "io", version.ref = "libsu" }
 libsu-service = { group = "com.github.topjohnwu.libsu", name = "service", version.ref = "libsu" }
+yuki-api = { module = "com.github.LSPosed.YukiHookAPI:api", name = "YukiHookAPI", version.ref = "yuki" }
 
 # Firebase dependencies with explicit versions and KTX variants
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }

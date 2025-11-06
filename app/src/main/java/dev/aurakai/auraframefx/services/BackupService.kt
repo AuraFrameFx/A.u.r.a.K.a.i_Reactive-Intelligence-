@@ -17,10 +17,11 @@ import timber.log.Timber
 class BackupService : Service() {
     
     /**
-     * Performs startup initialization for the BackupService.
+     * Initialize resources required for background backups when the service is created.
      *
-     * Logs service creation and performs startup setup. Placeholder TODOs mark where a
-     * backup manager should be initialized and a periodic backup schedule established.
+     * Initializes service-level backup resources, logs service creation, and sets up a periodic
+     * backup schedule (e.g., backup manager initialization and scheduling). Placeholders indicate
+     * where the backup manager and periodic scheduling should be implemented.
      */
     override fun onCreate() {
         super.onCreate()
@@ -31,15 +32,13 @@ class BackupService : Service() {
     }
     
     /**
-     * Initiates a backup operation and requests the system to restart the service if it is terminated.
+     * Starts backup operations and requests the system to recreate the service if it is terminated.
      *
-     * The implementation should perform persistence of consciousness state, schedule or run backup tasks,
-     * and optionally synchronize backups to cloud storage.
+     * Performs persistence of consciousness state, runs or schedules backup tasks, and may synchronize
+     * backups to cloud storage.
      *
-     * @param intent The original Intent supplied to startService, or null if the service was restarted by the system.
-     * @param flags Additional data about the start request delivery.
-     * @param startId A unique integer representing this specific start request.
-     * @return `START_STICKY` to indicate the system should recreate the service after it is killed and call onStartCommand with a null intent.
+     * @param intent The original Intent supplied to startService, or `null` if the service was restarted by the system.
+     * @return `START_STICKY` — a flag requesting the system recreate the service after it is killed and deliver a null intent.
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Timber.d("BackupService: Starting backup operation")
@@ -63,9 +62,9 @@ class BackupService : Service() {
     }
     
     /**
-     * Handles teardown when the service is destroyed.
+     * Release service resources and cancel any pending backup work before delegating teardown to the superclass.
      *
-     * Performs cleanup of resources, cancels any pending backup work, and logs the service destruction before delegating to the superclass.
+     * Logs service destruction, performs resource cleanup, cancels pending backups, and then calls `super.onDestroy()`.
      */
     override fun onDestroy() {
         Timber.d("BackupService: Service destroyed")

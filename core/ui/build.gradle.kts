@@ -15,6 +15,7 @@ android {
         }
     }
 }
+
 dependencies {
     api(libs.androidx.core.ktx) // if APIs leak types
     implementation(libs.androidx.appcompat)

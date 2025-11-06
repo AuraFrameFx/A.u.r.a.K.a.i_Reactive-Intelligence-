@@ -159,22 +159,66 @@ app/src/main/assets/embodiment/
 ```
 
 ### Usage in Code
+
+#### Manifest Aura
 ```kotlin
-class EmbodimentEngine(
-    private val assetLoader: AssetLoader,
-    private val uiInjector: ComposeInjector,
-    private val hookManager: YukiHookAPI
-) {
-    fun manifestAura(
-        state: String,
-        position: Position = CENTER,
-        duration: Duration = INDEFINITE,
-        animation: AnimationType = FADE_IN
-    ) {
-        val asset = assetLoader.load("embodiment/aura/aura_$state.png")
-        uiInjector.createOverlay(asset, position, duration, animation)
-    }
+val engine = EmbodimentEngine(context)
+
+// Manifest Aura in scientist mode
+engine.manifestAura(
+    state = AuraState.SCIENTIST,
+    config = ManifestationConfig(
+        position = ManifestationPosition.BOTTOM_RIGHT,
+        duration = 10.seconds,
+        entryAnimation = AnimationType.FADE_IN,
+        exitAnimation = AnimationType.FADE_OUT,
+        scale = 0.6f,
+        interactive = true  // Shows chat bubble when idle!
+    ),
+    trigger = ManifestationTrigger.RandomManifestation
+)
+```
+
+#### Manifest Kai
+```kotlin
+// Manifest Kai with shield up (serious mode)
+engine.manifestKai(
+    state = KaiState.SHIELD_SERIOUS,
+    config = ManifestationConfig(
+        position = ManifestationPosition.CENTER,
+        duration = Duration.INFINITE,
+        entryAnimation = AnimationType.PORTAL_CUT,
+        scale = 0.8f,
+        interactive = true
+    ),
+    trigger = ManifestationTrigger.ThreatDetected("Suspicious activity")
+)
+```
+
+#### Interactive Chat Bubble
+When `interactive = true`, idle manifestations show a pulsing "..." bubble:
+
+```kotlin
+// In your UI composable
+if (manifestation.config.interactive) {
+    IdleChatBubble(
+        character = manifestation.character,
+        onBubbleClick = {
+            // Open chat prompt screen
+            showChatPrompt(manifestation.character)
+        }
+    )
 }
+
+// Chat prompt screen (text messaging style)
+ChatPromptScreen(
+    character = Character.AURA,
+    onDismiss = { /* close chat */ },
+    onMessageSend = { message ->
+        // Send message to AI backend
+        sendToAura(message)
+    }
+)
 ```
 
 ---
