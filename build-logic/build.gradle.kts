@@ -4,7 +4,7 @@ plugins {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(25))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
@@ -17,19 +17,13 @@ dependencies {
     implementation(libs.ksp.gradle.plugin)
 }
 
-gradlePlugin {
-    plugins {
-        register("genesisApplication") {
-            id = "genesis.application"
-            implementationClass = "plugins.GenesisApplicationPlugin"
-        }
-        register("genesisLibrary") {
-            id = "genesis.library"
-            implementationClass = "plugins.GenesisLibraryPlugin"
-        }
-        register("genesisBase") {
-            id = "genesis.base"
-            implementationClass = "plugins.GenesisBasePlugin"
-        }
-    }
-}
+// Precompiled script plugins are automatically registered!
+// The following plugins are available:
+//   - genesis.android.application (from genesis.android.application.gradle.kts)
+//   - genesis.android.library (from genesis.android.library.gradle.kts)
+//   - genesis.android.hilt (from genesis.android.hilt.gradle.kts)
+//   - genesis.android.compose (from genesis.android.compose.gradle.kts)
+//   - genesis.android.room (from genesis.android.room.gradle.kts)
+//   - genesis.kotlin.jvm (from genesis.kotlin.jvm.gradle.kts)
+//
+// No manual registration needed - the file name becomes the plugin ID!
