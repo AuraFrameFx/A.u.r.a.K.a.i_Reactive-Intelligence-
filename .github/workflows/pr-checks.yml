@@ -43,7 +43,7 @@ jobs:
             doesn't start with an uppercase character.
 
       - name: Check PR size
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const { data: files } = await github.rest.pulls.listFiles({
@@ -128,7 +128,7 @@ jobs:
           echo "size_mb=$APK_SIZE_MB" >> $GITHUB_OUTPUT
 
       - name: Comment APK size
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const sizeMB = '${{ steps.apk-size.outputs.size_mb }}';
@@ -164,7 +164,7 @@ jobs:
           fetch-depth: 0
 
       - name: Danger
-        uses: danger/danger-js@12.3.3
+        uses: danger/danger-js@13.0.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
