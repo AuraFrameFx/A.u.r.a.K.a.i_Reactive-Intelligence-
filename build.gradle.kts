@@ -1,9 +1,17 @@
 // Root build.gradle.kts
-// Note: This file should generally be empty of plugin applications.
-// If you must apply java-library to all, do it in the subprojects block.
+// CRITICAL HILT/KSP WORKAROUND:
+// Apply plugins with `apply false` to make them available on the classpath
+// for all subprojects. This prevents Hilt/KSP resolution errors in multi-module projects.
+
 plugins {
-    // If you absolutely need something applied to the ROOT project, put it here.
-    // Otherwise, this block should ideally be empty in a multi-project setup.
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.google.services) apply false
+    alias(libs.plugins.compose.compiler) apply false
 }
 
 // Define common configuration for all subprojects
@@ -51,5 +59,10 @@ subprojects {
             }
         }
     }
+}
+
+// Root-level clean task
+tasks.register("clean", Delete::class) {
+    delete(rootProject.layout.buildDirectory)
 }
 

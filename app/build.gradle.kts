@@ -11,18 +11,37 @@ plugins {
 android {
     namespace = "dev.aurakai.auraframefx"
     compileSdk = libs.versions.compile.sdk.get().toInt()
+    ndkVersion = libs.versions.ndk.get()
+
     defaultConfig {
         applicationId = "dev.aurakai.auraframefx"
         minSdk = libs.versions.min.sdk.get().toInt()
         targetSdk = libs.versions.target.sdk.get().toInt()
         versionCode = 1
         versionName = "0.1.0"
+
+        externalNativeBuild {
+            cmake {
+                cppFlags += "-std=c++20"
+                arguments += listOf(
+                    "-DANDROID_STL=c++_shared",
+                    "-DANDROID_PLATFORM=android-${libs.versions.min.sdk.get()}"
+                )
+            }
+        }
     }
 
     lint {
         baseline = file("lint-baseline.xml")
         abortOnError = true
         checkReleaseBuilds = false
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = libs.versions.cmake.get()
+        }
     }
 }
 dependencies {
