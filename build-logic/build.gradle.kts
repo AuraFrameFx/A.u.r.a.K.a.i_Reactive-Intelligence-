@@ -9,13 +9,12 @@ java {
 }
 
 dependencies {
-    // Avoid leaking plugins to consumers
-    compileOnly(libs.android.application)
-    compileOnly(libs.kotlin.android)
-    compileOnly(libs.hilt)
-    compileOnly(libs.ksp)
-    compileOnly(libs.google.services)
-    compileOnly(libs.plugins.compose.compiler) // for type references
+    // Plugin dependencies for convention plugins
+    // These allow the convention plugins to apply Android, Kotlin, Hilt, and KSP plugins
+    implementation(libs.gradle.plugin)
+    implementation(libs.kotlin.gradle.plugin)
+    implementation(libs.hilt.gradle.plugin)
+    implementation(libs.ksp.gradle.plugin)
 }
 
 gradlePlugin {
