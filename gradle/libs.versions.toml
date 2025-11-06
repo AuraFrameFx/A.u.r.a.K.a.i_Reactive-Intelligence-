@@ -88,8 +88,12 @@ work = "2.11.0"
 # Compose BOM - Latest: 2025.10.01 (Oct 30, 2025)
 compose-bom = "2025.10.01"
 
-# Compose Compiler (if not using Kotlin Compose Compiler Plugin)
-composeCompiler = "1.5.4"
+# Compose Compiler - NO LONGER NEEDED with Kotlin 2.0+
+# Starting with Kotlin 2.0, Compose compiler is built-in via:
+# org.jetbrains.kotlin.plugin.compose
+# KSP 2.3.1 added official support for built-in Kotlin compiler
+# DO NOT use composeOptions { kotlinCompilerExtensionVersion } - it's deprecated!
+# composeCompiler = "1.5.4"  # ← REMOVED (deprecated)
 
 # ============================================================================
 # Firebase (Using BOM for version management)

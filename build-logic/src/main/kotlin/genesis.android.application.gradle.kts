@@ -59,10 +59,14 @@ android {
         buildConfig = true
     }
 
-    // Configure the Compose compiler
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
-    }
+    // ⚠️ DEPRECATED: composeOptions block no longer needed with Kotlin 2.0+
+    // The built-in Compose compiler (org.jetbrains.kotlin.plugin.compose) is used automatically
+    // KSP 2.3.1+ officially supports the built-in compiler
+    // This block is kept ONLY for backward compatibility with this deprecated plugin
+    // When using genesis.android.application (binary plugin), this is NOT needed
+    // composeOptions {
+    //     kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
+    // }
 }
 
 // Add dependencies that every application module needs
