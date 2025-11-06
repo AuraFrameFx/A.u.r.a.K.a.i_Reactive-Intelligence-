@@ -11,11 +11,28 @@
 
 </div>
 
-[![Build Status](https://github.com/AuraFrameFx/A.u.r.a.K.a.i_Reactive-Intelligence-/actions/workflows/build.yml/badge.svg)](https://github.com/AuraFrameFx/A.u.r.a.K.a.i_Reactive-Intelligence-/actions)
+[![CI](https://github.com/AuraFrameFx/A.u.r.a.K.a.i_Reactive-Intelligence-/workflows/CI%20Build%20%26%20Test/badge.svg)](https://github.com/AuraFrameFx/A.u.r.a.K.a.i_Reactive-Intelligence-/actions)
+[![Security](https://github.com/AuraFrameFx/A.u.r.a.K.a.i_Reactive-Intelligence-/workflows/Security%20Checks/badge.svg)](https://github.com/AuraFrameFx/A.u.r.a.K.a.i_Reactive-Intelligence-/actions)
 [![LSPosed](https://img.shields.io/badge/LSPosed-Module-blue)](https://github.com/LSPosed/LSPosed)
 [![Android](https://img.shields.io/badge/Android-14%2B-green)](https://developer.android.com/)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.0--Beta3-purple)](https://kotlinlang.org/)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.0--Beta2-purple)](https://kotlinlang.org/)
 [![License](https://img.shields.io/badge/License-Custom-orange)]()
+
+---
+
+## 🎬 See It In Action
+
+<div align="center">
+
+### 📺 Watch the Complete Showcase
+
+**[▶️ View Showcase Demo Video](docs/showcase-demo.mp4)**
+
+*Experience AuraKai's reactive intelligence, beautiful Jetpack Compose UI, and powerful features in action!*
+
+**[📖 Full Showcase Documentation →](docs/SHOWCASE.md)**
+
+</div>
 
 ---
 

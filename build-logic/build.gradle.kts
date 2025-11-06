@@ -18,6 +18,9 @@ dependencies {
     implementation(libs.hilt.gradle.plugin)
     implementation(libs.ksp.gradle.plugin)
     implementation(libs.google.services.gradle.plugin)
+
+    // Kotlin Serialization plugin is bundled in kotlin-gradle-plugin, but we need to ensure it's accessible
+    // The serialization plugin is applied via kotlin-gradle-plugin, no separate dependency needed
 }
 // ═══════════════════════════════════════════════════════════════════════════
 // Binary Kotlin Class Plugins Registration

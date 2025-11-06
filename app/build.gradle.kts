@@ -14,6 +14,13 @@
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
     id("genesis.android.application")
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
+    id("com.google.dagger.hilt.android") version libs.versions.hilt.get()
+    id("com.google.devtools.ksp") version libs.versions.ksp.get()
+    id("org.jetbrains.kotlin.plugin.compose") version libs.versions.kotlin.get()
+    id("com.google.gms.google-services") version libs.versions.googleServices.get()
+    id("genesis.android.base") version libs.versions.genesis.android.base.get()
+
 }
 
 android {
