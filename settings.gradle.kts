@@ -68,8 +68,7 @@ dependencyResolutionManagement {
 rootProject.name = "aurakai-reactive-intelligence"
 // --- Application ---
 include(":app")
-include(":feature-module")
-project(":feature-module").projectDir = File("path/to/your/feature-module")
+
 // --- Feature Modules ---
 include(":secure-comm")
 include(":collab-canvas")
@@ -78,6 +77,7 @@ include(":romtools")
 include(":oracle-drive-integration")
 include(":datavein-oracle-native")
 include(":feature-module")
+project(":feature-module").projectDir = File(rootDir, "featuremodule")
 // --- Core Modules ---
 include(":core:domain")
 include(":core:data")
