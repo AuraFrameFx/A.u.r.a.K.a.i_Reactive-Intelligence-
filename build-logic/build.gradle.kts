@@ -1,7 +1,11 @@
-plugins { `kotlin-dsl` }
+plugins {
+    `kotlin-dsl`
+}
 
 java {
-    toolchain { languageVersion.set(JavaLanguageVersion.of(25)) }
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
 }
 
 dependencies {
@@ -16,15 +20,15 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        create("genesisApplication") {
+        register("genesisApplication") {
             id = "genesis.application"
             implementationClass = "plugins.GenesisApplicationPlugin"
         }
-        create("genesisLibrary") {
+        register("genesisLibrary") {
             id = "genesis.library"
             implementationClass = "plugins.GenesisLibraryPlugin"
         }
-        create("genesisBase") {
+        register("genesisBase") {
             id = "genesis.base"
             implementationClass = "plugins.GenesisBasePlugin"
         }
