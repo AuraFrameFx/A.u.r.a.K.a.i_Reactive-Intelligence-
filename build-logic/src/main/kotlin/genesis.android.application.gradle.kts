@@ -3,26 +3,28 @@
 // Composes with genesis.android.base for foundational configuration.
 
 plugins {
+    // Note: Use plugin IDs directly in convention plugins, not alias()
+
     // 1. Apply the official Android Application plugin
-    alias(libs.plugins.android.application)
+    id("com.android.application")
 
     // 2. Apply our foundational base conventions (Kotlin, SDK versions, etc.)
     id("genesis.android.base")
 
     // 3. Apply the Hilt plugin for dependency injection
-    alias(libs.plugins.hilt)
+    id("com.google.dagger.hilt.android")
 
     // 4. Apply KSP for code generation (used by Hilt, Room, Moshi)
-    alias(libs.plugins.ksp)
+    id("com.google.devtools.ksp")
 
     // 5. Apply the Kotlin Serialization plugin
-    alias(libs.plugins.kotlin.serialization)
+    id("org.jetbrains.kotlin.plugin.serialization")
 
     // 6. Apply Compose Compiler plugin
-    alias(libs.plugins.compose.compiler)
+    id("org.jetbrains.kotlin.plugin.compose")
 
     // 7. Apply Google Services last, as recommended
-    alias(libs.plugins.google.services)
+    id("com.google.gms.google-services")
 }
 
 android {
