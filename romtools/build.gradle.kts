@@ -59,6 +59,6 @@ dependencies {
 // Force a single annotations artifact to avoid duplicate-class errors
 configurations.all {
     resolutionStrategy {
-        force("org.jetbrains:annotations:23.0.0")
+        force("org.jetbrains:annotations:26.0.2-1")
     }
 }
