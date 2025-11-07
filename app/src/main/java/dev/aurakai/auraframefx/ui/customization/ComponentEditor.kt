@@ -72,6 +72,9 @@ data class UIComponent(
     val animationType: AnimationType = AnimationType.NONE,
     val animationDuration: Float = 1f, // seconds
 
+    // Icon
+    val iconId: String? = null, // Iconify icon ID (e.g., "mdi:heart", "fa:user")
+
     // Behavior
     val isVisible: Boolean = true,
     val isInteractive: Boolean = true,
@@ -314,6 +317,55 @@ fun ComponentEditor(
                             onUpdate(editingComponent)
                         }
                     )
+
+                    // Icon Selector
+                    Text(
+                        text = "Icon",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                    )
+
+                    Button(
+                        onClick = { /* TODO: Show IconPicker dialog */ },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF2A2A2A)
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.InsertEmoticon,
+                            contentDescription = "Select Icon",
+                            tint = CyberpunkCyan
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (editingComponent.iconId != null) {
+                                editingComponent.iconId
+                            } else {
+                                "Select Icon (250K+ available)"
+                            },
+                            maxLines = 1
+                        )
+                    }
+
+                    if (editingComponent.iconId != null) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            TextButton(
+                                onClick = {
+                                    editingComponent = editingComponent.copy(iconId = null)
+                                    onUpdate(editingComponent)
+                                }
+                            ) {
+                                Text("Remove Icon", color = Color.Gray, fontSize = 12.sp)
+                            }
+                        }
+                    }
 
                     // TODO: Color pickers for background & border
                     Text(
