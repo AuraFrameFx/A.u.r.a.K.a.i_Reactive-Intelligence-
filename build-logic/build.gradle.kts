@@ -1,5 +1,5 @@
 plugins {
-    `kotlin-dsl`
+    `kotlin-dsl`        // applies java-gradle-plugin
 }
 
 repositories {
