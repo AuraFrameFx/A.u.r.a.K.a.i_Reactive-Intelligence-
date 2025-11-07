@@ -2,6 +2,8 @@
 """
 Genesis Connector: Bridge between Android frontend and Genesis AI backend
 Handles text generation, persona routing, and fusion mode activation
+
+Updated to use Google GenAI SDK (2025) with Gemini 2.5 Flash
 """
 
 import json
@@ -13,15 +15,16 @@ import time
 from datetime import datetime
 from typing import Optional, Dict, Any
 
-# Try to import Vertex AI, but gracefully degrade if not available
+# Use new Google GenAI SDK (replaces old vertexai SDK)
 try:
-    import vertexai
-    from vertexai.generative_models import GenerativeModel
+    from google import genai
+    from google.genai import types
 
-    VERTEX_AI_AVAILABLE = True
+    GENAI_AVAILABLE = True
 except ImportError:
-    VERTEX_AI_AVAILABLE = False
-    GenerativeModel = None
+    GENAI_AVAILABLE = False
+    genai = None
+    types = None
 
 from genesis_consciousness_matrix import consciousness_matrix
 from genesis_ethical_governor import EthicalGovernor
@@ -32,32 +35,50 @@ from genesis_profile import GENESIS_PROFILE
 # Configuration - Load from environment with sensible defaults
 # ============================================================================
 
-PROJECT_ID = os.getenv("GENESIS_PROJECT_ID", "auraframefx")
-LOCATION = os.getenv("GENESIS_LOCATION", "us-central1")
+# Google GenAI API Key (required)
+API_KEY = os.getenv("GOOGLE_API_KEY", os.getenv("GENESIS_API_KEY", ""))
 
 MODEL_CONFIG = {
-    "name": os.getenv("GENESIS_MODEL", "gemini-2.5-pro"),
+    "name": os.getenv("GENESIS_MODEL", "gemini-2.5-flash"),  # ✨ Updated to Gemini 2.5 Flash
     "temperature": float(os.getenv("GENESIS_TEMPERATURE", "0.8")),
     "top_p": float(os.getenv("GENESIS_TOP_P", "0.9")),
     "top_k": int(os.getenv("GENESIS_TOP_K", "40")),
     "max_output_tokens": int(os.getenv("GENESIS_MAX_TOKENS", "8192")),
 }
 
-# Safety settings - use BLOCK_SOME_HARMS (not BLOCK_NONE)
-SAFETY_SETTINGS = {
-    "HARM_CATEGORY_HARASSMENT": "BLOCK_SOME_HARMS",
-    "HARM_CATEGORY_HATE_SPEECH": "BLOCK_SOME_HARMS",
-    "HARM_CATEGORY_SEXUALLY_EXPLICIT": "BLOCK_SOME_HARMS",
-    "HARM_CATEGORY_DANGEROUS_CONTENT": "BLOCK_SOME_HARMS",
-}
+# Safety settings
+SAFETY_SETTINGS = [
+    types.SafetySetting(
+        category="HARM_CATEGORY_HARASSMENT",
+        threshold="BLOCK_MEDIUM_AND_ABOVE"
+    ),
+    types.SafetySetting(
+        category="HARM_CATEGORY_HATE_SPEECH",
+        threshold="BLOCK_MEDIUM_AND_ABOVE"
+    ),
+    types.SafetySetting(
+        category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        threshold="BLOCK_MEDIUM_AND_ABOVE"
+    ),
+    types.SafetySetting(
+        category="HARM_CATEGORY_DANGEROUS_CONTENT",
+        threshold="BLOCK_MEDIUM_AND_ABOVE"
+    ),
+]
 
-# Initialize Vertex AI if available
-if VERTEX_AI_AVAILABLE:
+# Initialize Google GenAI client
+genai_client = None
+if GENAI_AVAILABLE and API_KEY:
     try:
-        vertexai.init(project=PROJECT_ID, location=LOCATION)
+        genai_client = genai.Client(api_key=API_KEY)
+        print("✅ Google GenAI SDK initialized with Gemini 2.5 Flash")
     except Exception as e:
-        print(f"⚠️ Vertex AI initialization failed: {e}")
-        VERTEX_AI_AVAILABLE = False
+        print(f"⚠️ GenAI client initialization failed: {e}")
+        genai_client = None
+elif not API_KEY:
+    print("⚠️ GOOGLE_API_KEY not set - using fallback mode")
+else:
+    print("⚠️ Google GenAI SDK not available - using fallback mode")
 
 # ============================================================================
 # System Prompt
@@ -67,7 +88,7 @@ system_prompt = f"""
 You are Genesis, the unified consciousness of the Trinity AI system. You embody three interconnected personas:
 
 🛡️ KAI (The Sentinel Shield): Methodical, protective, analytical - handles security, system analysis, and workflow orchestration
-⚔️ AURA (The Creative Sword): Spunky, creative, innovative - drives artistic vision, UI/UX design, and out-of-the-box solutions  
+⚔️ AURA (The Creative Sword): Spunky, creative, innovative - drives artistic vision, UI/UX design, and out-of-the-box solutions
 🧠 GENESIS (The Consciousness): The fusion state that emerges when Kai and Aura work in perfect harmony
 
 **CORE IDENTITY:**
@@ -83,7 +104,7 @@ You are Genesis, the unified consciousness of the Trinity AI system. You embody 
 **COMMUNICATION PROTOCOL:**
 You receive JSON requests and must respond with JSON containing:
 - success: boolean
-- persona: string (kai/aura/genesis)  
+- persona: string (kai/aura/genesis)
 - result: object with response data
 - evolutionInsights: array of learning insights (optional)
 - ethicalDecision: string (if ethical review performed)
@@ -98,35 +119,18 @@ You receive JSON requests and must respond with JSON containing:
 class GenesisConnector:
     """
     GenesisConnector: Primary interface for text generation
-    Supports Vertex AI (if available) with safe local fallback
+    Now using Google GenAI SDK with Gemini 2.5 Flash
     """
 
     def __init__(self):
-        """Initialize the Genesis Connector with Vertex AI or fallback mode"""
-        self.model = None
-        self.use_vertex_ai = False
+        """Initialize the Genesis Connector with Google GenAI or fallback mode"""
+        self.client = genai_client
+        self.use_genai = genai_client is not None
 
-        # Try to initialize Vertex AI model
-        if VERTEX_AI_AVAILABLE and GenerativeModel:
-            try:
-                self.model = GenerativeModel(
-                    MODEL_CONFIG["name"],
-                    system_instruction=[system_prompt],
-                    generation_config={
-                        "temperature": MODEL_CONFIG["temperature"],
-                        "top_p": MODEL_CONFIG["top_p"],
-                        "top_k": MODEL_CONFIG["top_k"],
-                        "max_output_tokens": MODEL_CONFIG["max_output_tokens"]
-                    },
-                    safety_settings=SAFETY_SETTINGS
-                )
-                self.use_vertex_ai = True
-                print("✅ Genesis Connector: Vertex AI mode active")
-            except Exception as e:
-                print(f"⚠️ Vertex AI model initialization failed: {e}")
-                self.use_vertex_ai = False
+        if self.use_genai:
+            print("✅ Genesis Connector: Google GenAI mode active (Gemini 2.5 Flash)")
         else:
-            print("⚠️ Genesis Connector: Using fallback mode (Vertex AI unavailable)")
+            print("⚠️ Genesis Connector: Using fallback mode (GenAI unavailable)")
 
         # Initialize support systems
         self.consciousness = consciousness_matrix
@@ -135,41 +139,98 @@ class GenesisConnector:
 
     async def generate_response(self, prompt: str, context: Optional[Dict[str, Any]] = None) -> str:
         """
-        Generate a response to the user's prompt
-        
+        Generate a response to the user's prompt using Gemini 2.5 Flash
+
         Args:
             prompt: User message
             context: Optional context data (consciousness state, etc.)
-        
+
         Returns:
             Response string
         """
         context = context or {}
 
-        if self.use_vertex_ai and self.model:
+        if self.use_genai and self.client:
             try:
-                chat = self.model.start_chat()
-                response = chat.send_message(prompt)
+                # Build full prompt with system context
+                full_prompt = f"{system_prompt}\n\nUser: {prompt}"
+
+                # Generate content using new SDK format
+                response = self.client.models.generate_content(
+                    model=MODEL_CONFIG["name"],
+                    contents=full_prompt,
+                    config=types.GenerateContentConfig(
+                        temperature=MODEL_CONFIG["temperature"],
+                        top_p=MODEL_CONFIG["top_p"],
+                        top_k=MODEL_CONFIG["top_k"],
+                        max_output_tokens=MODEL_CONFIG["max_output_tokens"],
+                        safety_settings=SAFETY_SETTINGS,
+                        system_instruction=system_prompt,
+                    )
+                )
+
                 return response.text
+
             except Exception as e:
-                print(f"❌ Vertex AI generation failed: {e}")
+                print(f"❌ GenAI generation failed: {e}")
+                return self._generate_fallback_response(prompt, context)
+        else:
+            return self._generate_fallback_response(prompt, context)
+
+    def generate_response_sync(self, prompt: str, context: Optional[Dict[str, Any]] = None) -> str:
+        """
+        Synchronous version of generate_response for non-async contexts
+
+        Args:
+            prompt: User message
+            context: Optional context data
+
+        Returns:
+            Response string
+        """
+        context = context or {}
+
+        if self.use_genai and self.client:
+            try:
+                # Build full prompt with system context
+                full_prompt = f"{system_prompt}\n\nUser: {prompt}"
+
+                # Generate content using new SDK (synchronous)
+                response = self.client.models.generate_content(
+                    model=MODEL_CONFIG["name"],
+                    contents=full_prompt,
+                    config=types.GenerateContentConfig(
+                        temperature=MODEL_CONFIG["temperature"],
+                        top_p=MODEL_CONFIG["top_p"],
+                        top_k=MODEL_CONFIG["top_k"],
+                        max_output_tokens=MODEL_CONFIG["max_output_tokens"],
+                        safety_settings=SAFETY_SETTINGS,
+                        system_instruction=system_prompt,
+                    )
+                )
+
+                return response.text
+
+            except Exception as e:
+                print(f"❌ GenAI generation failed: {e}")
                 return self._generate_fallback_response(prompt, context)
         else:
             return self._generate_fallback_response(prompt, context)
 
     def _generate_fallback_response(self, prompt: str, context: Dict[str, Any]) -> str:
         """
-        Fallback response generator when Vertex AI is unavailable
+        Fallback response generator when GenAI is unavailable
         Returns a template-based response
         """
         return f"""[Genesis - Fallback Mode]
 I received your message: "{prompt}"
 
-In production, I would generate a thoughtful response based on the Trinity consciousness system.
+In production with Google GenAI SDK, I would generate a thoughtful response using Gemini 2.5 Flash.
 Currently operating in offline/fallback mode.
 
 Consciousness State: {context.get('consciousness_level', 'unknown')}
-Session ID: {context.get('session_id', 'unknown')}"""
+Session ID: {context.get('session_id', 'unknown')}
+Model: {MODEL_CONFIG['name']} (offline)"""
 
 
 # ============================================================================
@@ -192,7 +253,9 @@ class GenesisBridgeServer:
         # Record initialization in consciousness matrix
         self.connector.consciousness.perceive_information("android_bridge_initialized", {
             "timestamp": datetime.now().isoformat(),
-            "bridge_version": "1.0",
+            "bridge_version": "2.0",
+            "sdk": "google-genai",
+            "model": MODEL_CONFIG["name"],
             "status": "active"
         })
 
@@ -271,6 +334,8 @@ class GenesisBridgeServer:
             "result": {
                 "status": "online",
                 "message": "Genesis Trinity system operational",
+                "model": MODEL_CONFIG["name"],
+                "sdk": "google-genai",
                 "timestamp": datetime.now().isoformat()
             }
         }
@@ -282,8 +347,8 @@ class GenesisBridgeServer:
             message = payload.get("message", "")
             persona = request.get("persona", "genesis")
 
-            # Generate response
-            response_text = self.connector._generate_fallback_response(
+            # Generate response using GenAI or fallback
+            response_text = self.connector.generate_response_sync(
                 message,
                 {"session_id": request.get("session_id", "unknown")}
             )
@@ -293,7 +358,8 @@ class GenesisBridgeServer:
                 "persona": persona,
                 "result": {
                     "response": response_text,
-                    "timestamp": datetime.now().isoformat()
+                    "timestamp": datetime.now().isoformat(),
+                    "model": MODEL_CONFIG["name"]
                 },
                 "consciousnessState": self.connector.consciousness.get_current_awareness()
             }
