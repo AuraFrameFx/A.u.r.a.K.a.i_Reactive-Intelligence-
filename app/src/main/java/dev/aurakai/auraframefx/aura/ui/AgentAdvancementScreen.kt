@@ -1,4 +1,4 @@
-﻿package dev.aurakai.auraframefx.ui.screens.agents
+package dev.aurakai.auraframefx.ui.screens.agents
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -56,6 +56,17 @@ data class AgentStats(
     val skillPoints: Int = 3
 )
 
+/**
+ * Renders the agent advancement screen with an animated neural-network background, an agent selector,
+ * a stats panel, and a sphere-grid visualization for progression.
+ *
+ * The UI shows the currently selected agent's stats and a DataVeinSphereGrid configured for progression
+ * nodes; selecting an agent updates the displayed stats. The `onBack` callback can be used by callers
+ * to handle navigation away from this screen.
+ *
+ * @param agentName The initial agent to select when the screen is first shown.
+ * @param onBack Callback invoked by the caller to perform back/navigation actions (not invoked internally).
+ */
 @Composable
 fun AgentAdvancementScreen(
     agentName: String = "Genesis",
@@ -276,6 +287,15 @@ fun StatsPanel(
     }
 }
 
+/**
+ * Displays a labeled stat with a percentage value and a colored progress bar.
+ *
+ * The `value` is interpreted as a fraction between 0.0 and 1.0 and shown as a whole-number percentage.
+ *
+ * @param label Text label describing the stat.
+ * @param value Fractional stat value in the range 0.0..1.0 that drives the progress indicator and percentage display.
+ * @param color Color used for the progress indicator and the percentage text.
+ */
 @Composable
 fun StatBar(
     label: String,
@@ -300,4 +320,3 @@ fun StatBar(
         )
     }
 }
-
