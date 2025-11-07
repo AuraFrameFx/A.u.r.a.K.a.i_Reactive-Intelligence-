@@ -6,11 +6,11 @@ java {
 
 dependencies {
     // Avoid leaking plugins to consumers
-    compileOnly(libs.android.application)
-    compileOnly(libs.kotlin.android)
-    compileOnly(libs.hilt)
-    compileOnly(libs.ksp)
-    compileOnly(libs.google.services)
+    compileOnly(libs.plugins.android.application)
+    compileOnly(libs.plugins.kotlin.android)
+    compileOnly(libs.plugins.dagger.hilt)
+    compileOnly(libs.plugins.devtools.ksp)
+    compileOnly(libs.plugins.google.services)
     compileOnly(libs.plugins.compose.compiler) // for type references
 }
 
