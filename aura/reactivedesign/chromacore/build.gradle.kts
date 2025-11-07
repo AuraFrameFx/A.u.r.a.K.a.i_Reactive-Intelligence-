@@ -1,13 +1,13 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ROM Tools Module - System and ROM modification utilities
+// Color Blendr Module - Color blending and theming utilities
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
     id("genesis.android.library")
 }
 
 android {
-    namespace = "dev.aurakai.auraframefx.romtools"
-    // Java 24 compileOptions are set by genesis.android.base
+    namespace = "dev.aurakai.auraframefx.aura.reactivedesign.chromacore"
+    // Compose enabled by genesis.android.base
 }
 
 dependencies {
@@ -17,7 +17,6 @@ dependencies {
     // - Hilt (android + compiler via KSP)
     // - Coroutines (core + android)
     // - Compose enabled by default
-    // - Java 24 bytecode target
     // ═══════════════════════════════════════════════════════════════════════
 
     // Expose core KTX as API
@@ -27,39 +26,10 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
-    implementation(libs.compose.material.icons.extended)
-    implementation(libs.compose.ui.tooling.preview)
-    debugImplementation(libs.compose.ui.tooling)
-
-    // Compose / Lifecycle / Navigation / Hilt integrations
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-
-    // WorkManager
-    implementation(libs.androidx.work.runtime.ktx)
-
-    // Kotlin Serialization
-    implementation(libs.kotlinx.serialization.json)
-
-    // Root/System Operations
-    implementation(libs.libsu.core)
-    implementation(libs.libsu.io)
-    implementation(libs.libsu.service)
 
     // Xposed API (compile-only, not bundled in APK)
     compileOnly(files("$projectDir/libs/api-82.jar"))
 
     // YukiHook API Code Generation (Xposed framework)
     ksp(libs.yukihookapi.ksp)
-}
-
-// Force a single annotations artifact to avoid duplicate-class errors
-// Updated to 26.0.2-1 to match project dependencies
-configurations.all {
-    resolutionStrategy {
-        force("org.jetbrains:annotations:26.0.2-1")
-    }
 }

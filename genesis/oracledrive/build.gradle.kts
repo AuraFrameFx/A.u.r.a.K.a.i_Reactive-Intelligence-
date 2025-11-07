@@ -1,16 +1,13 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// Feature Module - Feature implementations
+// Oracle Drive Integration Module - Cloud storage integration
 // ═══════════════════════════════════════════════════════════════════════════
-
-olugins {
+plugins {
     id("genesis.android.library")
 }
 
 android {
-    namespace = "dev.aurakai.auraframefx.feature.module"
+    namespace = "dev.aurakai.auraframefx.genesis.oracledrive"
 }
-include(":libs.versions.toml")
-includeBuild(":build-logic")
 
 dependencies {
     // ═══════════════════════════════════════════════════════════════════════

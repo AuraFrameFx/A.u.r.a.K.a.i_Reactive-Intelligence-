@@ -66,24 +66,47 @@ dependencyResolutionManagement {
 
 // Human-friendly display title: A.u.r.a.K.a.i : Reactive=Intelligence
 rootProject.name = "aurakai-reactive-intelligence"
+
 // --- Application ---
 include(":app")
 
-// --- Feature Modules ---
-include(":secure-comm")
-include(":collab-canvas")
-include(":romtools")
-// Add your other feature modules here...
-include(":oracle-drive-integration")
-include(":datavein-oracle-native")
+// --- Aura → ReactiveDesign (Creative UI & Collaboration) ---
+include(":aura:reactivedesign:auraslab")
+include(":aura:reactivedesign:collabcanvas")
+include(":aura:reactivedesign:chromacore")
+include(":aura:reactivedesign:customization")
+
+// --- Kai → SentinelsFortress (Security & Threat Monitoring) ---
+include(":kai:sentinelsfortress:security")
+include(":kai:sentinelsfortress:systemintegrity")
+include(":kai:sentinelsfortress:threatmonitor")
+
+// --- Genesis → OracleDrive (System & Root Management) ---
+include(":genesis:oracledrive")
+include(":genesis:oracledrive:rootmanagement")
+include(":genesis:oracledrive:datavein")
+
+// --- Cascade → DataStream (Data Routing & Delivery) ---
+include(":cascade:datastream:routing")
+include(":cascade:datastream:delivery")
+include(":cascade:datastream:taskmanager")
+
+// --- Agents → GrowthMetrics (AI Agent Evolution) ---
+include(":agents:growthmetrics:metareflection")
+include(":agents:growthmetrics:nexusmemory")
+include(":agents:growthmetrics:spheregrid")
+include(":agents:growthmetrics:identity")
+include(":agents:growthmetrics:progression")
+include(":agents:growthmetrics:tasker")
+
 // --- Core Modules ---
 include(":core:domain")
 include(":core:data")
 include(":core:ui")
 include(":core:common")
 include(":core-module")
-include(":colorblendr")
 include(":list")
+
 // --- Extension Modules ---
 include(":extendsysa")
 include(":extendsysb")
@@ -91,6 +114,5 @@ include(":extendsysc")
 include(":extendsysd")
 include(":extendsyse")
 include(":extendsysf")
-
 
 // Note: Do NOT include ':build-logic' here. It is handled by includeBuild.

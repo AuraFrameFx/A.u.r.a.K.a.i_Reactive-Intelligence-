@@ -1,13 +1,12 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// Color Blendr Module - Color blending and theming utilities
+// Aura Customization Module - UI component editing and customization
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
     id("genesis.android.library")
 }
 
 android {
-    namespace = "dev.aurakai.auraframefx.colorblendr"
-    // Compose enabled by genesis.android.base
+    namespace = "dev.aurakai.auraframefx.aura.reactivedesign.customization"
 }
 
 dependencies {
@@ -19,17 +18,8 @@ dependencies {
     // - Compose enabled by default
     // ═══════════════════════════════════════════════════════════════════════
 
-    // Expose core KTX as API
-    api(libs.androidx.core.ktx)
-
-    // Compose UI
+    implementation(project(":core:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
-
-    // Xposed API (compile-only, not bundled in APK)
-    compileOnly(files("$projectDir/libs/api-82.jar"))
-
-    // YukiHook API Code Generation (Xposed framework)
-    ksp(libs.yukihookapi.ksp.xposed)
 }

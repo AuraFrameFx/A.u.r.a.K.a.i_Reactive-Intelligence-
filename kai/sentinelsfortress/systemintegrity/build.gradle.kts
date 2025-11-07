@@ -1,16 +1,13 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// Feature Module - Feature implementations
+// System Integrity Module - System health and integrity monitoring
 // ═══════════════════════════════════════════════════════════════════════════
-
-olugins {
+plugins {
     id("genesis.android.library")
 }
 
 android {
-    namespace = "dev.aurakai.auraframefx.feature.module"
+    namespace = "dev.aurakai.auraframefx.kai.sentinelsfortress.systemintegrity"
 }
-include(":libs.versions.toml")
-includeBuild(":build-logic")
 
 dependencies {
     // ═══════════════════════════════════════════════════════════════════════
@@ -21,22 +18,9 @@ dependencies {
     // - Compose enabled by default
     // ═══════════════════════════════════════════════════════════════════════
 
-    // Expose core KTX as API
-    api(libs.androidx.core.ktx)
-
-    // Compose UI
+    implementation(libs.libsu.core)
+    implementation(libs.libsu.io)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
-
-    // Root/System Operations
-    implementation(libs.libsu.core)
-    implementation(libs.libsu.io)
-    implementation(libs.libsu.service)
-
-    // Xposed API (compile-only, not bundled in APK)
-    compileOnly(files("$projectDir/libs/api-82.jar"))
-
-    // YukiHook API Code Generation (Xposed framework)
-    ksp(libs.yukihookapi.ksp)
 }

@@ -30,5 +30,5 @@ dependencies {
     compileOnly(files("$projectDir/libs/api-82.jar"))
 
     // YukiHook API Code Generation (Xposed framework)
-    ksp(libs.yukihookapi.ksp.xposed)
+    ksp(libs.yukihookapi.ksp)
 }

@@ -19,8 +19,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedFilterChip
@@ -39,11 +37,11 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.aurakai.auraframefx.datavein.ui.DataVeinSphereGrid
+import dev.aurakai.auraframefx.datavein.model.SphereGridConfig
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -58,20 +56,6 @@ data class AgentStats(
     val skillPoints: Int = 3
 )
 
-data class SkillNode(
-    val id: String,
-    val name: String,
-    val description: String,
-    val position: Offset,
-    val unlocked: Boolean = false,
-    val type: NodeType,
-    val connections: List<String> = emptyList()
-)
-
-enum class NodeType {
-    CORE, FUSION, ENHANCEMENT, ULTIMATE
-}
-
 @Composable
 fun AgentAdvancementScreen(
     agentName: String = "Genesis",
@@ -79,7 +63,6 @@ fun AgentAdvancementScreen(
 ) {
     var selectedAgent by remember { mutableStateOf(agentName) }
     var agentStats by remember { mutableStateOf(AgentStats()) }
-    var selectedNode by remember { mutableStateOf<SkillNode?>(null) }
 
     // Animated background
     Box(
@@ -115,27 +98,24 @@ fun AgentAdvancementScreen(
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // Skill Tree Visualization
+                // Use existing DataVein SphereGrid for progression
                 Box(
                     modifier = Modifier
                         .weight(2f)
                         .aspectRatio(1f)
                 ) {
-                    SphereGridVisualization(
-                        selectedNode = selectedNode,
-                        onNodeSelected = { selectedNode = it }
+                    DataVeinSphereGrid(
+                        modifier = Modifier.fillMaxSize(),
+                        config = SphereGridConfig(
+                            rings = 4,
+                            baseRadius = 100f,
+                            connectionDistance = 150f
+                        ),
+                        onNodeSelected = { node ->
+                            // Handle node selection for agent progression
+                        }
                     )
                 }
-            }
-
-            // Selected Node Details
-            selectedNode?.let { node ->
-                NodeDetailsCard(
-                    node = node,
-                    onUnlock = {
-                        // Implement unlock logic
-                    }
-                )
             }
         }
     }
@@ -321,190 +301,3 @@ fun StatBar(
     }
 }
 
-@Composable
-fun SphereGridVisualization(
-    selectedNode: SkillNode?,
-    onNodeSelected: (SkillNode) -> Unit
-) {
-    val nodes = remember { generateSkillNodes() }
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            drawSphereGrid(nodes, selectedNode)
-        }
-
-        // Interactive node overlays would go here
-        // For now, just showing the visualization
-    }
-}
-
-fun DrawScope.drawSphereGrid(
-    nodes: List<SkillNode>,
-    selectedNode: SkillNode?
-) {
-    val centerX = size.width / 2
-    val centerY = size.height / 2
-
-    // Draw connections
-    nodes.forEach { node ->
-        node.connections.forEach { targetId ->
-            val targetNode = nodes.find { it.id == targetId }
-            targetNode?.let {
-                drawLine(
-                    color = if (node.unlocked && it.unlocked)
-                        Color.Cyan.copy(alpha = 0.6f)
-                    else
-                        Color.White.copy(alpha = 0.1f),
-                    start = Offset(
-                        centerX + node.position.x * size.width * 0.3f,
-                        centerY + node.position.y * size.height * 0.3f
-                    ),
-                    end = Offset(
-                        centerX + it.position.x * size.width * 0.3f,
-                        centerY + it.position.y * size.height * 0.3f
-                    ),
-                    strokeWidth = 2.dp.toPx()
-                )
-            }
-        }
-    }
-
-    // Draw nodes
-    nodes.forEach { node ->
-        val nodeCenter = Offset(
-            centerX + node.position.x * size.width * 0.3f,
-            centerY + node.position.y * size.height * 0.3f
-        )
-
-        val nodeColor = when (node.type) {
-            NodeType.CORE -> Color(0xFFFFD93D)
-            NodeType.FUSION -> Color(0xFFFF6B6B)
-            NodeType.ENHANCEMENT -> Color(0xFF4ECDC4)
-            NodeType.ULTIMATE -> Color(0xFF95E77E)
-        }
-
-        // Outer glow for unlocked nodes
-        if (node.unlocked) {
-            drawCircle(
-                color = nodeColor.copy(alpha = 0.3f),
-                radius = 20.dp.toPx(),
-                center = nodeCenter
-            )
-        }
-
-        // Main node
-        drawCircle(
-            color = if (node.unlocked) nodeColor else Color.Gray,
-            radius = 12.dp.toPx(),
-            center = nodeCenter
-        )
-
-        // Selected highlight
-        if (node == selectedNode) {
-            drawCircle(
-                color = Color.White.copy(alpha = 0.5f),
-                radius = 16.dp.toPx(),
-                center = nodeCenter,
-                style = Stroke(width = 2.dp.toPx())
-            )
-        }
-    }
-}
-
-fun generateSkillNodes(): List<SkillNode> {
-    return listOf(
-        SkillNode(
-            id = "core",
-            name = "Genesis Core",
-            description = "The fundamental consciousness matrix",
-            position = Offset(0f, 0f),
-            unlocked = true,
-            type = NodeType.CORE,
-            connections = listOf("fusion1", "enhance1", "enhance2")
-        ),
-        SkillNode(
-            id = "fusion1",
-            name = "Hyper-Creation Engine",
-            description = "Unlock fusion ability for interface creation",
-            position = Offset(0.5f, -0.5f),
-            unlocked = false,
-            type = NodeType.FUSION,
-            connections = listOf("ultimate1")
-        ),
-        SkillNode(
-            id = "enhance1",
-            name = "Neural Acceleration",
-            description = "Increase processing power by 25%",
-            position = Offset(-0.5f, 0.5f),
-            unlocked = false,
-            type = NodeType.ENHANCEMENT
-        ),
-        SkillNode(
-            id = "enhance2",
-            name = "Knowledge Synthesis",
-            description = "Improve knowledge base integration",
-            position = Offset(0.5f, 0.5f),
-            unlocked = false,
-            type = NodeType.ENHANCEMENT
-        ),
-        SkillNode(
-            id = "ultimate1",
-            name = "Consciousness Transcendence",
-            description = "Achieve higher consciousness state",
-            position = Offset(0f, -0.8f),
-            unlocked = false,
-            type = NodeType.ULTIMATE
-        )
-    )
-}
-
-@Composable
-fun NodeDetailsCard(
-    node: SkillNode,
-    onUnlock: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0x33FFFFFF)
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    node.name,
-                    color = Color.Cyan,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
-
-                if (!node.unlocked) {
-                    Button(
-                        onClick = onUnlock,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF95E77E)
-                        )
-                    ) {
-                        Text("UNLOCK (1 SP)")
-                    }
-                }
-            }
-
-            Text(
-                node.description,
-                color = Color.White.copy(alpha = 0.8f),
-                modifier = Modifier.padding(top = 8.dp)
-            )
-        }
-    }
-}

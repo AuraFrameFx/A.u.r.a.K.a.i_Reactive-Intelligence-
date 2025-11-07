@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "dev.aurakai.auraframefx.benchmark"
+    namespace = "dev.aurakai.auraframefx.aura.reactivedesign.auraslab"
     compileSdk = 36
 }
 

@@ -1,16 +1,13 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// Feature Module - Feature implementations
+// DataVein Oracle Native Module - Native Oracle cloud data access
 // ═══════════════════════════════════════════════════════════════════════════
-
-olugins {
+plugins {
     id("genesis.android.library")
 }
 
 android {
-    namespace = "dev.aurakai.auraframefx.feature.module"
+    namespace = "dev.aurakai.auraframefx.genesis.oracledrive.datavein"
 }
-include(":libs.versions.toml")
-includeBuild(":build-logic")
 
 dependencies {
     // ═══════════════════════════════════════════════════════════════════════

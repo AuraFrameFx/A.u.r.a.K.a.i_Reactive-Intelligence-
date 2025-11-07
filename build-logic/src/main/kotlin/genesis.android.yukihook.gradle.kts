@@ -17,7 +17,7 @@ dependencies {
     implementation(libs.yukihookapi.api)
 
     // KSP processor for YukiHook annotation processing
-    ksp(libs.yukihookapi.ksp.xposed)
+    ksp(libs.yukihookapi.ksp)
 
     // KavaRef - reflection utilities for Xposed modules
     implementation(libs.kavaref.core)

@@ -14,12 +14,12 @@
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
     id("genesis.android.application")
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
+    id("org.jetbrains.kotlin.plugin.serialization") version libs.versions.kotlin.get()
     id("com.google.dagger.hilt.android") version libs.versions.hilt.get()
     id("com.google.devtools.ksp") version libs.versions.ksp.get()
     id("org.jetbrains.kotlin.plugin.compose") version libs.versions.kotlin.get()
     id("com.google.gms.google-services") version libs.versions.googleServices.get()
-    id("genesis.android.base") version libs.versions.genesis.android.base.get()
+    id("genesis.android.base")
 
 }
 
@@ -152,18 +152,41 @@ dependencies {
     compileOnly(files("$projectDir/libs/api-82.jar"))
     compileOnly(files("$projectDir/libs/api-82-sources.jar"))
 
-    // Internal Project Modules
+    // Internal Project Modules - Core
     implementation(project(":core-module"))
     implementation(project(":core:common"))
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
     implementation(project(":core:ui"))
     implementation(project(":feature-module"))
-    implementation(project(":secure-comm"))
-    implementation(project(":romtools"))
-    implementation(project(":colorblendr"))
     implementation(project(":list"))
-    implementation(project(":oracle-drive-integration"))
-    implementation(project(":collab-canvas"))
-    implementation(project(":datavein-oracle-native"))
+
+    // Aura → ReactiveDesign (Creative UI & Collaboration)
+    implementation(project(":aura:reactivedesign:auraslab"))
+    implementation(project(":aura:reactivedesign:collabcanvas"))
+    implementation(project(":aura:reactivedesign:chromacore"))
+    implementation(project(":aura:reactivedesign:customization"))
+
+    // Kai → SentinelsFortress (Security & Threat Monitoring)
+    implementation(project(":kai:sentinelsfortress:security"))
+    implementation(project(":kai:sentinelsfortress:systemintegrity"))
+    implementation(project(":kai:sentinelsfortress:threatmonitor"))
+
+    // Genesis → OracleDrive (System & Root Management)
+    implementation(project(":genesis:oracledrive"))
+    implementation(project(":genesis:oracledrive:rootmanagement"))
+    implementation(project(":genesis:oracledrive:datavein"))
+
+    // Cascade → DataStream (Data Routing & Delivery)
+    implementation(project(":cascade:datastream:routing"))
+    implementation(project(":cascade:datastream:delivery"))
+    implementation(project(":cascade:datastream:taskmanager"))
+
+    // Agents → GrowthMetrics (AI Agent Evolution)
+    implementation(project(":agents:growthmetrics:metareflection"))
+    implementation(project(":agents:growthmetrics:nexusmemory"))
+    implementation(project(":agents:growthmetrics:spheregrid"))
+    implementation(project(":agents:growthmetrics:identity"))
+    implementation(project(":agents:growthmetrics:progression"))
+    implementation(project(":agents:growthmetrics:tasker"))
 }
