@@ -57,16 +57,16 @@ enum class AuraState(val assetPath: String, val description: String) {
 // ========== KAI STATES ==========
 
 enum class KaiState(val assetPath: String, val description: String) {
-    DIMENSIONAL_SWORD("embodiment/kai/kai_dimensional_sword.jpg", "Portal cutting weapon"),
+    DIMENSIONAL_SWORD("embodiment/kai/kai_sword_dimensional.jpg", "Portal cutting weapon"),
     SHIELD_SERIOUS("embodiment/kai/kai_shield_serious.jpg", "Holding hex orb, combat ready"),
     SHIELD_PLAYFUL("embodiment/kai/kai_shield_playful.jpg", "Peace sign, smiling"),
     SHIELD_NEUTRAL("embodiment/kai/kai_shield_neutral.jpg", "Serious expression, orb present"),
-    GUARDIAN_STANCE("embodiment/kai/kai_guardian_stance.jpg", "Protective posture"),
+    GUARDIAN_STANCE("embodiment/kai/kai_shield_calm.jpg", "Protective posture"),
     COMBAT_FORM("embodiment/kai/kai_combat_form.jpg", "Full combat mode"),
-    MONITORING("embodiment/kai/kai_monitoring.jpg", "Background vigilance"),
-    PORTAL_CREATION("embodiment/kai/kai_portal.jpg", "Creating dimensional gate"),
-    HOLOGRAPHIC_INTERFACE("embodiment/kai/kai_interface.jpg", "Interacting with system"),
-    POWER_READY("embodiment/kai/kai_power_ready.jpg", "Energy charged"),
+    MONITORING("embodiment/kai/kai_playful_observer.jpg", "Background vigilance"),
+    PORTAL_CREATION("embodiment/kai/kai_portal_gate.jpg", "Creating dimensional gate"),
+    HOLOGRAPHIC_INTERFACE("embodiment/kai/kai_interface_panel.jpg", "Interacting with system"),
+    POWER_READY("embodiment/kai/kai_combat_form.jpg", "Energy charged"), // Using combat_form until dedicated asset
 
     // Safety Equipment - Maintenance Mode
     SAFETY_HARDHAT("embodiment/kai/kai_safety_hardhat.svg", "Hard hat + reflective vest, serious"),
