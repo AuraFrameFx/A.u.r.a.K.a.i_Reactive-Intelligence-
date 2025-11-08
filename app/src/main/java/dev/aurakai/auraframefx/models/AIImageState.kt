@@ -1,23 +1,38 @@
 ﻿package dev.aurakai.auraframefx.ui.state
 
+import android.graphics.Bitmap
+
 /**
  * Represents the state of an AI image generation operation.
+ *
+ * States:
+ * - Idle: No operation in progress
+ * - Loading: Image generation in progress
+ * - Success: Image generated successfully with result
+ * - Error: Image generation failed with error message
  */
 sealed class AIImageState {
-    object Idle : AIImageState()
-    object Loading : AIImageState()
+    /**
+     * Initial state - no image generation in progress.
+     */
+    data object Idle : AIImageState()
 
     /**
-     * Represents a successful image generation.
-     * @param _image The generated image object (e.g., Bitmap, URL String). Parameter reported as unused.
+     * Image generation is currently in progress.
      */
-    data class Success(val _image: Any?) :
-        AIImageState() // TODO: Define proper type for image. Param _image reported as unused.
+    data object Loading : AIImageState()
 
     /**
-     * Represents an error during image generation.
-     * @param _message The error message. Parameter reported as unused.
+     * Image generation completed successfully.
+     *
+     * @param image The generated image as a Bitmap, or URI string if stored externally
      */
-    data class Error(val _message: String) :
-        AIImageState() // TODO: Param _message reported as unused.
+    data class Success(val image: Any?) : AIImageState()
+
+    /**
+     * Image generation failed with an error.
+     *
+     * @param message The error message describing what went wrong
+     */
+    data class Error(val message: String) : AIImageState()
 }
