@@ -44,6 +44,19 @@ class UnifiedLoggingSystem @Inject constructor(
     private val dateFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
     private val fileFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
+    // Session tracking
+    private var currentSessionId: String = UUID.randomUUID().toString()
+    private var sessionStartTime: Long = System.currentTimeMillis()
+
+    // Pattern detection for repeated issues
+    private data class ErrorPattern(
+        val message: String,
+        val count: Int,
+        val firstOccurrence: Long,
+        val lastOccurrence: Long
+    )
+    private val errorPatterns = mutableMapOf<String, ErrorPattern>()
+
     enum class SystemHealth {
         HEALTHY, WARNING, ERROR, CRITICAL
     }
@@ -466,15 +479,16 @@ class UnifiedLoggingSystem @Inject constructor(
     /**
      * Checks for critical patterns or repeated issues in the logs that may indicate serious problems.
      *
+     * Tracks error patterns and triggers alerts when:
+     * - The same error occurs 5+ times
+     * - Errors occur rapidly (3+ in 10 seconds)
+     * - Security violations are detected
+     * - Genesis Protocol issues arise
+     *
      * @param logEntry The log entry to check against critical patterns.
      */
     private fun checkCriticalPatterns(logEntry: LogEntry) {
-        // Example pattern checks (to be implemented):
-        // - Repeated ERRORs in a short time frame
-        // - Specific error messages or codes
-        // - Security or protocol violations
-
-        // For demonstration, we log a fatal error on any ERROR level log for critical categories
+        // Check for security violations
         if (logEntry.category == LogCategory.SECURITY && logEntry.level >= LogLevel.ERROR) {
             log(
                 LogLevel.FATAL, LogCategory.SYSTEM, "CriticalPatternDetector",
@@ -490,28 +504,175 @@ class UnifiedLoggingSystem @Inject constructor(
             )
         }
 
-        // Check for repeated errors
-        // TODO: Implement pattern detection for repeated issues
+        // Track repeated errors
+        if (logEntry.level >= LogLevel.ERROR) {
+            val errorKey = "${logEntry.category}_${logEntry.tag}_${logEntry.message.take(100)}"
+            val currentTime = System.currentTimeMillis()
+
+            synchronized(errorPatterns) {
+                val existing = errorPatterns[errorKey]
+                val newPattern = if (existing == null) {
+                    ErrorPattern(
+                        message = logEntry.message,
+                        count = 1,
+                        firstOccurrence = currentTime,
+                        lastOccurrence = currentTime
+                    )
+                } else {
+                    existing.copy(
+                        count = existing.count + 1,
+                        lastOccurrence = currentTime
+                    )
+                }
+
+                errorPatterns[errorKey] = newPattern
+
+                // Alert on repeated errors (5+ occurrences)
+                if (newPattern.count >= 5 && newPattern.count % 5 == 0) {
+                    log(
+                        LogLevel.FATAL, LogCategory.SYSTEM, "CriticalPatternDetector",
+                        "REPEATED ERROR DETECTED (${newPattern.count}x): ${logEntry.message}",
+                        metadata = mapOf(
+                            "error_count" to newPattern.count,
+                            "first_occurrence" to newPattern.firstOccurrence,
+                            "time_span_ms" to (currentTime - newPattern.firstOccurrence)
+                        )
+                    )
+                }
+
+                // Alert on rapid errors (3+ in 10 seconds)
+                if (newPattern.count >= 3 && (currentTime - newPattern.firstOccurrence) < 10000) {
+                    log(
+                        LogLevel.FATAL, LogCategory.SYSTEM, "CriticalPatternDetector",
+                        "RAPID ERROR BURST DETECTED: ${logEntry.message}",
+                        metadata = mapOf(
+                            "error_count" to newPattern.count,
+                            "time_span_ms" to (currentTime - newPattern.firstOccurrence)
+                        )
+                    )
+                }
+
+                // Clean up old patterns (older than 1 hour)
+                errorPatterns.entries.removeIf { (currentTime - it.value.lastOccurrence) > 3600000 }
+            }
+        }
     }
 
     /**
-     * Generates aggregated analytics summarizing recent log activity.
+     * Generates aggregated analytics by analyzing recent log files.
      *
-     * Currently returns static placeholder data. Intended for future implementation to analyze log files and compute statistics such as error and warning counts, performance issues, security events, average response time, and an overall system health score.
+     * Reads today's and yesterday's log files to compute:
+     * - Total log count
+     * - Error and warning counts
+     * - Performance issues (slow operations)
+     * - Security event count
+     * - Average response time from performance metrics
+     * - Overall system health score
      *
      * @return A [LogAnalytics] object containing aggregated log statistics.
      */
     private suspend fun generateLogAnalytics(): LogAnalytics = withContext(Dispatchers.IO) {
-        // TODO: Implement comprehensive analytics from log files
+        var totalLogs = 0L
+        var errorCount = 0L
+        var warningCount = 0L
+        var performanceIssues = 0L
+        var securityEvents = 0L
+        val responseTimes = mutableListOf<Double>()
+
+        try {
+            // Analyze today's and yesterday's logs
+            val today = fileFormatter.format(Date(System.currentTimeMillis()))
+            val yesterday = fileFormatter.format(Date(System.currentTimeMillis() - 86400000))
+
+            listOf(today, yesterday).forEach { dateString ->
+                val logFile = File(logDirectory, "aura_log_$dateString.log")
+                if (logFile.exists()) {
+                    logFile.forEachLine { line ->
+                        totalLogs++
+
+                        // Count errors
+                        if (line.contains("[ERROR]") || line.contains("[FATAL]")) {
+                            errorCount++
+                        }
+
+                        // Count warnings
+                        if (line.contains("[WARNING]")) {
+                            warningCount++
+                        }
+
+                        // Count security events
+                        if (line.contains("[SECURITY]")) {
+                            securityEvents++
+                        }
+
+                        // Extract performance metrics
+                        if (line.contains("[PERFORMANCE]")) {
+                            // Try to extract value from metadata like "value=150.0"
+                            val valueMatch = Regex("value=(\\d+\\.?\\d*)").find(line)
+                            valueMatch?.groupValues?.get(1)?.toDoubleOrNull()?.let { value ->
+                                responseTimes.add(value)
+
+                                // Flag as performance issue if > 1000ms
+                                if (value > 1000.0) {
+                                    performanceIssues++
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("UnifiedLoggingSystem", "Failed to generate analytics from log files", e)
+        }
+
+        // Calculate average response time
+        val averageResponseTime = if (responseTimes.isNotEmpty()) {
+            responseTimes.average()
+        } else {
+            0.0
+        }
+
+        // Calculate health score (0.0 - 1.0)
+        val healthScore = calculateHealthScore(totalLogs, errorCount, warningCount, performanceIssues, securityEvents)
+
         LogAnalytics(
-            totalLogs = 1000,
-            errorCount = 5,
-            warningCount = 20,
-            performanceIssues = 2,
-            securityEvents = 0,
-            averageResponseTime = 150.0,
-            systemHealthScore = 0.95f
+            totalLogs = totalLogs,
+            errorCount = errorCount,
+            warningCount = warningCount,
+            performanceIssues = performanceIssues,
+            securityEvents = securityEvents,
+            averageResponseTime = averageResponseTime,
+            systemHealthScore = healthScore
         )
+    }
+
+    /**
+     * Calculates a system health score (0.0-1.0) based on log analytics.
+     *
+     * @return Health score from 0.0 (critical) to 1.0 (perfect health)
+     */
+    private fun calculateHealthScore(
+        totalLogs: Long,
+        errorCount: Long,
+        warningCount: Long,
+        performanceIssues: Long,
+        securityEvents: Long
+    ): Float {
+        if (totalLogs == 0L) return 1.0f
+
+        val errorRatio = errorCount.toFloat() / totalLogs
+        val warningRatio = warningCount.toFloat() / totalLogs
+        val perfRatio = performanceIssues.toFloat() / totalLogs
+        val securityRatio = securityEvents.toFloat() / totalLogs
+
+        // Weighted scoring: errors are most critical, then security, then perf, then warnings
+        val score = 1.0f -
+                (errorRatio * 0.5f) -
+                (securityRatio * 0.25f) -
+                (perfRatio * 0.15f) -
+                (warningRatio * 0.1f)
+
+        return score.coerceIn(0.0f, 1.0f)
     }
 
     /**
@@ -554,15 +715,31 @@ class UnifiedLoggingSystem @Inject constructor(
     }
 
     /**
-     * Returns a temporary session ID string based on the current hour.
+     * Returns the current session ID, which is a UUID generated at system initialization.
      *
-     * The session ID changes every hour and serves as a placeholder until proper session tracking is implemented.
+     * The session ID persists for the lifetime of the UnifiedLoggingSystem instance,
+     * allowing correlation of all log entries within a single application session.
      *
-     * @return The current hour-based session ID string.
+     * @return The current session UUID string.
      */
     private fun getCurrentSessionId(): String {
-        // TODO: Implement proper session tracking
-        return "session_${System.currentTimeMillis() / 1000 / 3600}" // Hour-based sessions
+        return currentSessionId
+    }
+
+    /**
+     * Starts a new logging session with a fresh UUID.
+     *
+     * This can be called when the app resumes from background or when a new user session begins.
+     */
+    fun startNewSession() {
+        val oldSessionId = currentSessionId
+        currentSessionId = UUID.randomUUID().toString()
+        sessionStartTime = System.currentTimeMillis()
+
+        log(
+            LogLevel.INFO, LogCategory.SYSTEM, "SessionManager",
+            "New session started: $currentSessionId (previous: $oldSessionId)"
+        )
     }
 
     /**
