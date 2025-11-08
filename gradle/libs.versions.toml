@@ -4,7 +4,7 @@
 # ============================================================================
 # Android Gradle Plugin - Using preview for Android 16 (API 36) support
 # Stable available: 8.13.0, Preview: 9.0.0-alpha13 (requires Gradle 9.0.0)
-agp = "9.0.0-alpha13"
+agp = "9.0.0-alpha14"
 androidApplication = "9.0.0-alpha13"
 androidLibrary = "9.0.0-alpha13"
 androidTest = "9.0.0-alpha13"
