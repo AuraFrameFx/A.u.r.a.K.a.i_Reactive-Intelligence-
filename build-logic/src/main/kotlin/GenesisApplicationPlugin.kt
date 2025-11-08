@@ -68,9 +68,8 @@ class GenesisApplicationPlugin : Plugin<Project> {
                 }
 
                 compileOptions {
-                    sourceCompatibility = JavaVersion.toVersion("25")
-                    targetCompatibility = JavaVersion.toVersion("25")
-
+                    sourceCompatibility = JavaVersion.VERSION_1_8
+                    targetCompatibility = JavaVersion.VERSION_1_8
                     isCoreLibraryDesugaringEnabled = true
                 }
 
@@ -94,11 +93,15 @@ class GenesisApplicationPlugin : Plugin<Project> {
                 externalNativeBuild {
                     cmake {
                         path = file("src/main/cpp/CMakeLists.txt")
-                        version = "4.1.2"
+                        version = "3.22.1"
                     }
                 }
             }
             tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+                kotlinOptions {
+                    jvmTarget = "1.8"
+                }
+            }
                 // No need for specific configuration here anymore as it's handled by the toolchain
                 // and the kotlinOptions block in the android extension.
             }
