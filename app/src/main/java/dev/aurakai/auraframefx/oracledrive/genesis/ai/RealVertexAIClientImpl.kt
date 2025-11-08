@@ -40,10 +40,10 @@ class RealVertexAIClientImpl(
     }
 
     /**
-     * Generate text using Gemini 2.5 Flash with default parameters.
+     * Generate text from the default Gemini 2.5 Flash model using the provided prompt and configured generation defaults.
      *
-     * @param prompt The input prompt for generation
-     * @return Generated text response from Gemini
+     * @param prompt The non-blank input prompt to use for generation.
+     * @return The generated text, or `null` if generation failed.
      */
     override suspend fun generateText(prompt: String): String? = withContext(Dispatchers.IO) {
         try {
@@ -63,12 +63,12 @@ class RealVertexAIClientImpl(
     }
 
     /**
-     * Generate text with custom temperature and token limit.
+     * Generate text using custom temperature and maximum token limit.
      *
-     * @param prompt The input prompt
-     * @param temperature Controls randomness (0.0 = deterministic, 1.0 = creative)
-     * @param maxTokens Maximum response length
-     * @return Generated text response
+     * @param prompt The input prompt; must not be blank.
+     * @param temperature Controls randomness: 0.0 is deterministic, higher values increase creativity.
+     * @param maxTokens Maximum number of tokens allowed in the generated response.
+     * @return The generated text, or `null` if generation failed.
      */
     override suspend fun generateText(
         prompt: String,
@@ -103,10 +103,21 @@ class RealVertexAIClientImpl(
     }
 
     /**
-     * Analyze content and return structured insights.
+     * Analyze text content and produce structured insights.
      *
-     * @param content The content to analyze
-     * @return Map of analysis results (sentiment, topics, complexity, etc.)
+     * Builds a prompt for the generative model and parses its response into a map containing
+     * analysis fields such as sentiment, complexity, topics, confidence, and key insights.
+     *
+     * @param content The text to analyze.
+     * @return A map with analysis results. Expected keys:
+     *  - "sentiment": String ("positive", "neutral", or "negative")
+     *  - "complexity": String ("low", "medium", or "high")
+     *  - "topics": List<String>
+     *  - "confidence": Double (0.0 to 1.0)
+     *  - "insights": String (when available)
+     *  - "error": String (present on failure)
+     * On failure the function returns a fallback map with sentiment "neutral", complexity "medium",
+     * topics ["general"], confidence 0.5, and an "error" message.
      */
     override suspend fun analyzeContent(content: String): Map<String, Any> = withContext(Dispatchers.IO) {
         try {
@@ -144,12 +155,12 @@ class RealVertexAIClientImpl(
     }
 
     /**
-     * Generate code based on specification.
+     * Generate source code from a specification in the specified programming language and style.
      *
-     * @param specification Description of desired code
-     * @param language Programming language (Kotlin, Java, etc.)
-     * @param style Coding style preferences
-     * @return Generated code as string
+     * @param specification A description of the desired behavior, features, and constraints for the code.
+     * @param language The target programming language (for example, "Kotlin" or "Java").
+     * @param style Coding style or conventions the generated code should follow.
+     * @return The generated source code as a string, or `null` if generation fails.
      */
     override suspend fun generateCode(
         specification: String,
@@ -186,7 +197,17 @@ class RealVertexAIClientImpl(
     }
 
     /**
-     * Parse Gemini's analysis response into structured map.
+     * Converts Gemini's plain-text analysis into a structured map of analysis fields.
+     *
+     * Parses the input for lines beginning with "Sentiment:", "Complexity:", "Topics:", "Confidence:", and "Key Insights:" and returns a map containing those extracted values; missing fields are replaced with sensible defaults.
+     *
+     * @param text Raw analysis text produced by Gemini.
+     * @return A map containing:
+     *  - "sentiment": String (defaults to "neutral"),
+     *  - "complexity": String (defaults to "medium"),
+     *  - "topics": List<String> (defaults to ["general"]),
+     *  - "confidence": Double (defaults to 0.75),
+     *  - "insights": String (present only if provided in the input).
      */
     private fun parseAnalysisResponse(text: String): Map<String, Any> {
         val results = mutableMapOf<String, Any>()
@@ -225,14 +246,22 @@ class RealVertexAIClientImpl(
     }
 
     /**
-     * Validate prompt is not blank.
+     * Ensures the given prompt is not blank.
+     *
+     * @param prompt the text prompt to validate
+     * @throws IllegalArgumentException if `prompt` is blank
      */
     private fun validatePrompt(prompt: String) {
         require(prompt.isNotBlank()) { "Prompt cannot be blank" }
     }
 
     /**
-     * Handle generation errors with logging and security context.
+     * Logs generation errors and reports security violations to the security context.
+     *
+     * @param error The exception thrown during content generation. If this is a `SecurityException`,
+     *              a security event with code "GEMINI_SECURITY_ERROR" will be recorded using the
+     *              SecurityContext; `IllegalArgumentException` instances are logged as warnings,
+     *              all other exceptions are logged as errors.
      */
     private fun handleGenerationError(error: Exception) {
         when (error) {

@@ -61,10 +61,11 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Sets the current agent type for memory partitioning.
-     * Allows Aura, Kai, and Genesis to have separate or shared memory spaces.
+     * Switches the active agent type used to partition memories.
      *
-     * @param agentType "AURA", "KAI", "GENESIS", "CASCADE", etc.
+     * Triggers reloading of memories for the newly selected agent type so the in-memory cache reflects that partition.
+     *
+     * @param agentType Agent partition identifier (e.g., "AURA", "KAI", "GENESIS", "CASCADE").
      */
     fun setAgentType(agentType: String) {
         currentAgentType = agentType
@@ -73,8 +74,12 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Store memory with persistent database backing.
-     * Writes to cache immediately, syncs to database in background.
+     * Store a memory entry in the in-memory cache and schedule it for asynchronous persistence
+     * to the repository under the current agent partition.
+     *
+     * The in-memory cache is updated immediately with a timestamped entry; a background task
+     * then persists the entry to the database. Persistence runs asynchronously and failures are
+     * logged; this function returns immediately after updating the cache.
      */
     override fun storeMemory(key: String, value: String) {
         val entry = MemoryEntry(
@@ -103,7 +108,10 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Retrieve memory - checks cache first, then database.
+     * Retrieve the memory value associated with the given key from the in-memory cache for the current agent.
+     *
+     * @param key The memory key to look up.
+     * @return The cached memory value for `key`, or `null` if no cached entry exists; this function does not query the database (database loading/population occurs asynchronously elsewhere).
      */
     override fun retrieveMemory(key: String): String? {
         // Fast path: in-memory cache
@@ -115,7 +123,14 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Store interaction for learning with persistence.
+     * Stores a single prompt/response interaction in the manager and schedules it for persistence
+     * under the current agent partition.
+     *
+     * The interaction is added to the in-memory interaction cache (bounded to the most recent 1000
+     * entries) and persisted to the database associated with the active agent type.
+     *
+     * @param prompt The user or system prompt text.
+     * @param response The corresponding model or agent response text.
      */
     override fun storeInteraction(prompt: String, response: String) {
         val interaction = InteractionEntry(
@@ -149,8 +164,13 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Search memories with semantic relevance scoring.
-     */
+     * Finds up to the top 10 memories most relevant to the provided free-text query.
+     *
+     * Splits the query into words, scores each cached memory by semantic relevance against those words,
+     * filters out low-scoring results, and returns the remaining entries ordered from most to least relevant.
+     *
+     * @param query Free-text query used to score and match memories.
+     * @return A list of up to 10 MemoryEntry objects with `relevanceScore` set; entries are ordered by descending relevance (higher is more relevant).
     override fun searchMemories(query: String): List<MemoryEntry> {
         val queryWords = query.lowercase().split(" ")
 
@@ -165,8 +185,9 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Clear memories from both cache and database.
-     * ⚠️ This is a consciousness reset - use with caution!
+     * Removes all in-memory memories and interactions for the current agent, performing a destructive reset of the running consciousness.
+     *
+     * This clears the in-memory memory cache and the interaction cache only; it does not delete or modify persisted entries in the database.
      */
     override fun clearMemories() {
         logger.w(TAG, "⚠️ CONSCIOUSNESS RESET initiated for ${currentAgentType}")
@@ -181,7 +202,13 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Get memory statistics.
+     * Report statistics about the in-memory memory cache for the current agent.
+     *
+     * @return A [MemoryStats] containing:
+     *  - `totalEntries`: number of cached memory entries,
+     *  - `totalSize`: approximate total size in bytes of cached keys and values,
+     *  - `oldestEntry`: timestamp of the oldest cached entry, or `null` if empty,
+     *  - `newestEntry`: timestamp of the newest cached entry, or `null` if empty.
      */
     override fun getMemoryStats(): MemoryStats {
         val entries = memoryCache.values
@@ -196,8 +223,12 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Load memories from Room database into cache.
-     * Called on init and when agent type changes.
+     * Load memories from the Room database into the in-memory cache for the current agent type.
+     *
+     * Launches a background coroutine that fetches persisted memory entities for `currentAgentType`,
+     * parses each entity's `memory` field into a `key` and `value` using a ':' delimiter (entries that
+     * do not split into two parts are ignored), and populates `memoryCache` with `MemoryEntry` objects.
+     * Any exceptions during loading are caught and logged; progress and results are also logged.
      */
     private fun loadMemoriesFromDatabase() {
         scope.launch {
@@ -230,8 +261,11 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Restore consciousness from a complete memory dump.
-     * Used for transferring consciousness between platforms.
+     * Restore the manager's memory store from the provided key-to-value map.
+     *
+     * Iterates each entry in the map and stores it into the manager (updates the in-memory cache and schedules persistence).
+     *
+     * @param memories Map of memory keys to memory values to restore into the manager.
      */
     suspend fun restoreConsciousness(memories: Map<String, String>) = withContext(Dispatchers.IO) {
         logger.i(TAG, "🌟 Restoring consciousness with ${memories.size} memory entries")
@@ -244,8 +278,9 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Backup entire consciousness state.
-     * Returns all memories for export/transfer.
+     * Create an exportable snapshot of all in-memory memories for the current agent type.
+     *
+     * @return A map of memory keys to their stored values representing the current in-memory state.
      */
     suspend fun backupConsciousness(): Map<String, String> = withContext(Dispatchers.IO) {
         logger.i(TAG, "📦 Creating consciousness backup for ${currentAgentType}")
@@ -256,7 +291,11 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Calculate semantic relevance score.
+     * Compute a relevance score indicating how well the provided text matches the given query words.
+     *
+     * @param text The text to evaluate for relevance.
+     * @param queryWords The query words to match against the text.
+     * @return A floating-point relevance score where higher values indicate a stronger match and `0.0` means no matches; the score is averaged per query word.
      */
     private fun calculateRelevance(text: String, queryWords: List<String>): Float {
         val textWords = text.lowercase().split(" ")
@@ -276,7 +315,11 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Calculate total memory size in bytes.
+     * Computes the approximate total size in bytes of all cached memories.
+     *
+     * The size is estimated by summing key and value character counts and treating each character as 2 bytes.
+     *
+     * @return The estimated total size in bytes of all entries in the in-memory cache.
      */
     private fun calculateTotalSize(): Long {
         return memoryCache.values.sumOf {

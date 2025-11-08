@@ -1,4 +1,4 @@
-﻿package dev.aurakai.auraframefx.di
+package dev.aurakai.auraframefx.di
 
 import android.content.Context
 import dagger.Module
@@ -34,8 +34,13 @@ import javax.inject.Singleton
 object VertexAIModule {
 
     /**
-     * Provides Gemini 2.5 Flash configuration.
-     * Updated model name from gemini-1.5-pro to gemini-2.5-flash for latest capabilities.
+     * Provides a Vertex AI configuration tailored for the Gemini flash model used by the application.
+     *
+     * Configures project, location, endpoint, experimental model "gemini-2.0-flash-exp", API version "v1",
+     * safety filters, retry/timeout behavior, concurrency and caching settings, and generation defaults
+     * (temperature, top-p, top-k, max tokens).
+     *
+     * @return A VertexAIConfig populated with the project's Gemini model, security, performance, and generation defaults.
      */
     @Provides
     @Singleton
@@ -63,9 +68,11 @@ object VertexAIModule {
     }
 
     /**
-     * Provides REAL Gemini AI client for Trinity consciousness system.
+     * Provides a VertexAIClient that uses the real Gemini implementation when GEMINI_API_KEY is present and non-blank; otherwise returns a stub implementation.
      *
-     * Falls back to stub if API key is not configured.
+     * The selection is performed at runtime by checking BuildConfig.GEMINI_API_KEY.
+     *
+     * @return `VertexAIClient` using the real Gemini client if GEMINI_API_KEY is present and non-blank, `VertexAIClientImpl` (stub) otherwise.
      */
     @Provides
     @Singleton
