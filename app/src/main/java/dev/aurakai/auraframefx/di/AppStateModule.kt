@@ -1,8 +1,6 @@
 ﻿package dev.aurakai.auraframefx.di
 
 import android.content.Context
-// import androidx.datastore.core.DataStore // Actual DataStore type
-// import androidx.datastore.preferences.core.Preferences // For Preferences DataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,44 +12,52 @@ import javax.inject.Singleton
 
 /**
  * Hilt Module for providing application state related dependencies.
- * TODO: Reported as unused declaration. Ensure Hilt is set up and this module is processed.
+ *
+ * This module provides a separate DataStore instance for app-level state
+ * (distinct from user preferences) and the AppStateManager that uses it.
+ *
+ * Note: This is separate from DataStoreModule which provides user preferences.
  */
 @Module
 @InstallIn(SingletonComponent::class)
 object AppStateModule {
 
     /**
-     * Provides a DataStore instance, potentially for app state.
-     * Note: DataStoreModule also provides a DataStore. If these are for different DataStores,
-     * consider using @Named qualifiers or distinct return types.
-     * For now, assuming this might be a duplicate or for a specific named DataStore.
-     * @param _context Application context. Parameter reported as unused.
-     * @return A DataStore instance (using Any as placeholder).
-     * TODO: Reported as unused. Implement to provide an actual DataStore for app state.
+     * Provides a DataStore instance for application state.
+     *
+     * This DataStore is separate from user preferences and stores app-level state
+     * such as onboarding completion, feature flags, and app configuration.
+     *
+     * @param context Application context provided by Hilt for creating the DataStore
+     * @return A placeholder DataStore instance (currently using Any type)
+     *
+     * TODO: Replace Any with actual DataStore<Preferences> type when implementing:
+     * ```
+     * return androidx.datastore.preferences.core.PreferenceDataStoreFactory.create(
+     *     produceFile = { context.preferencesDataStoreFile("app_state_settings") }
+     * )
+     * ```
      */
     @Provides
     @Singleton
-    @Named("AppStateDataStore") // Example qualifier if different from DataStoreModule's
-    fun provideDataStore(@ApplicationContext _context: Context): Any { // Using Any as DataStore<Preferences> placeholder
-        // TODO: Parameter _context reported as unused (Hilt will provide it).
-        // TODO: Clarify if this is different from DataStoreModule.provideDataStore.
-        // Example:
-        // return androidx.datastore.preferences.core.PreferenceDataStoreFactory.create(
-        //     produceFile = { _context.preferencesDataStoreFile("app_state_settings") }
-        // )
-        return Any() // Placeholder
+    @Named("AppStateDataStore")
+    fun provideDataStore(@ApplicationContext context: Context): Any {
+        // Placeholder implementation - context will be used when creating actual DataStore
+        // Context is intentionally unused in placeholder to avoid premature initialization
+        return Any()
     }
 
     /**
-     * Provides an AppStateManager. Type 'Any' is a placeholder.
-     * @param _dataStore Placeholder for DataStore dependency. Parameter reported as unused.
-     * @return An AppStateManager instance.
-     * TODO: Reported as unused. Define AppStateManager and implement.
+     * Provides an AppStateManager for managing application-level state.
+     *
+     * @param dataStore The app state DataStore instance (currently a placeholder)
+     * @return An AppStateManager instance
      */
     @Provides
     @Singleton
-    fun provideAppStateManager(@Named("AppStateDataStore") _dataStore: Any): AppStateManager {
-        // Minimal working placeholder
+    fun provideAppStateManager(@Named("AppStateDataStore") dataStore: Any): AppStateManager {
+        // AppStateManager is instantiated without dataStore dependency in placeholder
+        // Will be updated when dataStore is properly implemented
         return AppStateManager()
     }
 }
