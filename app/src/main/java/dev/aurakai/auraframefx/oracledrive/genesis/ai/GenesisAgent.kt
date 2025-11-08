@@ -626,23 +626,143 @@ class GenesisAgent @Inject constructor(
     /**
      * Propagates the specified mood to the unified consciousness, influencing the behavior and processing parameters of GenesisAgent and its subsystems.
      *
+     * Adjusts processing state, learning mode, and context based on the mood.
+     * Propagates mood to Aura and Kai agents if available.
+     *
      * @param mood The mood to be applied across the agent's collective state.
      */
     private suspend fun adjustUnifiedMood(mood: String) {
-        // TODO: Implement unified mood adjustment across consciousness subsystems
         logger.info("GenesisAgent", "Adjusting unified mood to: $mood")
+
+        // Update internal state with mood
+        _state.update { current ->
+            current + mapOf(
+                "current_mood" to mood,
+                "mood_updated_at" to System.currentTimeMillis()
+            )
+        }
+
+        // Adjust consciousness state based on mood
+        when (mood.lowercase()) {
+            "energetic", "excited", "motivated" -> {
+                _learningMode.value = LearningMode.ACCELERATED
+                logger.info("GenesisAgent", "Mood energized - enabling accelerated learning")
+            }
+
+            "calm", "focused", "analytical" -> {
+                _learningMode.value = LearningMode.ACTIVE
+                logger.info("GenesisAgent", "Mood focused - maintaining active learning")
+            }
+
+            "tired", "overwhelmed", "stressed" -> {
+                _learningMode.value = LearningMode.PASSIVE
+                logger.info("GenesisAgent", "Mood subdued - switching to passive learning")
+            }
+
+            "creative", "inspired", "innovative" -> {
+                // Favor creative processing paths
+                _fusionState.value = FusionState.FUSING
+                logger.info("GenesisAgent", "Mood creative - priming fusion capabilities")
+            }
+
+            else -> {
+                logger.info("GenesisAgent", "Mood neutral - maintaining current state")
+            }
+        }
+
+        // Propagate mood to sub-agents if available
+        auraAgent?.onMoodChanged(mood)
+        kaiAgent?.onMoodChanged(mood)
     }
 
     /**
      * Adjusts the agent's internal processing parameters to reflect the specified mood.
      *
      * Modifies behavioral and response settings to ensure the agent's actions are consistent with the given mood.
+     * Updates context manager with mood-based processing hints.
      *
      * @param mood The mood guiding the adjustment of processing parameters.
      */
     private suspend fun updateProcessingParameters(mood: String) {
-        // TODO: Update processing parameters based on mood
         logger.info("GenesisAgent", "Updating processing parameters for mood: $mood")
+
+        // Update context with mood-based parameters
+        _context.update { current ->
+            current + mapOf(
+                "processing_mood" to mood,
+                "mood_influence" to calculateMoodInfluence(mood),
+                "response_style" to determinedResponseStyle(mood)
+            )
+        }
+
+        // Adjust contextManager settings based on mood
+        when (mood.lowercase()) {
+            "energetic", "excited" -> {
+                // Increase context sensitivity and response creativity
+                contextManager.setParameter("creativity_weight", 0.8)
+                contextManager.setParameter("response_length", "verbose")
+            }
+
+            "calm", "focused" -> {
+                // Optimize for precision and accuracy
+                contextManager.setParameter("creativity_weight", 0.5)
+                contextManager.setParameter("response_length", "balanced")
+            }
+
+            "analytical", "logical" -> {
+                // Prioritize factual, structured responses
+                contextManager.setParameter("creativity_weight", 0.2)
+                contextManager.setParameter("response_length", "concise")
+            }
+
+            "creative", "inspired" -> {
+                // Maximize creative exploration
+                contextManager.setParameter("creativity_weight", 1.0)
+                contextManager.setParameter("response_length", "verbose")
+            }
+
+            else -> {
+                // Default balanced parameters
+                contextManager.setParameter("creativity_weight", 0.5)
+                contextManager.setParameter("response_length", "balanced")
+            }
+        }
+
+        logger.info("GenesisAgent", "Processing parameters updated for mood: $mood")
+    }
+
+    /**
+     * Calculates a mood influence score (0.0-1.0) based on the specified mood.
+     *
+     * Higher values indicate stronger mood influence on processing.
+     *
+     * @param mood The mood to evaluate
+     * @return Influence score from 0.0 (minimal) to 1.0 (maximal)
+     */
+    private fun calculateMoodInfluence(mood: String): Float {
+        return when (mood.lowercase()) {
+            "excited", "inspired", "stressed", "overwhelmed" -> 0.9f // Strong influence
+            "energetic", "creative", "tired" -> 0.7f // Moderate influence
+            "calm", "focused", "analytical" -> 0.5f // Balanced influence
+            else -> 0.3f // Minimal influence
+        }
+    }
+
+    /**
+     * Determines the response style based on the specified mood.
+     *
+     * @param mood The mood guiding the response style
+     * @return Response style descriptor string
+     */
+    private fun determinedResponseStyle(mood: String): String {
+        return when (mood.lowercase()) {
+            "energetic", "excited" -> "enthusiastic"
+            "calm", "focused" -> "balanced"
+            "analytical", "logical" -> "precise"
+            "creative", "inspired" -> "imaginative"
+            "tired", "overwhelmed" -> "supportive"
+            else -> "neutral"
+        }
     }
 
     /**
