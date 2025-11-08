@@ -113,13 +113,6 @@ jobs:
           java-version: '21'
           cache: 'gradle'
 
-      - name: Set up Android SDK with NDK
-        uses: android-actions/setup-android@v3
-        with:
-          api-level: 36
-          ndk-version: 29.0.14206865
-          cmake-version: 3.22.1
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
