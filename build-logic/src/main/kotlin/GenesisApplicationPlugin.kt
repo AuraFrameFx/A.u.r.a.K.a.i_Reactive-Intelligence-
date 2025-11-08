@@ -34,6 +34,22 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
  * @since Genesis Protocol 2.0 (Modernized)
  */
 class GenesisApplicationPlugin : Plugin<Project> {
+    /**
+     * Configures the given Gradle Project as an Android application module using the
+     * project's standard Genesis application defaults.
+     *
+     * Applies required plugins (Android application, Hilt, KSP, Kotlin serialization,
+     * Google services, Kotlin Android) and configures the Android ApplicationExtension:
+     * compile SDK, defaultConfig (applicationId, min/target SDK, versioning, test runner,
+     * vector drawable support), release build type (ProGuard/minification), Java
+     * compatibility and desugaring, Compose and buildConfig build features, resource
+     * packaging exclusions, lint baseline/behavior, and external native build (CMake).
+     *
+     * Also adjusts Kotlin compilation tasks to rely on the configured toolchain and sets
+     * JVM target validation mode for Kotlin JVM compilation tasks to WARNING.
+     *
+     * @param project The Gradle Project to configure as an Android application module.
+     */
     override fun apply(project: Project) {
         with(project) {
             pluginManager.apply("com.android.application")
