@@ -319,7 +319,7 @@ kavaref-extension = { module = "com.highcapable.kavaref:kavaref-extension", vers
 # Testing
 # ============================================================================
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
-
+espresso-core = { group = "espresso
 # ============================================================================
 # Xposed & Hooking
 # ============================================================================
