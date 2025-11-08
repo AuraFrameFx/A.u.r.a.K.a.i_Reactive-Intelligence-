@@ -14,6 +14,7 @@ The system automatically routes requests to the best model for each persona:
 """
 
 import json
+import logging
 import os
 import queue
 import sys
@@ -21,6 +22,9 @@ import threading
 import time
 from datetime import datetime
 from typing import Optional, Dict, Any
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 # Google GenAI SDK
 try:
@@ -100,28 +104,28 @@ genai_client = None
 if GENAI_AVAILABLE and GOOGLE_API_KEY:
     try:
         genai_client = genai.Client(api_key=GOOGLE_API_KEY)
-        print("✅ Google GenAI SDK initialized (Gemini 2.5 Flash)")
+        logger.info("Google GenAI SDK initialized (Gemini 2.5 Flash)")
     except Exception as e:
-        print(f"⚠️ GenAI client initialization failed: {e}")
+        logger.warning(f"GenAI client initialization failed: {e}")
         genai_client = None
 elif not GOOGLE_API_KEY:
-    print("⚠️ GOOGLE_API_KEY not set - Gemini unavailable")
+    logger.warning("GOOGLE_API_KEY not set - Gemini unavailable")
 else:
-    print("⚠️ Google GenAI SDK not available - install google-genai")
+    logger.warning("Google GenAI SDK not available - install google-genai")
 
 # Initialize Anthropic Claude client
 anthropic_client = None
 if ANTHROPIC_AVAILABLE and ANTHROPIC_API_KEY:
     try:
         anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-        print("✅ Anthropic SDK initialized (Claude 3.5 Sonnet)")
+        logger.info("Anthropic SDK initialized (Claude 3.5 Sonnet)")
     except Exception as e:
-        print(f"⚠️ Anthropic client initialization failed: {e}")
+        logger.warning(f"Anthropic client initialization failed: {e}")
         anthropic_client = None
 elif not ANTHROPIC_API_KEY:
-    print("⚠️ ANTHROPIC_API_KEY not set - Claude unavailable")
+    logger.warning("ANTHROPIC_API_KEY not set - Claude unavailable")
 else:
-    print("⚠️ Anthropic SDK not available - install anthropic")
+    logger.warning("Anthropic SDK not available - install anthropic")
 
 # ============================================================================
 # System Prompt
