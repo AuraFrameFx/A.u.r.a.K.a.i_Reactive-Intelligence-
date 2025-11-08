@@ -1,6 +1,9 @@
 // File: romtools/src/main/kotlin/dev/aurakai/auraframefx/romtools/ui/RomToolsScreen.kt
 package dev.aurakai.auraframefx.romtools.ui
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -67,6 +70,27 @@ fun RomToolsScreen(
     val operationProgress by romToolsManager.operationProgress.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
 
+    // File pickers for ROM and backup selection
+    val romPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let {
+            Timber.i("ROM file selected: $it")
+            // TODO: Wire up romToolsManager.flashRom() when it accepts Uri/path parameter
+            Timber.w("ROM flashing from URI requires RomToolsManager.flashRom(uri) implementation")
+        }
+    }
+
+    val backupPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let {
+            Timber.i("Backup file selected: $it")
+            // TODO: Wire up romToolsManager.restoreBackup() when it accepts Uri/path parameter
+            Timber.w("Backup restoration from URI requires RomToolsManager.restoreBackup(uri) implementation")
+        }
+    }
+
     // Main column container
     Column(
         modifier = modifier
@@ -98,11 +122,26 @@ fun RomToolsScreen(
                 romToolsState = romToolsState,
                 operationProgress = operationProgress,
                 onActionClick = { actionType ->
-                    handleRomAction(
-                        actionType = actionType,
-                        romToolsManager = romToolsManager,
-                        coroutineScope = coroutineScope
-                    )
+                    when (actionType) {
+                        RomActionType.FLASH_ROM -> {
+                            romPicker.launch(arrayOf(
+                                "application/zip",
+                                "application/octet-stream",
+                                "application/x-zip-compressed"
+                            ))
+                        }
+                        RomActionType.RESTORE_BACKUP -> {
+                            backupPicker.launch(arrayOf(
+                                "application/zip",
+                                "application/octet-stream"
+                            ))
+                        }
+                        else -> handleRomAction(
+                            actionType = actionType,
+                            romToolsManager = romToolsManager,
+                            coroutineScope = coroutineScope
+                        )
+                    }
                 }
             )
         }
@@ -111,6 +150,9 @@ fun RomToolsScreen(
 
 /**
  * Handles ROM tool action clicks by dispatching to the appropriate RomToolsManager method.
+ *
+ * Note: FLASH_ROM and RESTORE_BACKUP are handled at the screen level via file pickers
+ * and are not processed by this function.
  *
  * @param actionType The type of ROM action to perform
  * @param romToolsManager The manager instance to execute the operation
@@ -123,10 +165,6 @@ private fun handleRomAction(
 ) {
     coroutineScope.launch {
         when (actionType) {
-            RomActionType.FLASH_ROM -> {
-                // TODO: Show ROM selection dialog
-                Timber.i("Flash ROM action triggered - ROM selection dialog needed")
-            }
             RomActionType.CREATE_BACKUP -> {
                 // Generate a timestamp-based backup name
                 val backupName = "AuraKai_Backup_${System.currentTimeMillis()}"
@@ -136,10 +174,6 @@ private fun handleRomAction(
                 }.onFailure { error ->
                     Timber.e(error, "Backup creation failed")
                 }
-            }
-            RomActionType.RESTORE_BACKUP -> {
-                // TODO: Show backup selection dialog
-                Timber.i("Restore backup action triggered - backup selection dialog needed")
             }
             RomActionType.UNLOCK_BOOTLOADER -> {
                 val result = romToolsManager.unlockBootloader()
