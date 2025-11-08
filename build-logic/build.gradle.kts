@@ -5,16 +5,16 @@ plugins {
 // Configure Kotlin compilation to match Java toolchain
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
     jvmTargetValidationMode.set(org.jetbrains.kotlin.gradle.dsl.jvm.JvmTargetValidationMode.WARNING)
+    // Kotlin 2.3.0-Beta2 supports up to JVM 24
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_24)
     }
 }
 
 java {
     toolchain {
-        // Java 21 for stable build-logic compatibility
-        // (Changed from 25 to match Kotlin capabilities)
-        languageVersion.set(JavaLanguageVersion.of(21))
+        // Java 24 - required by Firebase and other dependencies
+        languageVersion.set(JavaLanguageVersion.of(24))
     }
 }
 
