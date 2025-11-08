@@ -1,45 +1,90 @@
 ﻿package dev.aurakai.auraframefx.data
 
-// import androidx.datastore.preferences.core.edit
-// import androidx.datastore.preferences.core.stringPreferencesKey
-// import androidx.datastore.preferences.preferencesDataStore
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import dev.aurakai.auraframefx.model.UserData
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
-// Example: Define a DataStore instance
-// val Context.dataStore by preferencesDataStore(name = "user_settings")
+// DataStore extension property
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_settings")
 
-class UserPreferences(context: Context) {
+/**
+ * Manages user preferences using Jetpack DataStore.
+ *
+ * Provides type-safe access to user settings including API keys, user information,
+ * and general application preferences.
+ */
+class UserPreferences(private val context: Context) {
 
-    // private val dataStore = context.dataStore
+    private val dataStore = context.dataStore
 
-    // Example preference key
-    // companion object {
-    //     val USER_NAME_KEY = stringPreferencesKey("user_name")
-    // }
-
-    // Example function to save a preference
-    // suspend fun saveUserName(name: String) {
-    //     dataStore.edit { settings ->
-    //         settings[USER_NAME_KEY] = name
-    //     }
-    // }
-
-    // Example function to read a preference
-    // val userNameFlow: Flow<String?> = dataStore.data.map { preferences ->
-    //     preferences[USER_NAME_KEY]
-    // }
-
-    // Placeholder content if not using Jetpack DataStore or for initial setup
-    init {
-        // TODO: Initialize preferences mechanism (e.g., SharedPreferences, DataStore)
-        // This is a placeholder. Actual implementation will depend on the chosen
-        // preferences storage solution.
-        val placeholder = "UserPreferences initialized (placeholder)"
+    companion object {
+        val API_KEY = stringPreferencesKey("api_key")
+        val USER_ID = stringPreferencesKey("user_id")
+        val USER_NAME = stringPreferencesKey("user_name")
+        val USER_EMAIL = stringPreferencesKey("user_email")
     }
 
-    // Minimal working implementation for placeholder
-    private val prefs = mutableMapOf<String, String>()
+    init {
+        // DataStore initialized automatically via lazy delegate
+        timber.log.Timber.d("UserPreferences initialized with DataStore")
+    }
+
+    // Flow-based reactive properties for observing preferences
+    val apiKeyFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[API_KEY] }
+    val userIdFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[USER_ID] }
+    val userNameFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[USER_NAME] }
+    val userEmailFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[USER_EMAIL] }
+
+    /**
+     * Stores the API key for the user.
+     *
+     * @param key The API key to store
+     */
+    suspend fun setApiKey(key: String) {
+        dataStore.edit { prefs ->
+            prefs[API_KEY] = key
+        }
+    }
+
+    /**
+     * Stores the user ID.
+     *
+     * @param id The user ID to store
+     */
+    suspend fun setUserId(id: String) {
+        dataStore.edit { prefs ->
+            prefs[USER_ID] = id
+        }
+    }
+
+    /**
+     * Stores the username.
+     *
+     * @param name The username to store
+     */
+    suspend fun setUserName(name: String) {
+        dataStore.edit { prefs ->
+            prefs[USER_NAME] = name
+        }
+    }
+
+    /**
+     * Stores the user email.
+     *
+     * @param email The email to store
+     */
+    suspend fun setUserEmail(email: String) {
+        dataStore.edit { prefs ->
+            prefs[USER_EMAIL] = email
+        }
+    }
 
     /**
      * Returns the stored string value for the specified preference key, or the provided default if the key is absent.
@@ -48,46 +93,80 @@ class UserPreferences(context: Context) {
      * @param defaultValue The value to return if the key is not found.
      * @return The value associated with the key, or the default value if the key does not exist.
      */
-    fun getPreference(key: String, defaultValue: String): String {
-        return prefs[key] ?: defaultValue
+    suspend fun getPreference(key: String, defaultValue: String): String {
+        val prefKey = stringPreferencesKey(key)
+        return dataStore.data.map { prefs ->
+            prefs[prefKey] ?: defaultValue
+        }.first()
     }
 
     /**
-     * Stores or updates the string value for the given key in the in-memory preferences.
+     * Stores or updates the string value for the given key in DataStore.
      *
      * If the key already exists, its value is overwritten.
      *
      * @param key The preference key to set.
      * @param value The string value to associate with the key.
      */
-    fun setPreference(key: String, value: String) {
-        prefs[key] = value
+    suspend fun setPreference(key: String, value: String) {
+        val prefKey = stringPreferencesKey(key)
+        dataStore.edit { prefs ->
+            prefs[prefKey] = value
+        }
     }
 
-    // Properties based on error report (unused declarations)
+    /**
+     * Retrieves complete user data from DataStore.
+     *
+     * Reads all user-related preferences and constructs a UserData object.
+     *
+     * @return UserData object with current user information, or null if no user data is set
+     */
+    suspend fun getUserData(): UserData? {
+        val prefs = dataStore.data.first()
 
-    // TODO: Reported as unused. Implement storage and retrieval if needed.
-    var apiKey: String? = null
+        val userId = prefs[USER_ID]
+        val userName = prefs[USER_NAME]
+        val userEmail = prefs[USER_EMAIL]
+        val apiKey = prefs[API_KEY]
 
-    // TODO: Reported as unused. Implement storage and retrieval if needed.
-    var userId: String? = null
+        // Return null if no user data is set
+        if (userId == null && userName == null && userEmail == null) {
+            return null
+        }
 
-    // TODO: Reported as unused. Implement storage and retrieval if needed.
-    var userName: String? = null
-
-    // TODO: Reported as unused. Implement storage and retrieval if needed.
-    var userEmail: String? = null
+        return UserData(
+            id = userId ?: "",
+            name = userName ?: "",
+            email = userEmail ?: "",
+            apiKey = apiKey
+        )
+    }
 
     /**
-     * Retrieves user data. The original error report mentioned a "NonExistentClass"
-     * for the return type, so using Any? as a placeholder.
-     * TODO: Reported as unused. Implement actual user data retrieval.
-     * @return User data object or null.
+     * Saves complete user data to DataStore.
+     *
+     * @param userData The user data to save
      */
-    suspend fun getUserData(): UserData? { // Changed return type from Any? to UserData?
-        // TODO: Implement actual data retrieval logic.
-        // This might involve fetching from DataStore, SharedPreferences, or a database.
-        // Example: return UserData(id = userId, name = userName, email = userEmail, apiKey = apiKey)
-        return null
+    suspend fun saveUserData(userData: UserData) {
+        dataStore.edit { prefs ->
+            prefs[USER_ID] = userData.id
+            prefs[USER_NAME] = userData.name
+            prefs[USER_EMAIL] = userData.email
+            userData.apiKey?.let { prefs[API_KEY] = it }
+        }
+    }
+
+    /**
+     * Clears all user data from DataStore.
+     * Useful for logout operations.
+     */
+    suspend fun clearUserData() {
+        dataStore.edit { prefs ->
+            prefs.remove(USER_ID)
+            prefs.remove(USER_NAME)
+            prefs.remove(USER_EMAIL)
+            prefs.remove(API_KEY)
+        }
     }
 }
