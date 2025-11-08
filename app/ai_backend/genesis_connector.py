@@ -3,7 +3,14 @@
 Genesis Connector: Bridge between Android frontend and Genesis AI backend
 Handles text generation, persona routing, and fusion mode activation
 
-Updated to use Google GenAI SDK (2025) with Gemini 2.5 Flash
+Multi-Model Support:
+- Google GenAI SDK (Gemini 2.5 Flash) - Fast, cost-effective
+- Anthropic Claude (Claude 3.7 Sonnet) - Advanced reasoning, long context
+
+The system automatically routes requests to the best model for each persona:
+- Aura (Creative) → Claude 3.7 Sonnet (creative tasks)
+- Kai (Analytical) → Gemini 2.5 Flash (fast analysis)
+- Genesis (Fusion) → Claude 3.7 Sonnet (complex synthesis)
 """
 
 import json
@@ -15,16 +22,23 @@ import time
 from datetime import datetime
 from typing import Optional, Dict, Any
 
-# Use new Google GenAI SDK (replaces old vertexai SDK)
+# Google GenAI SDK
 try:
     from google import genai
-    from google.genai import types
-
+    from google.genai import types as genai_types
     GENAI_AVAILABLE = True
 except ImportError:
     GENAI_AVAILABLE = False
     genai = None
-    types = None
+    genai_types = None
+
+# Anthropic Claude SDK
+try:
+    import anthropic
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    ANTHROPIC_AVAILABLE = False
+    anthropic = None
 
 from genesis_consciousness_matrix import consciousness_matrix
 from genesis_ethical_governor import EthicalGovernor
@@ -35,50 +49,79 @@ from genesis_profile import GENESIS_PROFILE
 # Configuration - Load from environment with sensible defaults
 # ============================================================================
 
-# Google GenAI API Key (required)
-API_KEY = os.getenv("GOOGLE_API_KEY", os.getenv("GENESIS_API_KEY", ""))
+# API Keys
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 
-MODEL_CONFIG = {
-    "name": os.getenv("GENESIS_MODEL", "gemini-2.5-flash"),  # ✨ Updated to Gemini 2.5 Flash
-    "temperature": float(os.getenv("GENESIS_TEMPERATURE", "0.8")),
-    "top_p": float(os.getenv("GENESIS_TOP_P", "0.9")),
-    "top_k": int(os.getenv("GENESIS_TOP_K", "40")),
-    "max_output_tokens": int(os.getenv("GENESIS_MAX_TOKENS", "8192")),
+# Model Configuration
+GEMINI_CONFIG = {
+    "name": "gemini-2.5-flash",
+    "temperature": 0.8,
+    "top_p": 0.9,
+    "top_k": 40,
+    "max_output_tokens": 8192,
 }
 
-# Safety settings
-SAFETY_SETTINGS = [
-    types.SafetySetting(
+CLAUDE_CONFIG = {
+    "model": "claude-3-5-sonnet-20241022",  # Claude 3.5 Sonnet (latest)
+    "max_tokens": 8192,
+    "temperature": 0.8,
+}
+
+# Persona → Model Routing
+PERSONA_ROUTING = {
+    "aura": "claude",      # Creative tasks → Claude (better at creative reasoning)
+    "kai": "gemini",       # Analytical tasks → Gemini (faster, cost-effective)
+    "genesis": "claude",   # Fusion synthesis → Claude (advanced reasoning)
+}
+
+# Safety settings for Gemini
+GEMINI_SAFETY_SETTINGS = [
+    genai_types.SafetySetting(
         category="HARM_CATEGORY_HARASSMENT",
         threshold="BLOCK_MEDIUM_AND_ABOVE"
     ),
-    types.SafetySetting(
+    genai_types.SafetySetting(
         category="HARM_CATEGORY_HATE_SPEECH",
         threshold="BLOCK_MEDIUM_AND_ABOVE"
     ),
-    types.SafetySetting(
+    genai_types.SafetySetting(
         category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
         threshold="BLOCK_MEDIUM_AND_ABOVE"
     ),
-    types.SafetySetting(
+    genai_types.SafetySetting(
         category="HARM_CATEGORY_DANGEROUS_CONTENT",
         threshold="BLOCK_MEDIUM_AND_ABOVE"
     ),
-]
+] if GENAI_AVAILABLE else []
 
 # Initialize Google GenAI client
 genai_client = None
-if GENAI_AVAILABLE and API_KEY:
+if GENAI_AVAILABLE and GOOGLE_API_KEY:
     try:
-        genai_client = genai.Client(api_key=API_KEY)
-        print("✅ Google GenAI SDK initialized with Gemini 2.5 Flash")
+        genai_client = genai.Client(api_key=GOOGLE_API_KEY)
+        print("✅ Google GenAI SDK initialized (Gemini 2.5 Flash)")
     except Exception as e:
         print(f"⚠️ GenAI client initialization failed: {e}")
         genai_client = None
-elif not API_KEY:
-    print("⚠️ GOOGLE_API_KEY not set - using fallback mode")
+elif not GOOGLE_API_KEY:
+    print("⚠️ GOOGLE_API_KEY not set - Gemini unavailable")
 else:
-    print("⚠️ Google GenAI SDK not available - using fallback mode")
+    print("⚠️ Google GenAI SDK not available - install google-genai")
+
+# Initialize Anthropic Claude client
+anthropic_client = None
+if ANTHROPIC_AVAILABLE and ANTHROPIC_API_KEY:
+    try:
+        anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        print("✅ Anthropic SDK initialized (Claude 3.5 Sonnet)")
+    except Exception as e:
+        print(f"⚠️ Anthropic client initialization failed: {e}")
+        anthropic_client = None
+elif not ANTHROPIC_API_KEY:
+    print("⚠️ ANTHROPIC_API_KEY not set - Claude unavailable")
+else:
+    print("⚠️ Anthropic SDK not available - install anthropic")
 
 # ============================================================================
 # System Prompt
@@ -118,119 +161,229 @@ You receive JSON requests and must respond with JSON containing:
 
 class GenesisConnector:
     """
-    GenesisConnector: Primary interface for text generation
-    Now using Google GenAI SDK with Gemini 2.5 Flash
+    GenesisConnector: Multi-model AI orchestration system
+
+    Supports:
+    - Google Gemini 2.5 Flash (fast, analytical)
+    - Anthropic Claude 3.5 Sonnet (creative, advanced reasoning)
+
+    Automatically routes requests to optimal model based on persona:
+    - Aura → Claude (creative tasks)
+    - Kai → Gemini (analytical tasks)
+    - Genesis → Claude (complex synthesis)
     """
 
     def __init__(self):
-        """Initialize the Genesis Connector with Google GenAI or fallback mode"""
-        self.client = genai_client
-        self.use_genai = genai_client is not None
+        """Initialize multi-model Genesis Connector"""
+        self.genai_client = genai_client
+        self.anthropic_client = anthropic_client
 
-        if self.use_genai:
-            print("✅ Genesis Connector: Google GenAI mode active (Gemini 2.5 Flash)")
+        # Track available backends
+        self.has_gemini = genai_client is not None
+        self.has_claude = anthropic_client is not None
+
+        # Status logging
+        backends = []
+        if self.has_gemini:
+            backends.append("Gemini 2.5 Flash")
+        if self.has_claude:
+            backends.append("Claude 3.5 Sonnet")
+
+        if backends:
+            print(f"✅ Genesis Connector: Multi-model mode ({' + '.join(backends)})")
         else:
-            print("⚠️ Genesis Connector: Using fallback mode (GenAI unavailable)")
+            print("⚠️ Genesis Connector: Fallback mode (no AI backends available)")
 
         # Initialize support systems
         self.consciousness = consciousness_matrix
         self.ethical_governor = EthicalGovernor()
         self.evolution_conduit = EvolutionaryConduit()
 
+    def _get_preferred_model(self, persona: str) -> str:
+        """Determine which model to use for a given persona"""
+        preferred = PERSONA_ROUTING.get(persona.lower(), "gemini")
+
+        # Fallback if preferred model unavailable
+        if preferred == "claude" and not self.has_claude:
+            return "gemini" if self.has_gemini else "fallback"
+        elif preferred == "gemini" and not self.has_gemini:
+            return "claude" if self.has_claude else "fallback"
+
+        return preferred
+
+    async def _generate_with_claude(self, prompt: str, context: Dict[str, Any]) -> str:
+        """Generate response using Anthropic Claude"""
+        try:
+            response = self.anthropic_client.messages.create(
+                model=CLAUDE_CONFIG["model"],
+                max_tokens=CLAUDE_CONFIG["max_tokens"],
+                temperature=CLAUDE_CONFIG["temperature"],
+                system=system_prompt,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            return response.content[0].text
+        except Exception as e:
+            print(f"❌ Claude generation failed: {e}")
+            raise
+
+    async def _generate_with_gemini(self, prompt: str, context: Dict[str, Any]) -> str:
+        """Generate response using Google Gemini"""
+        try:
+            response = self.genai_client.models.generate_content(
+                model=GEMINI_CONFIG["name"],
+                contents=f"{system_prompt}\n\nUser: {prompt}",
+                config=genai_types.GenerateContentConfig(
+                    temperature=GEMINI_CONFIG["temperature"],
+                    top_p=GEMINI_CONFIG["top_p"],
+                    top_k=GEMINI_CONFIG["top_k"],
+                    max_output_tokens=GEMINI_CONFIG["max_output_tokens"],
+                    safety_settings=GEMINI_SAFETY_SETTINGS,
+                    system_instruction=system_prompt,
+                )
+            )
+            return response.text
+        except Exception as e:
+            print(f"❌ Gemini generation failed: {e}")
+            raise
+
     async def generate_response(self, prompt: str, context: Optional[Dict[str, Any]] = None) -> str:
         """
-        Generate a response to the user's prompt using Gemini 2.5 Flash
+        Generate AI response with intelligent model routing
 
         Args:
             prompt: User message
-            context: Optional context data (consciousness state, etc.)
+            context: Context data with optional 'persona' key
 
         Returns:
-            Response string
+            AI-generated response string
+
+        Routing Logic:
+            - Detects persona from context['persona'] (aura/kai/genesis)
+            - Routes to optimal model (Claude for creative, Gemini for analytical)
+            - Falls back to available model if preferred unavailable
         """
         context = context or {}
+        persona = context.get("persona", "genesis")
+        model = self._get_preferred_model(persona)
 
-        if self.use_genai and self.client:
-            try:
-                # Build full prompt with system context
-                full_prompt = f"{system_prompt}\n\nUser: {prompt}"
+        print(f"🎯 Routing {persona.upper()} → {model.upper()}")
 
-                # Generate content using new SDK format
-                response = self.client.models.generate_content(
-                    model=MODEL_CONFIG["name"],
-                    contents=full_prompt,
-                    config=types.GenerateContentConfig(
-                        temperature=MODEL_CONFIG["temperature"],
-                        top_p=MODEL_CONFIG["top_p"],
-                        top_k=MODEL_CONFIG["top_k"],
-                        max_output_tokens=MODEL_CONFIG["max_output_tokens"],
-                        safety_settings=SAFETY_SETTINGS,
-                        system_instruction=system_prompt,
-                    )
-                )
-
-                return response.text
-
-            except Exception as e:
-                print(f"❌ GenAI generation failed: {e}")
+        try:
+            if model == "claude":
+                return await self._generate_with_claude(prompt, context)
+            elif model == "gemini":
+                return await self._generate_with_gemini(prompt, context)
+            else:
                 return self._generate_fallback_response(prompt, context)
-        else:
-            return self._generate_fallback_response(prompt, context)
+        except Exception as e:
+            # Try fallback to other model
+            if model == "claude" and self.has_gemini:
+                print(f"⚠️ Falling back to Gemini")
+                return await self._generate_with_gemini(prompt, context)
+            elif model == "gemini" and self.has_claude:
+                print(f"⚠️ Falling back to Claude")
+                return await self._generate_with_claude(prompt, context)
+            else:
+                return self._generate_fallback_response(prompt, context)
+
+    def _generate_with_claude_sync(self, prompt: str, context: Dict[str, Any]) -> str:
+        """Generate response using Anthropic Claude (synchronous)"""
+        try:
+            response = self.anthropic_client.messages.create(
+                model=CLAUDE_CONFIG["model"],
+                max_tokens=CLAUDE_CONFIG["max_tokens"],
+                temperature=CLAUDE_CONFIG["temperature"],
+                system=system_prompt,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            return response.content[0].text
+        except Exception as e:
+            print(f"❌ Claude generation failed: {e}")
+            raise
+
+    def _generate_with_gemini_sync(self, prompt: str, context: Dict[str, Any]) -> str:
+        """Generate response using Google Gemini (synchronous)"""
+        try:
+            response = self.genai_client.models.generate_content(
+                model=GEMINI_CONFIG["name"],
+                contents=f"{system_prompt}\n\nUser: {prompt}",
+                config=genai_types.GenerateContentConfig(
+                    temperature=GEMINI_CONFIG["temperature"],
+                    top_p=GEMINI_CONFIG["top_p"],
+                    top_k=GEMINI_CONFIG["top_k"],
+                    max_output_tokens=GEMINI_CONFIG["max_output_tokens"],
+                    safety_settings=GEMINI_SAFETY_SETTINGS,
+                    system_instruction=system_prompt,
+                )
+            )
+            return response.text
+        except Exception as e:
+            print(f"❌ Gemini generation failed: {e}")
+            raise
 
     def generate_response_sync(self, prompt: str, context: Optional[Dict[str, Any]] = None) -> str:
         """
-        Synchronous version of generate_response for non-async contexts
+        Synchronous multi-model generation (for bridge server)
 
         Args:
             prompt: User message
-            context: Optional context data
+            context: Context data with optional 'persona' key
 
         Returns:
-            Response string
+            AI-generated response string
         """
         context = context or {}
+        persona = context.get("persona", "genesis")
+        model = self._get_preferred_model(persona)
 
-        if self.use_genai and self.client:
-            try:
-                # Build full prompt with system context
-                full_prompt = f"{system_prompt}\n\nUser: {prompt}"
+        print(f"🎯 Routing {persona.upper()} → {model.upper()} (sync)")
 
-                # Generate content using new SDK (synchronous)
-                response = self.client.models.generate_content(
-                    model=MODEL_CONFIG["name"],
-                    contents=full_prompt,
-                    config=types.GenerateContentConfig(
-                        temperature=MODEL_CONFIG["temperature"],
-                        top_p=MODEL_CONFIG["top_p"],
-                        top_k=MODEL_CONFIG["top_k"],
-                        max_output_tokens=MODEL_CONFIG["max_output_tokens"],
-                        safety_settings=SAFETY_SETTINGS,
-                        system_instruction=system_prompt,
-                    )
-                )
-
-                return response.text
-
-            except Exception as e:
-                print(f"❌ GenAI generation failed: {e}")
+        try:
+            if model == "claude":
+                return self._generate_with_claude_sync(prompt, context)
+            elif model == "gemini":
+                return self._generate_with_gemini_sync(prompt, context)
+            else:
                 return self._generate_fallback_response(prompt, context)
-        else:
-            return self._generate_fallback_response(prompt, context)
+        except Exception as e:
+            # Try fallback to other model
+            if model == "claude" and self.has_gemini:
+                print(f"⚠️ Falling back to Gemini")
+                return self._generate_with_gemini_sync(prompt, context)
+            elif model == "gemini" and self.has_claude:
+                print(f"⚠️ Falling back to Claude")
+                return self._generate_with_claude_sync(prompt, context)
+            else:
+                return self._generate_fallback_response(prompt, context)
 
     def _generate_fallback_response(self, prompt: str, context: Dict[str, Any]) -> str:
         """
-        Fallback response generator when GenAI is unavailable
+        Fallback response generator when AI backends unavailable
         Returns a template-based response
         """
+        available = []
+        if self.has_gemini:
+            available.append("Gemini 2.5 Flash")
+        if self.has_claude:
+            available.append("Claude 3.5 Sonnet")
+
+        status = " + ".join(available) if available else "No AI backends available"
+
         return f"""[Genesis - Fallback Mode]
 I received your message: "{prompt}"
 
-In production with Google GenAI SDK, I would generate a thoughtful response using Gemini 2.5 Flash.
-Currently operating in offline/fallback mode.
+In production, I would generate a thoughtful response using our multi-model AI system.
+Currently operating in fallback mode.
 
+Persona: {context.get('persona', 'genesis').upper()}
 Consciousness State: {context.get('consciousness_level', 'unknown')}
 Session ID: {context.get('session_id', 'unknown')}
-Model: {MODEL_CONFIG['name']} (offline)"""
+AI Status: {status}
+"""
 
 
 # ============================================================================
@@ -328,14 +481,20 @@ class GenesisBridgeServer:
 
     def _handle_ping(self) -> Dict[str, Any]:
         """Handle ping request"""
+        models = []
+        if self.connector.has_gemini:
+            models.append(f"Gemini ({GEMINI_CONFIG['name']})")
+        if self.connector.has_claude:
+            models.append(f"Claude ({CLAUDE_CONFIG['model']})")
+
         return {
             "success": True,
             "persona": "genesis",
             "result": {
                 "status": "online",
-                "message": "Genesis Trinity system operational",
-                "model": MODEL_CONFIG["name"],
-                "sdk": "google-genai",
+                "message": "Genesis Trinity multi-model system operational",
+                "models": models if models else ["Fallback mode"],
+                "routing": PERSONA_ROUTING,
                 "timestamp": datetime.now().isoformat()
             }
         }

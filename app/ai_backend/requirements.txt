@@ -1,10 +1,11 @@
 # Core AI and Cloud Services
-# ✨ Updated to new Google GenAI SDK (2025) - replaces old vertexai
-google-genai>=0.2.0  # New unified SDK for Gemini 2.5 Flash
+# ✨ Multi-Model Support: Google Gemini + Anthropic Claude
+google-genai>=0.2.0     # Google Gemini 2.5 Flash (fast, analytical)
+anthropic>=0.40.0       # Anthropic Claude 3.5 Sonnet (creative, advanced)
 # Legacy dependencies (can be removed if not using Vertex AI directly):
 # vertexai>=1.38.0
 # google-cloud-aiplatform>=1.34.0
-openai>=1.0.0
+openai>=1.0.0           # Keep for potential future integration
 
 # Web Framework and API
 flask>=2.3.0
