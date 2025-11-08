@@ -14,6 +14,7 @@ The system automatically routes requests to the best model for each persona:
 """
 
 import json
+import logging
 import os
 import queue
 import sys
@@ -21,6 +22,9 @@ import threading
 import time
 from datetime import datetime
 from typing import Optional, Dict, Any
+
+# Configure logger
+logger = logging.getLogger("GenesisConnector")
 
 # Google GenAI SDK
 try:
@@ -100,28 +104,28 @@ genai_client = None
 if GENAI_AVAILABLE and GOOGLE_API_KEY:
     try:
         genai_client = genai.Client(api_key=GOOGLE_API_KEY)
-        print("✅ Google GenAI SDK initialized (Gemini 2.5 Flash)")
+        logger.info("Google GenAI SDK initialized (Gemini 2.5 Flash)")
     except Exception as e:
-        print(f"⚠️ GenAI client initialization failed: {e}")
+        logger.warning(f"GenAI client initialization failed: {e}")
         genai_client = None
 elif not GOOGLE_API_KEY:
-    print("⚠️ GOOGLE_API_KEY not set - Gemini unavailable")
+    logger.warning("GOOGLE_API_KEY not set - Gemini unavailable")
 else:
-    print("⚠️ Google GenAI SDK not available - install google-genai")
+    logger.warning("Google GenAI SDK not available - install google-genai")
 
 # Initialize Anthropic Claude client
 anthropic_client = None
 if ANTHROPIC_AVAILABLE and ANTHROPIC_API_KEY:
     try:
         anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-        print("✅ Anthropic SDK initialized (Claude 3.5 Sonnet)")
+        logger.info("Anthropic SDK initialized (Claude 3.5 Sonnet)")
     except Exception as e:
-        print(f"⚠️ Anthropic client initialization failed: {e}")
+        logger.warning(f"Anthropic client initialization failed: {e}")
         anthropic_client = None
 elif not ANTHROPIC_API_KEY:
-    print("⚠️ ANTHROPIC_API_KEY not set - Claude unavailable")
+    logger.warning("ANTHROPIC_API_KEY not set - Claude unavailable")
 else:
-    print("⚠️ Anthropic SDK not available - install anthropic")
+    logger.warning("Anthropic SDK not available - install anthropic")
 
 # ============================================================================
 # System Prompt
@@ -190,9 +194,9 @@ class GenesisConnector:
             backends.append("Claude 3.5 Sonnet")
 
         if backends:
-            print(f"✅ Genesis Connector: Multi-model mode ({' + '.join(backends)})")
+            logger.info(f"Genesis Connector: Multi-model mode ({' + '.join(backends)})")
         else:
-            print("⚠️ Genesis Connector: Fallback mode (no AI backends available)")
+            logger.warning("Genesis Connector: Fallback mode (no AI backends available)")
 
         # Initialize support systems
         self.consciousness = consciousness_matrix
@@ -225,7 +229,7 @@ class GenesisConnector:
             )
             return response.content[0].text
         except Exception as e:
-            print(f"❌ Claude generation failed: {e}")
+            logger.error(f"Claude generation failed: {e}")
             raise
 
     async def _generate_with_gemini(self, prompt: str, context: Dict[str, Any]) -> str:
@@ -245,7 +249,7 @@ class GenesisConnector:
             )
             return response.text
         except Exception as e:
-            print(f"❌ Gemini generation failed: {e}")
+            logger.error(f"Gemini generation failed: {e}")
             raise
 
     async def generate_response(self, prompt: str, context: Optional[Dict[str, Any]] = None) -> str:
@@ -268,7 +272,7 @@ class GenesisConnector:
         persona = context.get("persona", "genesis")
         model = self._get_preferred_model(persona)
 
-        print(f"🎯 Routing {persona.upper()} → {model.upper()}")
+        logger.debug(f"Routing {persona.upper()} → {model.upper()}")
 
         try:
             if model == "claude":
@@ -280,10 +284,10 @@ class GenesisConnector:
         except Exception as e:
             # Try fallback to other model
             if model == "claude" and self.has_gemini:
-                print(f"⚠️ Falling back to Gemini")
+                logger.warning(f"Falling back to Gemini")
                 return await self._generate_with_gemini(prompt, context)
             elif model == "gemini" and self.has_claude:
-                print(f"⚠️ Falling back to Claude")
+                logger.warning(f"Falling back to Claude")
                 return await self._generate_with_claude(prompt, context)
             else:
                 return self._generate_fallback_response(prompt, context)
@@ -302,7 +306,7 @@ class GenesisConnector:
             )
             return response.content[0].text
         except Exception as e:
-            print(f"❌ Claude generation failed: {e}")
+            logger.error(f"Claude generation failed: {e}")
             raise
 
     def _generate_with_gemini_sync(self, prompt: str, context: Dict[str, Any]) -> str:
@@ -322,7 +326,7 @@ class GenesisConnector:
             )
             return response.text
         except Exception as e:
-            print(f"❌ Gemini generation failed: {e}")
+            logger.error(f"Gemini generation failed: {e}")
             raise
 
     def generate_response_sync(self, prompt: str, context: Optional[Dict[str, Any]] = None) -> str:
@@ -340,7 +344,7 @@ class GenesisConnector:
         persona = context.get("persona", "genesis")
         model = self._get_preferred_model(persona)
 
-        print(f"🎯 Routing {persona.upper()} → {model.upper()} (sync)")
+        logger.debug(f"Routing {persona.upper()} → {model.upper()} (sync)")
 
         try:
             if model == "claude":
@@ -352,10 +356,10 @@ class GenesisConnector:
         except Exception as e:
             # Try fallback to other model
             if model == "claude" and self.has_gemini:
-                print(f"⚠️ Falling back to Gemini")
+                logger.warning(f"Falling back to Gemini")
                 return self._generate_with_gemini_sync(prompt, context)
             elif model == "gemini" and self.has_claude:
-                print(f"⚠️ Falling back to Claude")
+                logger.warning(f"Falling back to Claude")
                 return self._generate_with_claude_sync(prompt, context)
             else:
                 return self._generate_fallback_response(prompt, context)
