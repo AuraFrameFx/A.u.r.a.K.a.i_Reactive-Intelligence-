@@ -38,12 +38,3 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
-venv/
-ENV/
-.venv
-*.egg
-*.egg-info/
-dist/
-build/
-.pytest_cache/

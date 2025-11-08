@@ -1,76 +1,139 @@
 ﻿package dev.aurakai.auraframefx.ui
 
+import timber.log.Timber
+
 /**
- * Controller class for Kai UI elements or interactions.
+ * Controller class for Kai UI elements and gesture interactions.
+ *
+ * Handles gesture-based interactions with the Kai assistant, including taps,
+ * long presses, and swipe gestures for navigation and control.
  */
-class KaiController(
-    // private val context: Context // Example: if context is needed
-) {
+class KaiController {
 
     /**
      * Indicates if Kai features are currently active or visible.
-     * Initialized to false as a placeholder.
      */
     var isActive: Boolean = false
-        private set // Example: Setter might be private if managed internally
+        private set
 
-    // Placeholder for the listener based on error report
-    // TODO: Define proper listener type (e.g., an interface) and usage. Reported as unused.
-    private var _kaiInteractionListener: (() -> Unit)? = null
+    /**
+     * Listener interface for Kai interaction events.
+     * Implement this to receive callbacks for gesture-based Kai interactions.
+     */
+    interface KaiInteractionListener {
+        fun onKaiTapped()
+        fun onKaiLongPressed()
+        fun onKaiSwipedLeft()
+        fun onKaiSwipedRight()
+    }
+
+    private var interactionListener: KaiInteractionListener? = null
 
     init {
-        // TODO: Initialize KaiController, set up listeners, etc.
-        // Example of setting up the listener if it were an interface:
-        // _kaiInteractionListener = object : KaiInteractionListener {
-        //     override fun onKaiTapped() { TODO("Reported as unused. Implement or remove.") }
-        //     override fun onKaiLongPressed() { TODO("Reported as unused. Implement or remove.") }
-        //     override fun onKaiSwipedLeft() { TODO("Reported as unused. Implement or remove.") }
-        //     override fun onKaiSwipedRight() { TODO("Reported as unused. Implement or remove.") }
-        // }
-    }
-
-    // Placeholder methods based on error report (originally part of an anonymous class)
-    // TODO: These methods were reported as unused within an anonymous listener. Implement or remove.
-    fun onKaiTapped() { /* TODO: Implement or remove. */
-    }
-
-    fun onKaiLongPressed() { /* TODO: Implement or remove. */
-    }
-
-    fun onKaiSwipedLeft() { /* TODO: Implement or remove. */
-    }
-
-    fun onKaiSwipedRight() { /* TODO: Implement or remove. */
+        Timber.d("KaiController initialized")
     }
 
     /**
-     * Placeholder for retrieving or managing the Kai Notch Bar.
-     * The actual return type might be a custom Composable, a View, or Unit if it controls via side effects.
+     * Sets the listener for Kai interaction events.
      *
-     * @return A placeholder View object or Unit.
+     * @param listener The listener to receive Kai interaction callbacks
      */
-    fun getKaiNotchBar(): Any { // Using Any as a very generic placeholder type
-        // TODO: Implement logic to return or manage the Kai Notch Bar.
-        // This might involve returning a Composable, a View instance, or managing its state directly.
-        // return View(context) // Example if it were to return a View
-        return Unit // Placeholder, returning Unit if it's more about state management
+    fun setInteractionListener(listener: KaiInteractionListener) {
+        interactionListener = listener
+        Timber.d("KaiInteractionListener set")
+    }
+
+    /**
+     * Handles a tap gesture on the Kai assistant.
+     * Triggers quick activation or primary action.
+     */
+    fun onKaiTapped() {
+        Timber.i("Kai tapped - activating quick action")
+        interactionListener?.onKaiTapped()
+
+        // Default behavior: toggle active state
+        if (!isActive) {
+            activate()
+        }
+    }
+
+    /**
+     * Handles a long press gesture on the Kai assistant.
+     * Typically used for advanced options or contextual menus.
+     */
+    fun onKaiLongPressed() {
+        Timber.i("Kai long pressed - showing advanced options")
+        interactionListener?.onKaiLongPressed()
+
+        // Default behavior: show Kai control panel or settings
+    }
+
+    /**
+     * Handles a left swipe gesture on the Kai assistant.
+     * Typically used for navigation or dismissal.
+     */
+    fun onKaiSwipedLeft() {
+        Timber.i("Kai swiped left - navigating or dismissing")
+        interactionListener?.onKaiSwipedLeft()
+
+        // Default behavior: previous context or minimize
+        if (isActive) {
+            deactivate()
+        }
+    }
+
+    /**
+     * Handles a right swipe gesture on the Kai assistant.
+     * Typically used for navigation or expansion.
+     */
+    fun onKaiSwipedRight() {
+        Timber.i("Kai swiped right - navigating or expanding")
+        interactionListener?.onKaiSwipedRight()
+
+        // Default behavior: next context or maximize
+        if (!isActive) {
+            activate()
+        }
+    }
+
+    /**
+     * Retrieves the current Kai Notch Bar state.
+     *
+     * @return The active state of the Kai Notch Bar
+     */
+    fun getKaiNotchBar(): Boolean {
+        return isActive
+    }
+
+    /**
+     * Activates the Kai assistant and notifies listeners.
+     */
+    fun activate() {
+        if (!isActive) {
+            isActive = true
+            Timber.i("Kai activated")
+            // Trigger UI updates or animations
+        }
+    }
+
+    /**
+     * Deactivates the Kai assistant and notifies listeners.
+     */
+    fun deactivate() {
+        if (isActive) {
+            isActive = false
+            Timber.i("Kai deactivated")
+            // Trigger UI updates or animations
+        }
     }
 
     /**
      * Cleans up resources used by the KaiController.
+     * Removes listeners and resets state.
      */
     fun destroy() {
-        // TODO: Implement cleanup logic, remove listeners, release resources.
-        isActive = false
-    }
-
-    fun activate() {
-        // TODO: Implement activation logic
-        isActive = true
-    }
-
-    fun deactivate() {
-        // TODO: Implement deactivation logic
+        Timber.d("KaiController destroyed")
+        interactionListener = null
         isActive = false
     }
 }

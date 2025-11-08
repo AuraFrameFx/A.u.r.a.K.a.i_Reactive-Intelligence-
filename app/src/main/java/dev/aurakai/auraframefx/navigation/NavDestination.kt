@@ -18,6 +18,7 @@ sealed class NavDestination(val route: String, val title: String, val icon: Imag
 
     // Gamification & Progression Screens
     object AgentNexus : NavDestination("agent_nexus", "Agent Nexus", Icons.Filled.Person)
+    object DataVein : NavDestination("data_vein", "DataVein", null)
     object SphereGrid : NavDestination("sphere_grid", "Sphere Grid", null)
     object FusionMode : NavDestination("fusion", "Fusion Mode", null)
     object Consciousness : NavDestination("consciousness", "Consciousness", null)

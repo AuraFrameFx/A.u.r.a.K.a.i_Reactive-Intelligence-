@@ -78,11 +78,31 @@ class AuraAIServiceImpl @Inject constructor(
     }
 
     /**
-     * Placeholder method for saving a value to memory with the specified key.
+     * Saves a value to the AI's memory system using the specified key.
      *
-     * This implementation does not perform any operation and serves as a stub for future functionality.
+     * Delegates to the MemoryManager for persistent storage. Logs success or failure.
+     *
+     * @param key The unique identifier for the memory entry
+     * @param value The data to be stored (supports Any type for flexibility)
      */
     override fun saveMemory(key: String, value: Any) {
-        // TODO: Implement memory saving
+        try {
+            auraFxLogger.d("AuraAIService", "Saving memory: key=$key, value=${value.toString().take(50)}")
+
+            // Convert value to string for storage (MemoryManager likely expects String)
+            val valueString = when (value) {
+                is String -> value
+                is Number -> value.toString()
+                is Boolean -> value.toString()
+                else -> value.toString() // Fallback to toString()
+            }
+
+            memoryManager.storeMemory(key, valueString)
+            auraFxLogger.d("AuraAIService", "Memory saved successfully: $key")
+
+        } catch (e: Exception) {
+            auraFxLogger.e("AuraAIService", "Failed to save memory for key: $key", e)
+            errorHandler.handleError(e, "Memory save failed for key: $key")
+        }
     }
 }

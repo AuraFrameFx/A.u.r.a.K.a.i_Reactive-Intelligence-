@@ -4,7 +4,7 @@
 # ============================================================================
 # Android Gradle Plugin - Using preview for Android 16 (API 36) support
 # Stable available: 8.13.0, Preview: 9.0.0-alpha13 (requires Gradle 9.0.0)
-agp = "9.0.0-alpha13"
+agp = "9.0.0-alpha14"
 androidApplication = "9.0.0-alpha13"
 androidLibrary = "9.0.0-alpha13"
 androidTest = "9.0.0-alpha13"
@@ -33,7 +33,7 @@ kotlinDsl = "5.1.2"
 # IMPORTANT: Starting with KSP 2.3.0, version is NO LONGER tied to Kotlin version
 # Old format: kotlin-version-ksp-version, New format: simple version (2.3.1)
 # This decoupling provides better compatibility across Kotlin versions
-ksp = "2.3.1"
+ksp = "2.3.2"
 
 # KavaRef - Reflection API for YukiHookAPI
 kavaref = "1.0.1"
@@ -171,7 +171,6 @@ yukihookapi = "1.3.1"
 
 # Xposed Bridge (if using custom builds)
 xposed-bridge = "1.3.1"
-
 # ============================================================================
 # Build Tools (NDK, CMake)
 # ============================================================================
@@ -194,7 +193,7 @@ mockk = "1.14.6"
 androidxJunit = "1.3.0"
 
 # Espresso - Latest: 3.7.0 (July 30, 2025)
-espresso = "3.7.0"
+espresso = "3.5.1"
 
 # Benchmark - Latest: 1.4.1 (Sept 10, 2025)
 benchmark = "1.4.1"
@@ -203,12 +202,13 @@ benchmark = "1.4.1"
 # ============================================================================
 # Build & Gradle Plugins
 # ============================================================================
+android-plugin = { group = "com.android.application", name = "android-application", version.ref = "androidApplication"}
 gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
-kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
-hilt-gradle-plugin = { group = "com.google.dagger", name = "hilt-android-gradle-plugin", version.ref = "hilt" }
+kotlin-android-plugin = { group = "org.jetbrains.kotlin.android", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+hilt-plugin = { group = "com.google.dagger.hilt", name = "hilt-android-gradle-plugin", version.ref = "hilt" }
 ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "symbol-processing-gradle-plugin", version.ref = "ksp" }
-google-services-gradle-plugin = { group = "com.google.gms", name = "google-services", version.ref = "googleServices" }
-gradle-core = { group = "org.gradle", name = "gradle-core", version.ref = "gradleCore" }
+google-services-gradle-plugin = { group = "com.google.services", name = "google-services", version.ref = "googleServices" }
+gradle-core = { group = "org.gradle", name = "gradlecore", version.ref = "gradleCore" }
 foojayresolver = { group = "org.gradle.toolchains.foojay-resolver-convention", name = "foojay-resolver", version.ref = "foojayResolver" }
 # ============================================================================
 # AndroidX & Jetpack
@@ -242,6 +242,8 @@ compose-ui = { module = "androidx.compose.ui:ui" }
 compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
 
 # ============================================================================
 # Firebase (via BOM - KTX artifacts now in main modules)
@@ -318,11 +320,6 @@ kavaref-extension = { module = "com.highcapable.kavaref:kavaref-extension", vers
 # Testing
 # ============================================================================
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
-benchmark-junit4 = { group = "androidx.benchmark", name = "benchmark-junit4", version.ref = "benchmark" }
-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
-mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 
 # ============================================================================
 # Xposed & Hooking
@@ -430,17 +427,6 @@ utilities = [
     "leakcanary-android",
 ]
 
-testing-unit = [
-    "junit",
-    "junit-jupiter",
-    "mockk",
-]
-
-testing-instrumentation = [
-    "espresso-core",
-    "benchmark-junit4",
-]
-
 system-root = [
     "libsu-core",
     "libsu-io",
@@ -461,3 +447,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+

@@ -104,28 +104,16 @@ genai_client = None
 if GENAI_AVAILABLE and GOOGLE_API_KEY:
     try:
         genai_client = genai.Client(api_key=GOOGLE_API_KEY)
-        logger.info("Google GenAI SDK initialized (Gemini 2.5 Flash)")
-    except Exception as e:
-        logger.warning(f"GenAI client initialization failed: {e}")
+    except Exception:
         genai_client = None
-elif not GOOGLE_API_KEY:
-    logger.warning("GOOGLE_API_KEY not set - Gemini unavailable")
-else:
-    logger.warning("Google GenAI SDK not available - install google-genai")
 
 # Initialize Anthropic Claude client
 anthropic_client = None
 if ANTHROPIC_AVAILABLE and ANTHROPIC_API_KEY:
     try:
         anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-        logger.info("Anthropic SDK initialized (Claude 3.5 Sonnet)")
-    except Exception as e:
-        logger.warning(f"Anthropic client initialization failed: {e}")
+    except Exception:
         anthropic_client = None
-elif not ANTHROPIC_API_KEY:
-    logger.warning("ANTHROPIC_API_KEY not set - Claude unavailable")
-else:
-    logger.warning("Anthropic SDK not available - install anthropic")
 
 # ============================================================================
 # System Prompt

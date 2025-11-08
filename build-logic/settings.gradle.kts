@@ -1,15 +1,5 @@
 // build-logic/settings.gradle.kts
 
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        google()
-        mavenCentral()
-        // Kotlin dev EAP repository
-        maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") }
-    }
-}
-
 dependencyResolutionManagement {
     repositories {
         google()
@@ -23,5 +13,4 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "build-logic"
-
+rootProject.name = "app"

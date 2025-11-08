@@ -32,17 +32,18 @@ import androidx.compose.ui.unit.sp
  *
  * Renders a full-screen dark background with a centered translucent card containing
  * title/subtitle, a divider, overall system status, three small status chips, multiline
- * status details, an action button, and a build note. The action button currently
- * contains a placeholder (no navigation or side effects are performed).
+ * status details, an action button, and a build note.
  *
  * @param modifier Modifier applied to the outer container (Box); use to adjust layout or
  * positioning from the caller.
-
+ * @param onLaunchSphereGrid Callback invoked when the "Launch Sphere Grid" button is clicked.
+ * Use this to navigate to the full 3D sphere grid visualization screen.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SimpleDataVeinScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLaunchSphereGrid: () -> Unit = {}
 ) {
     Box(
         modifier = modifier
@@ -106,7 +107,7 @@ fun SimpleDataVeinScreen(
                 )
 
                 Button(
-                    onClick = { /* TODO: Implement sphere grid navigation */ },
+                    onClick = onLaunchSphereGrid,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Cyan
                     )
