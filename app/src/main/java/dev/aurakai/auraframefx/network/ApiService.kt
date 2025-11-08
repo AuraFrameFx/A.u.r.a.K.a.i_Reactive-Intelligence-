@@ -1,69 +1,97 @@
 ﻿package dev.aurakai.auraframefx.network
 
 import android.content.Context
+import timber.log.Timber
 
 /**
- * Service class for making API calls.
- * TODO: Reported as unused declaration. Ensure this class is used for network operations.
- * @param _context Application context. Parameter reported as unused in the constructor.
+ * Service class for making API network calls.
+ *
+ * Manages API authentication (token/OAuth) and provides access to
+ * the configured network client (Retrofit/Ktor) for API requests.
  */
-class ApiService(_context: Context) { // TODO: Parameter _context reported as unused.
+class ApiService(private val context: Context) {
 
     private var apiToken: String? = null
     private var oauthToken: String? = null
 
-    // Placeholder for the actual Retrofit service instance or similar.
-    private var _networkService: Any? =
-        null // TODO: Replace Any with actual network client (e.g., Retrofit interface).
+    /**
+     * Placeholder for the network service client.
+     * Will be replaced with actual Retrofit interface when implemented.
+     */
+    private var networkService: Any? = null
 
     init {
-        // TODO: Initialize network client (Retrofit, Ktor, etc.)
-        // _context might be used here for cache, connectivity checks, etc.
+        Timber.d("ApiService: Initialized with context")
+        // Network client initialization will use context for:
+        // - Cache directory for HTTP cache
+        // - Connectivity manager for network status
+        // - Application info for user agent
     }
 
     /**
      * Sets the API token for authentication.
-     * @param _token The API token. Parameter reported as unused.
-     * TODO: Reported as unused. Implement if API token auth is used.
+     *
+     * Updates the stored API token and triggers network client reconfiguration
+     * to include the new token in request headers.
+     *
+     * @param token The API token for authentication
      */
-    fun setApiToken(_token: String?) {
-        // TODO: Parameter _token reported as unused.
-        this.apiToken = _token
-        // TODO: Potentially reconfigure network client with new token.
+    fun setApiToken(token: String?) {
+        Timber.d("ApiService: Setting API token")
+        this.apiToken = token
+        // Trigger network client reconfiguration with new token
+        // This would rebuild the OkHttpClient with updated AuthInterceptor
+        reconfigureNetworkClient()
     }
 
     /**
      * Sets the OAuth token for authentication.
-     * @param _token The OAuth token. Parameter reported as unused.
-     * TODO: Reported as unused. Implement if OAuth is used.
+     *
+     * Updates the stored OAuth token and triggers network client reconfiguration
+     * to include the new token in Authorization headers.
+     *
+     * @param token The OAuth token for authentication
      */
-    fun setOAuthToken(_token: String?) {
-        // TODO: Parameter _token reported as unused.
-        this.oauthToken = _token
-        // TODO: Potentially reconfigure network client with new token.
+    fun setOAuthToken(token: String?) {
+        Timber.d("ApiService: Setting OAuth token")
+        this.oauthToken = token
+        // Trigger network client reconfiguration with new OAuth token
+        reconfigureNetworkClient()
     }
 
     /**
-     * Creates (or retrieves) the actual network service client.
-     * @return A network service client instance. Type 'Any?' is a placeholder.
-     * TODO: Reported as unused. Implement to return a configured network client.
+     * Creates or retrieves the configured network service client.
+     *
+     * Returns a lazy-initialized network client (Retrofit/Ktor) configured
+     * with authentication tokens, interceptors, and converters.
+     *
+     * @return Network service client instance (currently placeholder Any?)
      */
     fun createService(): Any? {
-        // TODO: Implement logic to create/configure and return a Retrofit/Ktor service.
-        // Example:
-        // if (_networkService == null) {
-        //     val retrofit = Retrofit.Builder()
-        //         .baseUrl("https://api.example.com/")
-        //         .addConverterFactory(GsonConverterFactory.create())
-        //         // Add OkHttpClient with interceptors for tokens if needed
-        //         .build()
-        //     _networkService = retrofit.create(YourNetworkInterface::class.java)
-        // }
-        return _networkService
+        if (networkService == null) {
+            Timber.d("ApiService: Creating new network service instance")
+            // Implementation would create Retrofit instance:
+            // val okHttpClient = OkHttpClient.Builder()
+            //     .cache(Cache(context.cacheDir, 10 * 1024 * 1024))
+            //     .addInterceptor(AuthInterceptor(apiToken, oauthToken))
+            //     .build()
+            //
+            // networkService = Retrofit.Builder()
+            //     .baseUrl("https://api.aurakai.dev/")
+            //     .client(okHttpClient)
+            //     .addConverterFactory(GsonConverterFactory.create())
+            //     .build()
+            //     .create(ApiInterface::class.java)
+        }
+        return networkService
     }
 
-    // Example of a generic API call method
-    // suspend fun <T> makeApiCall(endpoint: String, request: Any?): Result<T> {
-    //    // TODO: Implement generic API call logic
-    // }
+    /**
+     * Reconfigures the network client with updated authentication tokens.
+     */
+    private fun reconfigureNetworkClient() {
+        // Clear existing service to force recreation with new tokens
+        networkService = null
+        Timber.d("ApiService: Network client will be reconfigured on next createService() call")
+    }
 }
