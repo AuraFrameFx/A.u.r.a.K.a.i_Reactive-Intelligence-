@@ -68,11 +68,11 @@ object VertexAIModule {
     }
 
     /**
-     * Provides a VertexAIClient that uses the real Gemini implementation when GEMINI_API_KEY is present and non-blank; otherwise returns a stub implementation.
+     * Selects and provides a Vertex AI client implementation based on the presence of `GEMINI_API_KEY`.
      *
-     * The selection is performed at runtime by checking BuildConfig.GEMINI_API_KEY.
+     * If `BuildConfig.GEMINI_API_KEY` is present and non-blank, returns a `VertexAIClient` backed by the real Gemini implementation; otherwise returns the stub `VertexAIClientImpl`.
      *
-     * @return `VertexAIClient` using the real Gemini client if GEMINI_API_KEY is present and non-blank, `VertexAIClientImpl` (stub) otherwise.
+     * @return A `VertexAIClient` using the real Gemini client when `GEMINI_API_KEY` is present and non-blank, `VertexAIClientImpl` (stub) otherwise.
      */
     @Provides
     @Singleton

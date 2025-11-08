@@ -63,10 +63,10 @@ class RealVertexAIClientImpl(
     }
 
     /**
-     * Generate text using custom temperature and maximum token limit.
+     * Generates text using a custom temperature and maximum token limit.
      *
      * @param prompt The input prompt; must not be blank.
-     * @param temperature Controls randomness: 0.0 is deterministic, higher values increase creativity.
+     * @param temperature Controls randomness (0.0 is deterministic; higher values increase randomness).
      * @param maxTokens Maximum number of tokens allowed in the generated response.
      * @return The generated text, or `null` if generation failed.
      */
@@ -155,10 +155,10 @@ class RealVertexAIClientImpl(
     }
 
     /**
-     * Generate source code from a specification in the specified programming language and style.
+     * Generate source code from a specification using the given programming language and style.
      *
-     * @param specification A description of the desired behavior, features, and constraints for the code.
-     * @param language The target programming language (for example, "Kotlin" or "Java").
+     * @param specification Description of the desired behavior, features, and constraints for the code.
+     * @param language Target programming language, e.g. "Kotlin" or "Java".
      * @param style Coding style or conventions the generated code should follow.
      * @return The generated source code as a string, or `null` if generation fails.
      */
@@ -197,17 +197,17 @@ class RealVertexAIClientImpl(
     }
 
     /**
-     * Converts Gemini's plain-text analysis into a structured map of analysis fields.
+     * Parse Gemini's plain-text analysis into a structured map of analysis fields.
      *
-     * Parses the input for lines beginning with "Sentiment:", "Complexity:", "Topics:", "Confidence:", and "Key Insights:" and returns a map containing those extracted values; missing fields are replaced with sensible defaults.
+     * Extracts values for sentiment, complexity, topics, confidence, and insights when present and supplies sensible defaults for missing fields.
      *
      * @param text Raw analysis text produced by Gemini.
-     * @return A map containing:
-     *  - "sentiment": String (defaults to "neutral"),
-     *  - "complexity": String (defaults to "medium"),
-     *  - "topics": List<String> (defaults to ["general"]),
-     *  - "confidence": Double (defaults to 0.75),
-     *  - "insights": String (present only if provided in the input).
+     * @return A map with these keys:
+     *  - "sentiment": String — one of the analysis sentiment values (defaults to "neutral")
+     *  - "complexity": String — assessed complexity level (defaults to "medium")
+     *  - "topics": List<String> — detected topics (defaults to ["general"])
+     *  - "confidence": Double — confidence score (defaults to 0.75)
+     *  - "insights": String — key insights text (included only if provided in the input)
      */
     private fun parseAnalysisResponse(text: String): Map<String, Any> {
         val results = mutableMapOf<String, Any>()

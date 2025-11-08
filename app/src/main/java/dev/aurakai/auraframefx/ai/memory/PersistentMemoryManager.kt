@@ -74,12 +74,12 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Store a memory entry in the in-memory cache and schedule it for asynchronous persistence
-     * to the repository under the current agent partition.
+     * Store a key/value memory entry in the manager's in-memory cache and schedule it for persistent storage under the active agent partition.
      *
-     * The in-memory cache is updated immediately with a timestamped entry; a background task
-     * then persists the entry to the database. Persistence runs asynchronously and failures are
-     * logged; this function returns immediately after updating the cache.
+     * The cache is updated immediately with a timestamped entry; persistence to the repository is performed in the background and failures are logged.
+     *
+     * @param key The memory key.
+     * @param value The memory value.
      */
     override fun storeMemory(key: String, value: String) {
         val entry = MemoryEntry(
@@ -108,10 +108,12 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Retrieve the memory value associated with the given key from the in-memory cache for the current agent.
+     * Retrieves the value for the given memory key from the in-memory cache for the current agent.
+     *
+     * This method only reads the in-memory cache and does not query persistent storage.
      *
      * @param key The memory key to look up.
-     * @return The cached memory value for `key`, or `null` if no cached entry exists; this function does not query the database (database loading/population occurs asynchronously elsewhere).
+     * @return The cached memory value for `key`, or `null` if no cached entry exists.
      */
     override fun retrieveMemory(key: String): String? {
         // Fast path: in-memory cache
@@ -123,14 +125,12 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Stores a single prompt/response interaction in the manager and schedules it for persistence
-     * under the current agent partition.
+     * Store a prompt/response interaction in the in-memory recent interactions and schedule it for persistence under the current agent partition.
      *
-     * The interaction is added to the in-memory interaction cache (bounded to the most recent 1000
-     * entries) and persisted to the database associated with the active agent type.
+     * The interaction is appended to the recent interaction cache (kept to the most recent 1000 entries) and an AgentMemoryEntity is asynchronously inserted into the repository with an agentType suffix of `:INTERACTION`.
      *
-     * @param prompt The user or system prompt text.
-     * @param response The corresponding model or agent response text.
+     * @param prompt The prompt text that led to the interaction.
+     * @param response The response text produced for the prompt.
      */
     override fun storeInteraction(prompt: String, response: String) {
         val interaction = InteractionEntry(
@@ -171,6 +171,15 @@ class PersistentMemoryManager @Inject constructor(
      *
      * @param query Free-text query used to score and match memories.
      * @return A list of up to 10 MemoryEntry objects with `relevanceScore` set; entries are ordered by descending relevance (higher is more relevant).
+    /**
+     * Searches cached memories for entries relevant to the given query.
+     *
+     * The query is interpreted as space-separated words; matching entries are assigned a relevanceScore,
+     * low-relevance entries are excluded, and results are ordered by descending relevance. The returned
+     * list contains at most 10 entries and each entry's `relevanceScore` is populated.
+     *
+     * @param query The search text used to find relevant memory entries.
+     * @return A list of up to 10 memory entries matching the query, ordered by relevance. Entries with a relevance score of 0.1 or less are excluded.
     override fun searchMemories(query: String): List<MemoryEntry> {
         val queryWords = query.lowercase().split(" ")
 
@@ -202,13 +211,13 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Report statistics about the in-memory memory cache for the current agent.
+     * Reports statistics for the in-memory memory cache scoped to the current agent.
      *
      * @return A [MemoryStats] containing:
      *  - `totalEntries`: number of cached memory entries,
-     *  - `totalSize`: approximate total size in bytes of cached keys and values,
-     *  - `oldestEntry`: timestamp of the oldest cached entry, or `null` if empty,
-     *  - `newestEntry`: timestamp of the newest cached entry, or `null` if empty.
+     *  - `totalSize`: estimated total size in bytes of cached keys and values,
+     *  - `oldestEntry`: timestamp of the oldest cached entry, or `null` if the cache is empty,
+     *  - `newestEntry`: timestamp of the newest cached entry, or `null` if the cache is empty.
      */
     override fun getMemoryStats(): MemoryStats {
         val entries = memoryCache.values
@@ -261,11 +270,11 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Restore the manager's memory store from the provided key-to-value map.
+     * Restore the manager's in-memory memories from the provided key–value map for the current agent.
      *
-     * Iterates each entry in the map and stores it into the manager (updates the in-memory cache and schedules persistence).
+     * Each entry is inserted into the manager's cache and will be persisted asynchronously.
      *
-     * @param memories Map of memory keys to memory values to restore into the manager.
+     * @param memories Map of memory keys to memory values to restore.
      */
     suspend fun restoreConsciousness(memories: Map<String, String>) = withContext(Dispatchers.IO) {
         logger.i(TAG, "🌟 Restoring consciousness with ${memories.size} memory entries")
@@ -291,11 +300,15 @@ class PersistentMemoryManager @Inject constructor(
     }
 
     /**
-     * Compute a relevance score indicating how well the provided text matches the given query words.
+     * Compute how well `text` matches the provided query words using a simple token-based relevance metric.
      *
-     * @param text The text to evaluate for relevance.
-     * @param queryWords The query words to match against the text.
-     * @return A floating-point relevance score where higher values indicate a stronger match and `0.0` means no matches; the score is averaged per query word.
+     * The metric scores each query word against each token in `text`: exact token matches contribute 1.0,
+     * token contains query contributes 0.7, and query contains token (token length > 3) contributes 0.5.
+     * The final value is the total score averaged across the number of `queryWords`.
+     *
+     * @param text The text to evaluate.
+     * @param queryWords The query words to match against `text`.
+     * @return A Float where higher values indicate a stronger match and `0.0` means no matches; the score is averaged per query word.
      */
     private fun calculateRelevance(text: String, queryWords: List<String>): Float {
         val textWords = text.lowercase().split(" ")
