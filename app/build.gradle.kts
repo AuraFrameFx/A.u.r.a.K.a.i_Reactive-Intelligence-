@@ -87,6 +87,10 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    // Hilt Dependency Injection (REQUIRED when using Hilt plugin)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
