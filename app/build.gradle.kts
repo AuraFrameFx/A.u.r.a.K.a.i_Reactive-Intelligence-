@@ -20,6 +20,19 @@ plugins {
 
 
 
+        // Genesis Protocol: Gemini 2.0 Flash API Key
+        // Add to local.properties: GEMINI_API_KEY=your_key_here
+        // Get key from: https://aistudio.google.com/app/apikey
+        val geminiApiKey = project.findProperty("GEMINI_API_KEY")?.toString() ?: ""
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
+
+        externalNativeBuild {
+            cmake {
+                cppFlags += "-std=c++20"
+                arguments += listOf(
+                    "-DANDROID_STL=c++_shared",
+                    "-DANDROID_PLATFORM=android-${libs.versions.min.sdk.get()}"
+                )
 }
     android {
         namespace = "dev.aurakai.auraframefx"
