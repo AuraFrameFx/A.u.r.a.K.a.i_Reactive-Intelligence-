@@ -55,10 +55,10 @@ interface BootloaderManager {
 class BootloaderManagerImpl @Inject constructor() : BootloaderManager {
     override fun checkBootloaderAccess(): Boolean {
         return try {
-            // Check if we can read bootloader-related system properties
+            // Check if we can read bootloader-related system properties via getprop
             // This indicates the device exposes bootloader information
-            val flashLocked = System.getProperty("ro.boot.flash.locked")
-            val oemUnlock = System.getProperty("ro.oem_unlock_supported")
+            val flashLocked = executeGetProp("ro.boot.flash.locked")
+            val oemUnlock = executeGetProp("ro.oem_unlock_supported")
 
             // If either property exists, bootloader access is available
             flashLocked != null || oemUnlock != null
@@ -70,9 +70,9 @@ class BootloaderManagerImpl @Inject constructor() : BootloaderManager {
 
     override fun isBootloaderUnlocked(): Boolean {
         return try {
-            // Read the bootloader lock status from system property
+            // Read the bootloader lock status from system property via getprop
             // "0" = unlocked, "1" = locked, null = unknown
-            val flashLocked = System.getProperty("ro.boot.flash.locked")
+            val flashLocked = executeGetProp("ro.boot.flash.locked")
 
             when (flashLocked) {
                 "0" -> true  // Bootloader is unlocked
@@ -80,7 +80,7 @@ class BootloaderManagerImpl @Inject constructor() : BootloaderManager {
                 else -> {
                     // Property doesn't exist or has unexpected value
                     // Check alternative property as fallback
-                    val verified = System.getProperty("ro.boot.verifiedbootstate")
+                    val verified = executeGetProp("ro.boot.verifiedbootstate")
                     verified == "orange" // Orange state indicates unlocked bootloader
                 }
             }
@@ -106,5 +106,24 @@ class BootloaderManagerImpl @Inject constructor() : BootloaderManager {
                 "Automated bootloader unlocking is dangerous and may brick your device."
             )
         )
+    }
+
+    /**
+     * Executes getprop command to read Android system property.
+     * @param property The system property name to read
+     * @return The property value, or null if the property doesn't exist or can't be read
+     */
+    private fun executeGetProp(property: String): String? {
+        return try {
+            val process = Runtime.getRuntime().exec(arrayOf("getprop", property))
+            val output = process.inputStream.bufferedReader().use { it.readText().trim() }
+            process.waitFor()
+            
+            // Return null if the output is empty (property doesn't exist)
+            if (output.isEmpty()) null else output
+        } catch (e: Exception) {
+            // Return null if we can't execute getprop
+            null
+        }
     }
 }
