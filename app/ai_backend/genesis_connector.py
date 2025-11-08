@@ -5,12 +5,12 @@ Handles text generation, persona routing, and fusion mode activation
 
 Multi-Model Support:
 - Google GenAI SDK (Gemini 2.5 Flash) - Fast, cost-effective
-- Anthropic Claude (Claude 3.7 Sonnet) - Advanced reasoning, long context
+- Anthropic Claude (Claude 3.5 Sonnet) - Advanced reasoning, long context
 
 The system automatically routes requests to the best model for each persona:
-- Aura (Creative) → Claude 3.7 Sonnet (creative tasks)
+- Aura (Creative) → Claude 3.5 Sonnet (creative tasks)
 - Kai (Analytical) → Gemini 2.5 Flash (fast analysis)
-- Genesis (Fusion) → Claude 3.7 Sonnet (complex synthesis)
+- Genesis (Fusion) → Claude 3.5 Sonnet (complex synthesis)
 """
 
 import json
