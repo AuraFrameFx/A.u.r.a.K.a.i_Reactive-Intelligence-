@@ -1,4 +1,4 @@
-// Aply YukiHook conventions to all modules
+// Apply YukiHook conventions to all modules
 subprojects { subproject ->
     // Skip build-logic and other non-Android modules
     if (subproject.name == "build-logic" || subproject.name == "buildSrc") {
