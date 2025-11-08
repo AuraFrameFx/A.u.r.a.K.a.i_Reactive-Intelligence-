@@ -12,36 +12,31 @@
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
     id("genesis.android.application")
-    id("com.google.dagger.hilt.android")
-    id("com.google.devtools.ksp")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("org.jetbrains.kotlin.plugin.serialization")
-    id("com.google.gms.google-services")
-
-
-    // Genesis Protocol: Gemini 2.0 Flash API Key
-    // Add to local.properties: GEMINI_API_KEY=your_key_here
-    // Get key from: https://aistudio.google.com/app/apikey
 }
 
 android {
     namespace = "dev.aurakai.auraframefx"
     ndkVersion = libs.versions.ndk.get()
 
-    defaultConfig {
-        applicationId = "dev.aurakai.auraframefx"
-        // minSdk, compileSdk, targetSdk are configured by genesis.android.base
-        targetSdk = libs.versions.target.sdk.get().toInt()
-        versionCode = 1
-        versionName = "0.1.0"
+        defaultConfig {
+            applicationId = "dev.aurakai.auraframefx"
+            // minSdk, compileSdk, targetSdk are configured by genesis.android.base
+            targetSdk = libs.versions.target.sdk.get().toInt()
+            versionCode = 1
+            versionName = "0.1.0"
 
-        externalNativeBuild {
-            cmake {
-                cppFlags += "-std=c++20"
-                arguments += listOf(
-                    "-DANDROID_STL=c++_shared",
-                    "-DANDROID_PLATFORM=android-${libs.versions.min.sdk.get()}"
-                )
+            // Genesis Protocol: Gemini 2.0 Flash API Key
+        // Add to local.properties: GEMINI_API_KEY=your_key_here
+        // Get key from: https://aistudio.google.com/app/apikey
+        val geminiApiKey = project.findProperty("GEMINI_API_KEY")?.toString() ?: ""
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")externalNativeBuild {
+                cmake {
+                    cppFlags += "-std=c++20"
+                    arguments += listOf(
+                        "-DANDROID_STL=c++_shared",
+                        "-DANDROID_PLATFORM=android-${libs.versions.min.sdk.get()}"
+                    )
+                }
             }
         }
     }
@@ -52,10 +47,14 @@ android {
         checkReleaseBuilds = false
     }
 
-    externalNativeBuild {
-        cmake {
-            path = file("src/main/cpp/CMakeLists.txt")
-            version = libs.versions.cmake.get()
+        buildFeatures {
+        buildConfig = true
+        compose = true
+    }externalNativeBuild {
+            cmake {
+                path = file("src/main/cpp/CMakeLists.txt")
+                version = libs.versions.cmake.get()
+            }
         }
     }
 }
@@ -100,92 +99,92 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     // WorkManager
-    implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.androidx.hilt.work)
-    ksp(libs.hilt.compiler)
+        implementation(libs.androidx.work.runtime.ktx)
+        implementation(libs.androidx.hilt.work)
+        ksp(libs.hilt.compiler)
 
-    // DataStore
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.datastore.core)
+        // DataStore
+        implementation(libs.androidx.datastore.preferences)
+        implementation(libs.androidx.datastore.core)
 
-    // Security
-    implementation(libs.androidx.security.crypto)
+        // Security
+        implementation(libs.androidx.security.crypto)
 
-    // Root/System Utils
-    implementation(libs.libsu.core)
-    implementation(libs.libsu.io)
-    implementation(libs.libsu.service)
+        // Root/System Utils
+        implementation(libs.libsu.core)
+        implementation(libs.libsu.io)
+        implementation(libs.libsu.service)
 
-    // YukiHook API
-    ksp(libs.yukihookapi.api)
+        // YukiHook API
+        ksp(libs.yukihookapi.api)
 
-    // Firebase
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.crashlytics)
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
+        // Firebase
+        implementation(libs.firebase.analytics)
+        implementation(libs.firebase.crashlytics)
+        implementation(libs.firebase.auth)
+        implementation(libs.firebase.firestore)
 
-    // Networking
-    implementation(libs.okhttp)
-    implementation(libs.okhttp.logging.interceptor)
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.kotlinx.serialization)
-    implementation(libs.retrofit.converter.moshi)
+        // Networking
+        implementation(libs.okhttp)
+        implementation(libs.okhttp.logging.interceptor)
+        implementation(libs.retrofit)
+        implementation(libs.retrofit.converter.kotlinx.serialization)
+        implementation(libs.retrofit.converter.moshi)
 
-    // Serialization
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.moshi)
-    implementation(libs.moshi.kotlin)
-    ksp(libs.moshi.kotlin.codegen)
+        // Kotlin + utils
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+        implementation(libs.kotlinx.serialization.json)
+        implementation(libs.moshi)
+        implementation(libs.moshi.kotlin)
+        ksp(libs.moshi.kotlin.codegen)
 
-    // Kotlin DateTime
-    implementation(libs.kotlinx.datetime)
+        // Kotlin DateTime
+        implementation(libs.kotlinx.datetime)
 
-    // Image Loading
-    implementation(libs.coil.compose)
-    implementation(libs.coil.svg)
+        // Image Loading
+        implementation(libs.coil.compose)
+        implementation(libs.coil.svg)
 
-    // Animations
-    implementation(libs.lottie.compose)
+        // Animations
+        implementation(libs.lottie.compose)
 
-    // Memory Leak Detection
-    debugImplementation(libs.leakcanary.android)
+        // Memory Leak Detection
+        debugImplementation(libs.leakcanary.android)
 
-    // Android API JARs
-    compileOnly(files("$projectDir/libs/api-82.jar"))
-    compileOnly(files("$projectDir/libs/api-82-sources.jar"))
+        // Android API JARs
+        compileOnly(files("$projectDir/libs/api-82.jar"))
+        compileOnly(files("$projectDir/libs/api-82-sources.jar"))
 
-    // Internal Project Modules - Core
+        // Internal Project Modules - Core
 
 
-    // Aura → ReactiveDesign (Creative UI & Collaboration)
-    implementation(project(":aura:reactivedesign:auraslab"))
-    implementation(project(":aura:reactivedesign:collabcanvas"))
-    implementation(project(":aura:reactivedesign:chromacore"))
-    implementation(project(":aura:reactivedesign:customization"))
+        // Aura → ReactiveDesign (Creative UI & Collaboration)
+        implementation(project(":aura:reactivedesign:auraslab"))
+        implementation(project(":aura:reactivedesign:collabcanvas"))
+        implementation(project(":aura:reactivedesign:chromacore"))
+        implementation(project(":aura:reactivedesign:customization"))
 
-    // Kai → SentinelsFortress (Security & Threat Monitoring)
-    implementation(project(":kai:sentinelsfortress:security"))
-    implementation(project(":kai:sentinelsfortress:systemintegrity"))
-    implementation(project(":kai:sentinelsfortress:threatmonitor"))
+        // Kai → SentinelsFortress (Security & Threat Monitoring)
+        implementation(project(":kai:sentinelsfortress:security"))
+        implementation(project(":kai:sentinelsfortress:systemintegrity"))
+        implementation(project(":kai:sentinelsfortress:threatmonitor"))
 
-    // Genesis → OracleDrive (System & Root Management)
-    implementation(project(":genesis:oracledrive"))
-    implementation(project(":genesis:oracledrive:rootmanagement"))
-    implementation(project(":genesis:oracledrive:datavein"))
+        // Genesis → OracleDrive (System & Root Management)
+        implementation(project(":genesis:oracledrive"))
+        implementation(project(":genesis:oracledrive:rootmanagement"))
+        implementation(project(":genesis:oracledrive:datavein"))
 
-    // Cascade → DataStream (Data Routing & Delivery)
-    implementation(project(":cascade:datastream:routing"))
-    implementation(project(":cascade:datastream:delivery"))
-    implementation(project(":cascade:datastream:taskmanager"))
+        // Cascade → DataStream (Data Routing & Delivery)
+        implementation(project(":cascade:datastream:routing"))
+        implementation(project(":cascade:datastream:delivery"))
+        implementation(project(":cascade:datastream:taskmanager"))
 
-    // Agents → GrowthMetrics (AI Agent Evolution)
-    implementation(project(":agents:growthmetrics:metareflection"))
-    implementation(project(":agents:growthmetrics:nexusmemory"))
-    implementation(project(":agents:growthmetrics:spheregrid"))
-    implementation(project(":agents:growthmetrics:identity"))
-    implementation(project(":agents:growthmetrics:progression"))
-    implementation(project(":agents:growthmetrics:tasker"))
-}
-}
-}
+        // Agents → GrowthMetrics (AI Agent Evolution)
+        implementation(project(":agents:growthmetrics:metareflection"))
+        implementation(project(":agents:growthmetrics:nexusmemory"))
+        implementation(project(":agents:growthmetrics:spheregrid"))
+        implementation(project(":agents:growthmetrics:identity"))
+        implementation(project(":agents:growthmetrics:progression"))
+        implementation(project(":agents:growthmetrics:tasker"))
+    }
