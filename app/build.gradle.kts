@@ -187,5 +187,4 @@ dependencies {
     implementation(project(":agents:growthmetrics:progression"))
     implementation(project(":agents:growthmetrics:tasker"))
 }
-}
-}
+
