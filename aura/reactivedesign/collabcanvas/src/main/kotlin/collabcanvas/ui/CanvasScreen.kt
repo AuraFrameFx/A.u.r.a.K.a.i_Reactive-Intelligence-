@@ -474,37 +474,6 @@ fun CanvasScreen(
     }
 }
 
-private fun Unit.Path(src: Path): android.graphics.Path {
-    TODO("Not yet implemented")
-}
-
-private fun DrawingOperation.Companion.PathOp(
-    path: android.graphics.Path,
-    color: Color,
-    strokeWidth: Dp,
-    tool: DrawingTool
-) {
-    TODO("Not yet implemented")
-}
-
-private fun SliderDefaults.colors(
-    thumbColor: Any,
-    activeTrackColor: Path,
-    inactiveTrackColor: Path
-): SliderColors {
-    TODO("Not yet implemented")
-}
-
-private fun DrawScope.drawLine(
-    color: Any,
-    start: Any,
-    end: Any,
-    strokeWidth: Any,
-    cap: StrokeCap
-) {
-    TODO("Not yet implemented")
-}
-
 // Extension functions
 private fun Offset.toSize() = Size(x, y)
 private fun Size.toOffset() = Offset(width, height)
