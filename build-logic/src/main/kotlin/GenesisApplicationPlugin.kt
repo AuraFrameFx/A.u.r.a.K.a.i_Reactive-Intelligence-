@@ -41,10 +41,10 @@ class GenesisApplicationPlugin : Plugin<Project> {
             pluginManager.apply("com.google.devtools.ksp")
             pluginManager.apply("org.jetbrains.kotlin.plugin.serialization")
             pluginManager.apply("com.google.gms.google-services")
+            pluginManager.apply("org.jetbrains.kotlin.android")
 
             extensions.configure<ApplicationExtension> {
                 compileSdk = 36
-
                 defaultConfig {
                     applicationId = "dev.aurakai.auraframefx"
                     minSdk = 34
@@ -62,8 +62,7 @@ class GenesisApplicationPlugin : Plugin<Project> {
                     release {
                         isMinifyEnabled = true
                         proguardFiles(
-                            getDefaultProguardFile("proguard-android-optimize.txt"),
-                            "proguard-rules.pro"
+                            getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
                         )
                     }
                 }
@@ -83,15 +82,27 @@ class GenesisApplicationPlugin : Plugin<Project> {
                 packaging {
                     resources {
                         excludes += "/META-INF/{AL2.0,LGPL2.1}"
+
+                    }
+                }
+
+                lint {
+                    baseline = file("lint-baseline.xml")
+                    abortOnError = true
+                    checkReleaseBuilds = false
+                }
+
+                externalNativeBuild {
+                    cmake {
+                        path = file("src/main/cpp/CMakeLists.txt")
+                        version = "4.1.2"
                     }
                 }
             }
-
             tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
                 // No need for specific configuration here anymore as it's handled by the toolchain
                 // and the kotlinOptions block in the android extension.
             }
-
             tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
                 jvmTargetValidationMode.set(org.jetbrains.kotlin.gradle.dsl.jvm.JvmTargetValidationMode.WARNING)
             }

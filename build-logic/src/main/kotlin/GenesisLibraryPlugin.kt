@@ -1,48 +1,51 @@
-package plugins
-
+import com.android.build.api.dsl.LibraryExtension
+import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.withType
 
-/**
- * ═══════════════════════════════════════════════════════════════════════════
- * GENESIS LIBRARY CONVENTION PLUGIN
- * ═══════════════════════════════════════════════════════════════════════════
- *
- * Primary convention plugin for Android library modules.
- * Applies all necessary plugins in the correct order.
- *
- * Usage:
- * ```kotlin
- * plugins {
- *     id("genesis.android.library")
- * }
- * android {
- *     namespace = "dev.aurakai.auraframefx.your.module"
- * }
- * ```
- */
 class GenesisLibraryPlugin : Plugin<Project> {
-    override fun apply(target: Project) {
-        with(target.pluginManager) {
-            // Apply plugins in the CRITICAL order specified above
+    override fun apply(project: Project) {
+        with(project) {
+            pluginManager.apply("com.android.library")
+            pluginManager.apply("com.google.dagger.hilt.android")
+            pluginManager.apply("com.google.devtools.ksp")
+            pluginManager.apply("org.jetbrains.kotlin.plugin.serialization")
+            pluginManager.apply("org.jetbrains.kotlin.android")
 
-            // 1. Android Library - MUST be first
-            apply("com.android.library")
+            extensions.configure<LibraryExtension> {
+                compileSdk = 36
+                defaultConfig {
+                    minSdk = 34
 
-            // 2. Hilt - Dependency Injection (most libraries use DI)
-            apply("com.google.dagger.hilt.android")
+                    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+                }
 
-            // 3. Compose Compiler - UI framework (most libraries have UI components)
-            apply("org.jetbrains.kotlin.plugin.compose")
+                buildTypes {
+                    getByName("release") {
+                        isMinifyEnabled = false
+                        proguardFiles(
+                            getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+                        )
+                    }
+                }
 
-            // 4. KSP - Annotation Processing (required by Hilt, Room, Moshi, etc.)
-            apply("com.google.devtools.ksp")
+                compileOptions {
+                    sourceCompatibility = JavaVersion.VERSION_1_8
+                    targetCompatibility = JavaVersion.VERSION_1_8
+                }
 
-            // Now apply our base configuration
-            apply("genesis.android.base")
+                kotlinOptions {
+                    jvmTarget = "1.8"
+                }
+                }
+
+                buildFeatures {
+                    compose = true
+                    buildConfig = true
+                }
+            }
         }
-
-        // Log successful application (helpful for debugging)
-        target.logger.info("✓ Genesis Library Plugin applied to ${target.name}")
     }
 }

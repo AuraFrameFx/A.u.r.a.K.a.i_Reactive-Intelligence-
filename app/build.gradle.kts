@@ -14,9 +14,17 @@ plugins {
     id("genesis.android.application")
 }
 
-android {
-    namespace = "dev.aurakai.auraframefx"
-    ndkVersion = libs.versions.ndk.get()
+        externalNativeBuild {
+            cmake {
+                cppFlags += "-std=c++20"
+                arguments += listOf(
+                    "-DANDROID_STL=c++_shared",
+                    "-DANDROID_PLATFORM=android-${libs.versions.min.sdk.get()}"
+                )
+}
+    android {
+        namespace = "dev.aurakai.auraframefx"
+        ndkVersion = libs.versions.ndk.get()
 
         defaultConfig {
             applicationId = "dev.aurakai.auraframefx"
