@@ -142,12 +142,20 @@ private fun handleRomAction(
                 Timber.i("Restore backup action triggered - backup selection dialog needed")
             }
             RomActionType.UNLOCK_BOOTLOADER -> {
-                // TODO: Add bootloader unlock support
-                Timber.i("Unlock bootloader action triggered - requires bootloader manager integration")
+                val result = romToolsManager.unlockBootloader()
+                result.onSuccess {
+                    Timber.i("✅ Bootloader unlocked successfully")
+                }.onFailure { error ->
+                    Timber.e(error, "❌ Bootloader unlock failed")
+                }
             }
             RomActionType.INSTALL_RECOVERY -> {
-                // TODO: Add recovery installation support
-                Timber.i("Install recovery action triggered - requires recovery manager integration")
+                val result = romToolsManager.installRecovery()
+                result.onSuccess {
+                    Timber.i("✅ Custom recovery installed successfully")
+                }.onFailure { error ->
+                    Timber.e(error, "❌ Recovery installation failed")
+                }
             }
             RomActionType.GENESIS_OPTIMIZATIONS -> {
                 val result = romToolsManager.installGenesisOptimizations()
