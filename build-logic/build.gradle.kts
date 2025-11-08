@@ -1,13 +1,20 @@
 plugins {
     `kotlin-dsl`        // applies java-gradle-plugin
 }
+
+// Configure Kotlin compilation to match Java toolchain
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
     jvmTargetValidationMode.set(org.jetbrains.kotlin.gradle.dsl.jvm.JvmTargetValidationMode.WARNING)
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+    }
 }
+
 java {
     toolchain {
-        // UPDATED: Java 25 toolchain for development environment
-        languageVersion.set(JavaLanguageVersion.of(25))
+        // Java 21 for stable build-logic compatibility
+        // (Changed from 25 to match Kotlin capabilities)
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
