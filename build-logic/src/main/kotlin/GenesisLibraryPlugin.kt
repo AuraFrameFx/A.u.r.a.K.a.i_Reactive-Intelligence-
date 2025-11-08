@@ -33,13 +33,13 @@ class GenesisLibraryPlugin : Plugin<Project> {
                 }
 
                 compileOptions {
-                    sourceCompatibility = JavaVersion.VERSION_1_8
-                    targetCompatibility = JavaVersion.VERSION_1_8
+                    sourceCompatibility = JavaVersion.VERSION_24
+                    targetCompatibility = JavaVersion.VERSION_24
                 }
 
                 // Correct way to set Kotlin JVM target inside android extension
                 (this as org.gradle.api.plugins.ExtensionAware).extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions>("kotlinOptions") {
-                    jvmTarget = "1.8"
+                    jvmTarget = "24"
                 }
 
                 buildFeatures {
