@@ -169,19 +169,71 @@ fun IconPicker(
                     }
 
                     IconPickerTab.RECENT -> {
-                        // TODO: Implement recent icons tracking
-                        EmptyState(
-                            icon = Icons.Default.History,
-                            message = "No recent icons yet"
-                        )
+                        // Implement recent icons tracking
+                        val recentIcons = remember { loadRecentIcons(context) }
+
+                        if (recentIcons.isEmpty()) {
+                            EmptyState(
+                                icon = Icons.Default.History,
+                                message = "No recent icons yet"
+                            )
+                        } else {
+                            LazyVerticalGrid(
+                                columns = GridCells.Adaptive(minSize = 72.dp),
+                                contentPadding = PaddingValues(16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(recentIcons) { iconId ->
+                                    IconGridItem(
+                                        iconId = iconId,
+                                        selected = selectedIcon == iconId,
+                                        onClick = {
+                                            selectedIcon = iconId
+                                            saveRecentIcon(context, iconId)
+                                            onIconSelected(iconId)
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     IconPickerTab.FAVORITES -> {
-                        // TODO: Implement favorites
-                        EmptyState(
-                            icon = Icons.Default.Favorite,
-                            message = "No favorite icons yet"
-                        )
+                        // Implement favorites
+                        val favoriteIcons = remember { loadFavoriteIcons(context) }
+                        var favorites by remember { mutableStateOf(favoriteIcons) }
+
+                        if (favorites.isEmpty()) {
+                            EmptyState(
+                                icon = Icons.Default.Favorite,
+                                message = "No favorite icons yet"
+                            )
+                        } else {
+                            LazyVerticalGrid(
+                                columns = GridCells.Adaptive(minSize = 72.dp),
+                                contentPadding = PaddingValues(16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(favorites) { iconId ->
+                                    IconGridItem(
+                                        iconId = iconId,
+                                        selected = selectedIcon == iconId,
+                                        isFavorite = true,
+                                        onClick = {
+                                            selectedIcon = iconId
+                                            saveRecentIcon(context, iconId)
+                                            onIconSelected(iconId)
+                                        },
+                                        onFavoriteToggle = {
+                                            removeFavoriteIcon(context, iconId)
+                                            favorites = favorites.filter { it != iconId }
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -625,4 +677,73 @@ fun EmptyState(
             )
         }
     }
+}
+
+/**
+ * Load recent icons from SharedPreferences
+ */
+private fun loadRecentIcons(context: android.content.Context): List<String> {
+    val prefs = context.getSharedPreferences("icon_picker", android.content.Context.MODE_PRIVATE)
+    val recentIconsString = prefs.getString("recent_icons", "") ?: ""
+    return if (recentIconsString.isNotEmpty()) {
+        recentIconsString.split(",").take(20) // Keep last 20
+    } else {
+        emptyList()
+    }
+}
+
+/**
+ * Save recent icon to SharedPreferences
+ */
+private fun saveRecentIcon(context: android.content.Context, iconId: String) {
+    val prefs = context.getSharedPreferences("icon_picker", android.content.Context.MODE_PRIVATE)
+    val currentRecent = loadRecentIcons(context).toMutableList()
+
+    // Remove if already exists (to move to front)
+    currentRecent.remove(iconId)
+
+    // Add to front
+    currentRecent.add(0, iconId)
+
+    // Keep only last 20
+    val recentToSave = currentRecent.take(20)
+
+    prefs.edit().putString("recent_icons", recentToSave.joinToString(",")).apply()
+}
+
+/**
+ * Load favorite icons from SharedPreferences
+ */
+private fun loadFavoriteIcons(context: android.content.Context): List<String> {
+    val prefs = context.getSharedPreferences("icon_picker", android.content.Context.MODE_PRIVATE)
+    val favoriteIconsString = prefs.getString("favorite_icons", "") ?: ""
+    return if (favoriteIconsString.isNotEmpty()) {
+        favoriteIconsString.split(",")
+    } else {
+        emptyList()
+    }
+}
+
+/**
+ * Add icon to favorites
+ */
+private fun addFavoriteIcon(context: android.content.Context, iconId: String) {
+    val prefs = context.getSharedPreferences("icon_picker", android.content.Context.MODE_PRIVATE)
+    val currentFavorites = loadFavoriteIcons(context).toMutableList()
+
+    if (!currentFavorites.contains(iconId)) {
+        currentFavorites.add(iconId)
+        prefs.edit().putString("favorite_icons", currentFavorites.joinToString(",")).apply()
+    }
+}
+
+/**
+ * Remove icon from favorites
+ */
+private fun removeFavoriteIcon(context: android.content.Context, iconId: String) {
+    val prefs = context.getSharedPreferences("icon_picker", android.content.Context.MODE_PRIVATE)
+    val currentFavorites = loadFavoriteIcons(context).toMutableList()
+
+    currentFavorites.remove(iconId)
+    prefs.edit().putString("favorite_icons", currentFavorites.joinToString(",")).apply()
 }

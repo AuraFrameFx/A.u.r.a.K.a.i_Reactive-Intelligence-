@@ -19,10 +19,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.aurakai.auraframefx.ui.model.ImageResource
 
+/**
+ * Composable for selecting and managing images.
+ *
+ * Note: The actual image selection must be handled by the hosting Activity
+ * using registerForActivityResult with a PickVisualMedia contract.
+ *
+ * @param currentImage The currently selected image, or null
+ * @param onImageSelected Callback invoked when an image is selected or cleared
+ * @param onPickerRequested Callback to trigger the image picker (Activity must handle)
+ */
 @Composable
 fun ImagePicker(
     currentImage: ImageResource?,
     onImageSelected: (ImageResource?) -> Unit,
+    onPickerRequested: () -> Unit = {},
 ) {
     Card(
         modifier = Modifier
@@ -62,7 +73,10 @@ fun ImagePicker(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Button(
-                        onClick = { /* TODO: Implement image picker with ActivityResultLauncher */ },
+                        onClick = {
+                            timber.log.Timber.d("ImagePicker: Change image requested")
+                            onPickerRequested()
+                        },
                         modifier = Modifier.weight(1f)
                     ) {
                         Text("Change Image")
@@ -84,7 +98,10 @@ fun ImagePicker(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Button(
-                    onClick = { /* TODO: Implement image picker with ActivityResultLauncher */ },
+                    onClick = {
+                        timber.log.Timber.d("ImagePicker: Select image requested")
+                        onPickerRequested()
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Select Image")

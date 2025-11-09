@@ -11,7 +11,15 @@ data class SystemMonitoringConfig(
     val networkChangeMonitoringEnabled: Boolean = false,
     val appUsageAnomalyDetectionEnabled: Boolean = false,
     val securityScanIntervalHours: Int = 24,
-    // TODO: Add more monitoring parameters as needed
+    val cpuUsageThresholdPercent: Int = 80,
+    val memoryUsageThresholdPercent: Int = 85,
+    val diskSpaceThresholdMB: Int = 500,
+    val temperatureThresholdCelsius: Int = 45,
+    val crashReportingEnabled: Boolean = true,
+    val performanceLoggingEnabled: Boolean = true,
+    val autoOptimizationEnabled: Boolean = false,
+    val notificationPriority: String = "high", // "low", "medium", "high"
+    val monitoringFrequencyMinutes: Int = 30
 )
 
 // --- Placeholder definitions for other data classes referenced by CriticalOfflineData ---

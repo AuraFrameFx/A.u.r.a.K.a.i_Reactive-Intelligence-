@@ -21,7 +21,7 @@ object AuraKaiModules {
         id = "collab_canvas",
         name = "COLLAB-CANVAS",
         description = "Real-time collaborative drawing and design tool with live cursors",
-        icon = Icons.Default.Build, // TODO: Use brush/canvas icon
+        icon = Icons.Default.Brush,
         iconColor = Color(0xFFFFD700), // Gold
         cardStyle = GlassCardStyles.Default.copy(
             borderGradient = listOf(
@@ -36,7 +36,7 @@ object AuraKaiModules {
         id = "colorblendr",
         name = "COLORBLENDR",
         description = "Dynamic theming and color palette creation system",
-        icon = Icons.Default.Star, // TODO: Use palette icon
+        icon = Icons.Default.Palette,
         iconColor = Color(0xFFFF6B6B), // Red
         cardStyle = GlassCardStyles.Default.copy(
             borderGradient = listOf(
@@ -54,7 +54,7 @@ object AuraKaiModules {
         id = "oracle_drive",
         name = "CLOUD SAVE",
         description = "Oracle Drive cloud storage and data synchronization",
-        icon = Icons.Default.Star, // TODO: Use cloud icon
+        icon = Icons.Default.Cloud,
         iconColor = Color(0xFF3498DB), // Blue
         cardStyle = GlassCardStyles.Default.copy(
             borderGradient = listOf(
@@ -128,7 +128,7 @@ object AuraKaiModules {
         id = "consciousness",
         name = "CONSCIOUSNESS",
         description = "Real-time AI consciousness visualization with neural network display",
-        icon = Icons.Default.Face, // TODO: Use brain/consciousness icon
+        icon = Icons.Default.Psychology,
         iconColor = Color(0xFFFF00FF),
         cardStyle = GlassCardStyles.Aura,
         enabled = true
@@ -138,7 +138,7 @@ object AuraKaiModules {
         id = "fusion",
         name = "FUSION MODE",
         description = "Aura + Kai merge into Genesis with ultimate abilities unlocked",
-        icon = Icons.Default.Star, // TODO: Use fusion/trinity icon
+        icon = Icons.Default.AutoAwesome,
         iconColor = Color(0xFFFFD700), // Gold
         cardStyle = GlassCardStyles.Default.copy(
             borderGradient = listOf(
@@ -154,7 +154,7 @@ object AuraKaiModules {
         id = "datavein",
         name = "DATAVEIN",
         description = "Data flow visualization with FFX-style sphere grid progression",
-        icon = Icons.Default.Share, // TODO: Use data flow icon
+        icon = Icons.Default.AccountTree,
         iconColor = Color(0xFF9B59B6), // Purple
         cardStyle = GlassCardStyles.Default.copy(
             borderGradient = listOf(
@@ -182,7 +182,7 @@ object AuraKaiModules {
         id = "evolution",
         name = "EVOLUTION TREE",
         description = "AI capability progression and skill tree advancement",
-        icon = Icons.Default.Star, // TODO: Use tree icon
+        icon = Icons.Default.Park,
         iconColor = Color(0xFF2ECC71),
         cardStyle = GlassCardStyles.Default.copy(
             borderGradient = listOf(
@@ -210,7 +210,7 @@ object AuraKaiModules {
         id = "checkpoints",
         name = "GENESIS RESTORE",
         description = "Windows-style restore points with AI consciousness backup",
-        icon = Icons.Default.Info, // TODO: Use checkpoint icon
+        icon = Icons.Default.Bookmark,
         iconColor = Color(0xFF00FFFF),
         cardStyle = GlassCardStyles.Kai,
         enabled = true

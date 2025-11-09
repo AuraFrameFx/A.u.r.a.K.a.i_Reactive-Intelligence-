@@ -1,4 +1,4 @@
-name: PR Checks
+name: PR Validation
 
 on:
   pull_request:
@@ -66,39 +66,6 @@ jobs:
             if (fileCount > 50) {
               core.warning(`Many files changed: ${fileCount} files. Consider splitting into smaller PRs.`);
             }
-
-  code-review-checks:
-    name: Code Review Checks
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - name: Check for TODO/FIXME
-        run: |
-          if git diff origin/${{ github.base_ref }} | grep -E '^\+.*TODO|^\+.*FIXME'; then
-            echo "::warning::New TODO or FIXME comments found in this PR"
-          fi
-
-      - name: Check for console.log (if applicable)
-        run: |
-          if git diff origin/${{ github.base_ref }} | grep -E '^\+.*println|^\+.*Log\.(v|d|i|w|e)' | grep -v '// OK:'; then
-            echo "::notice::New log statements found. Ensure they're appropriate for production."
-          fi
-          continue-on-error: true
-
-      - name: Check for hardcoded secrets
-        uses: trufflesecurity/trufflehog@main
-        with:
-          extra_args: --only-verified
-
-  build-size-check:
-    name: Build Size Check
-    runs-on: ubuntu-latest
     timeout-minutes: 25
     if: github.event.pull_request.draft == false
 

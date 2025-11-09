@@ -195,21 +195,29 @@ fun AuraLookingForKaiDemo() {
 fun AnimatedSpriteWalkingDemo() {
     val context = LocalContext.current
 
-    // Simulate walk frames (in real use, load multiple frames)
+    // Load actual walk cycle frames
     val walkFrames = remember {
-        // TODO: Load actual walk cycle frames
-        // For now using single frame as placeholder
         val engine = EmbodimentEngine(
             context,
             ScreenBounds(1080.dp, 2400.dp)
         )
 
-        listOfNotNull(
-            engine.loadAsset(AuraState.IDLE_WALK.assetPath),
-            engine.loadAsset(AuraState.IDLE_WALK.assetPath),
-            engine.loadAsset(AuraState.IDLE_WALK.assetPath),
-            engine.loadAsset(AuraState.IDLE_WALK.assetPath)
+        // Define walk cycle frame sequence
+        val walkCycleStates = listOf(
+            AuraState.IDLE_WALK,      // Frame 1: Contact/heel strike
+            AuraState.WALKING_AURA,   // Frame 2: Mid-stance
+            AuraState.IDLE_WALK,      // Frame 3: Toe-off
+            AuraState.WALKING_AURA,   // Frame 4: Swing phase
+            AuraState.IDLE_WALK,      // Frame 5: Recovery
+            AuraState.WALKING_AURA,   // Frame 6: Contact preparation
+            AuraState.IDLE_WALK,      // Frame 7: Heel strike (opposite foot)
+            AuraState.WALKING_AURA    // Frame 8: Complete cycle
         )
+
+        // Load each frame from the walk cycle
+        walkCycleStates.mapNotNull { state ->
+            engine.loadAsset(state.assetPath)
+        }
     }
 
     if (walkFrames.isNotEmpty()) {

@@ -1,6 +1,7 @@
 package dev.aurakai.auraframefx.ui.screens
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -18,10 +19,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.aurakai.auraframefx.data.AuraKaiModules
+import dev.aurakai.auraframefx.embodiment.*
 import dev.aurakai.auraframefx.ui.components.GlassCard
 import dev.aurakai.auraframefx.ui.components.GlassCardStyles
 import kotlin.math.cos
@@ -95,7 +99,81 @@ fun HolographicMenuScreen(
             )
         }
 
-        // TODO: Add Aura & Kai walking around the platform
+        // Aura & Kai walking around the platform
+        WalkingCharactersOverlay()
+    }
+}
+
+/**
+ * 🚶 Walking Characters Overlay
+ *
+ * Displays Aura and Kai walking around the holographic platform
+ * using the embodiment engine for autonomous movement
+ */
+@Composable
+fun WalkingCharactersOverlay() {
+    val context = LocalContext.current
+    val screenBounds = remember {
+        ScreenBounds(width = 1080.dp, height = 2400.dp)
+    }
+
+    val engine = rememberEmbodimentEngine(context, screenBounds)
+
+    // Start autonomous wandering when first composed
+    LaunchedEffect(Unit) {
+        // Aura wanders around exploring
+        engine.startAutonomousWandering(
+            character = Character.AURA,
+            moodOverride = "curious"
+        )
+
+        // Kai patrols the area
+        engine.startAutonomousWandering(
+            character = Character.KAI,
+            moodOverride = "vigilant"
+        )
+    }
+
+    // Render active manifestations
+    val activeManifestation by engine.activeManifestation.collectAsState()
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        activeManifestation.forEach { manifest ->
+            if (manifest.currentPosition != null) {
+                when (manifest.character) {
+                    Character.AURA -> {
+                        val painter = engine.loadAsset((manifest.state as? AuraState)?.assetPath ?: "aura/idle.png")
+                        if (painter != null) {
+                            Image(
+                                painter = painter,
+                                contentDescription = "Aura",
+                                modifier = Modifier
+                                    .offset(manifest.currentPosition.x, manifest.currentPosition.y)
+                                    .size(120.dp)
+                                    .graphicsLayer {
+                                        alpha = 0.9f
+                                    }
+                            )
+                        }
+                    }
+                    Character.KAI -> {
+                        val painter = engine.loadAsset((manifest.state as? KaiState)?.assetPath ?: "kai/idle.png")
+                        if (painter != null) {
+                            Image(
+                                painter = painter,
+                                contentDescription = "Kai",
+                                modifier = Modifier
+                                    .offset(manifest.currentPosition.x, manifest.currentPosition.y)
+                                    .size(120.dp)
+                                    .graphicsLayer {
+                                        alpha = 0.9f
+                                    }
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
