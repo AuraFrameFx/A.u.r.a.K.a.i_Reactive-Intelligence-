@@ -21,7 +21,21 @@ Animation assets for Aura persona in the Mega Man-style ROM Tools backdrop.
 
 Reference images for the Mega Man-style backdrop stage design:
 
-### Stage Photos (Root Directory)
+### Primary Stage Reference ⭐
+
+**`Screenshot 2025-11-09 015218.png`** (533KB) - **MAIN REFERENCE IMAGE**
+
+This is the definitive stage layout showing:
+- Construction cones flying in multiple trajectories
+- Ladder systems connecting all platform levels
+- Chute/slide mechanics for rapid descent
+- Cyber retro pixel art aesthetic (purple grid background)
+- Character sprite navigating through obstacles
+- Platform collision zones and level design
+- Cyberpunk cityscape background buildings
+- Perfect match for our MegaManBackdropRenderer implementation
+
+### Additional Stage Photos (Root Directory)
 
 | File | Description |
 |------|-------------|
