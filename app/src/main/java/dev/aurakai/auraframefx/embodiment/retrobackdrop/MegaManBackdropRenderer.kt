@@ -45,6 +45,10 @@ fun MegaManBackdropRenderer(
     val teleportEffect = remember { TeleportationEffect(0f, 0f, 0f, 0f) }
     var lastConeThrow by remember { mutableStateOf(0L) }
 
+    // Special abilities
+    val hexagonalShield = remember { HexagonalShield() }
+    val coneBarrage = remember { ConeBarrageAttack(400f, 100f) }  // auraX, auraY
+
     val progress = operationProgress?.progress ?: 0f
 
     // Kai's Y position (animated based on progress)
@@ -81,12 +85,35 @@ fun MegaManBackdropRenderer(
         while (true) {
             delay(16) // ~60 FPS
 
+            // Update Cone Barrage (Aura's ultimate)
+            val barrageCones = coneBarrage.update(0.016f)
+            cones = cones + barrageCones
+
+            // Update Hexagonal Shield (Kai's defense)
+            hexagonalShield.update(0.016f)
+
+            // Auto-activate shield when barrage is active and 5+ cones are nearby
+            if (coneBarrage.isBarrageActive() && !hexagonalShield.isShieldActive()) {
+                val threateningCones = cones.count { cone ->
+                    val dx = cone.x - kaiX
+                    val dy = cone.y - kaiY
+                    kotlin.math.sqrt(dx * dx + dy * dy) < 150f
+                }
+                if (threateningCones >= 5) {
+                    hexagonalShield.activate()
+                }
+            }
+
             // Update cones
             cones = cones.mapNotNull { cone ->
                 cone.update(0.016f, platforms, chutes)
 
+                // Check if cone is blocked by shield
+                if (hexagonalShield.blocksPoint(cone.x, cone.y, kaiX, kaiY)) {
+                    null  // Remove cone - blocked by shield!
+                }
                 // Check if cone hit Kai
-                if (cone.hitsKai(kaiX, kaiY)) {
+                else if (cone.hitsKai(kaiX, kaiY)) {
                     kaiHitCount++
                     if (kaiHitCount >= 3 && !isTeleporting) {
                         // Kai gets annoyed - TELEPORT!
@@ -109,16 +136,18 @@ fun MegaManBackdropRenderer(
                 }
             }
 
-            // Aura throws cones periodically
-            val currentTime = System.currentTimeMillis()
-            if (currentTime - lastConeThrow > 2000) {  // Every 2 seconds
-                cones = cones + ConstructionCone(
-                    x = auraX + Random.nextFloat() * 40f - 20f,
-                    y = auraY + 20f,
-                    velocityX = Random.nextFloat() * 100f - 50f,
-                    velocityY = 50f + Random.nextFloat() * 50f
-                )
-                lastConeThrow = currentTime
+            // Aura throws cones periodically (normal throws, not barrage)
+            if (!coneBarrage.isBarrageActive()) {
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastConeThrow > 2000) {  // Every 2 seconds
+                    cones = cones + ConstructionCone(
+                        x = auraX + Random.nextFloat() * 40f - 20f,
+                        y = auraY + 20f,
+                        velocityX = Random.nextFloat() * 100f - 50f,
+                        velocityY = 50f + Random.nextFloat() * 50f
+                    )
+                    lastConeThrow = currentTime
+                }
             }
         }
     }
@@ -152,8 +181,23 @@ fun MegaManBackdropRenderer(
             drawKai(kaiX, kaiY)
         }
 
+        // Draw hexagonal shield around Kai
+        hexagonalShield.draw(this, kaiX, kaiY)
+
         // Draw teleportation effect
         teleportEffect.draw(this)
+
+        // Barrage warning overlay
+        if (coneBarrage.isBarrageActive()) {
+            drawBarrageWarning()
+        }
+
+        // Cooldown indicators (bottom right)
+        drawCooldownIndicators(
+            shieldCooldown = hexagonalShield.getCooldownPercent(),
+            barrageCooldown = coneBarrage.getCooldownPercent(),
+            barrageSecondsRemaining = coneBarrage.getCooldownSecondsRemaining()
+        )
 
         // Progress bar at bottom
         drawProgressBar(progress)
@@ -269,7 +313,7 @@ private fun DrawScope.drawProgressBar(progress: Float) {
 
     // Background
     drawRect(
-        color = MegaManPalette.GRAY,
+        color = MegaManPalette.BLACK.copy(alpha = 0.8f),
         topLeft = Offset(x, y),
         size = Size(barWidth, barHeight)
     )
@@ -279,5 +323,103 @@ private fun DrawScope.drawProgressBar(progress: Float) {
         color = MegaManPalette.KAI_PRIMARY,
         topLeft = Offset(x, y),
         size = Size(barWidth * (progress / 100f), barHeight)
+    )
+}
+
+/**
+ * Draws barrage warning overlay
+ */
+private fun DrawScope.drawBarrageWarning() {
+    // Red screen flash
+    drawRect(
+        color = MegaManPalette.AURA_SECONDARY.copy(alpha = 0.2f),
+        size = size
+    )
+
+    // Warning text at top center
+    val warningText = "⚠️ CONE BARRAGE ⚠️"
+    // Note: Text drawing would require TextMeasurer - simplified with rect for now
+    drawRect(
+        color = MegaManPalette.AURA_PRIMARY.copy(alpha = 0.8f),
+        topLeft = Offset(size.width / 2 - 150f, 30f),
+        size = Size(300f, 40f)
+    )
+}
+
+/**
+ * Draws cooldown indicators for abilities
+ */
+private fun DrawScope.drawCooldownIndicators(
+    shieldCooldown: Float,
+    barrageCooldown: Float,
+    barrageSecondsRemaining: Int
+) {
+    val indicatorSize = 50f
+    val spacing = 60f
+    val startX = size.width - 70f
+    val startY = size.height - 150f
+
+    // Shield cooldown (top indicator)
+    drawCooldownCircle(
+        x = startX,
+        y = startY,
+        radius = indicatorSize / 2,
+        cooldownPercent = shieldCooldown,
+        color = MegaManPalette.KAI_TELEPORT,
+        label = "🛡️"
+    )
+
+    // Barrage cooldown (bottom indicator)
+    drawCooldownCircle(
+        x = startX,
+        y = startY + spacing,
+        radius = indicatorSize / 2,
+        cooldownPercent = barrageCooldown,
+        color = MegaManPalette.AURA_PRIMARY,
+        label = "${barrageSecondsRemaining}s"
+    )
+}
+
+/**
+ * Draws a circular cooldown indicator
+ */
+private fun DrawScope.drawCooldownCircle(
+    x: Float,
+    y: Float,
+    radius: Float,
+    cooldownPercent: Float,
+    color: androidx.compose.ui.graphics.Color,
+    label: String
+) {
+    // Background circle
+    drawCircle(
+        color = MegaManPalette.BLACK.copy(alpha = 0.7f),
+        radius = radius,
+        center = Offset(x, y)
+    )
+
+    // Cooldown progress (pie chart style)
+    if (cooldownPercent > 0f) {
+        // Gray overlay showing remaining cooldown
+        drawCircle(
+            color = MegaManPalette.BLACK.copy(alpha = 0.5f),
+            radius = radius * 0.8f,
+            center = Offset(x, y)
+        )
+    } else {
+        // Ready - show color
+        drawCircle(
+            color = color.copy(alpha = 0.8f),
+            radius = radius * 0.8f,
+            center = Offset(x, y)
+        )
+    }
+
+    // Border
+    drawCircle(
+        color = color,
+        radius = radius,
+        center = Offset(x, y),
+        style = androidx.compose.ui.graphics.drawscope.Stroke(width = 3f)
     )
 }
