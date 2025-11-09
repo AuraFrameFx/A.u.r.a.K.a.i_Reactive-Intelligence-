@@ -58,8 +58,9 @@ fun ConferenceRoomScreen() {
 
             IconButton(
                 onClick = {
-                    // TODO: Navigate to conference settings screen
-                    timber.log.Timber.i("Conference room settings clicked")
+                    // Log settings access for analytics
+                    // Future navigation: navController.navigate("conference_settings")
+                    timber.log.Timber.i("Conference room settings clicked - Settings screen not yet implemented")
                 }
             ) {
                 Icon(

@@ -911,25 +911,125 @@ class OracleDriveSandbox @Inject constructor(
     }
 
     /**
-     * Simulates applying the provided system modifications to the real device.
+     * Applies system modifications to the real device with full backup and rollback support.
      *
-     * This function does not perform any actual changes and always returns a successful result. Intended as a placeholder for future implementation of real system modification with backup and rollback support.
+     * Creates a complete backup of all files to be modified, applies changes sequentially,
+     * verifies each modification, and provides automatic rollback on any failure.
      *
-     * @return An ApplicationResult indicating a successful simulated operation.
+     * @param modifications The list of system modifications to apply.
+     * @return An ApplicationResult indicating success or failure with detailed reason.
      */
     private suspend fun applyModificationsToRealSystem(
         modifications: List<SystemModification>,
-    ): ApplicationResult {
-        // TODO: Implement actual system modification with full backup/rollback
+    ): ApplicationResult = withContext(Dispatchers.IO) {
         AuraFxLogger.w(
             "OracleDriveSandbox",
-            "REAL SYSTEM MODIFICATION - ${modifications.size} changes"
+            "REAL SYSTEM MODIFICATION - ${modifications.size} changes - BACKUP/ROLLBACK ENABLED"
         )
 
-        return ApplicationResult(
-            success = true,
-            failureReason = ""
-        )
+        // Backup storage for rollback
+        val backupMap = mutableMapOf<String, ByteArray>()
+        val appliedModifications = mutableListOf<SystemModification>()
+
+        try {
+            // Phase 1: Create backups of all target files
+            AuraFxLogger.i("OracleDriveSandbox", "Phase 1: Creating backups...")
+            modifications.forEach { mod ->
+                try {
+                    val targetFile = java.io.File(mod.targetPath)
+                    if (targetFile.exists()) {
+                        // Backup existing file
+                        backupMap[mod.targetPath] = targetFile.readBytes()
+                        AuraFxLogger.d(
+                            "OracleDriveSandbox",
+                            "Backed up: ${mod.targetPath} (${backupMap[mod.targetPath]!!.size} bytes)"
+                        )
+                    } else {
+                        // Mark for deletion on rollback (new file)
+                        backupMap[mod.targetPath] = byteArrayOf() // Empty marker
+                        AuraFxLogger.d("OracleDriveSandbox", "New file marker: ${mod.targetPath}")
+                    }
+                } catch (e: Exception) {
+                    AuraFxLogger.e("OracleDriveSandbox", "Backup failed for ${mod.targetPath}", e)
+                    throw Exception("Backup phase failed: ${e.message}")
+                }
+            }
+
+            // Phase 2: Apply modifications sequentially
+            AuraFxLogger.i("OracleDriveSandbox", "Phase 2: Applying modifications...")
+            modifications.forEach { mod ->
+                try {
+                    val targetFile = java.io.File(mod.targetPath)
+
+                    // Create parent directories if needed
+                    targetFile.parentFile?.mkdirs()
+
+                    // Write modified content
+                    targetFile.writeBytes(mod.modifiedContent)
+                    appliedModifications.add(mod)
+
+                    // Verify write
+                    val written = targetFile.readBytes()
+                    if (!written.contentEquals(mod.modifiedContent)) {
+                        throw Exception("Verification failed: content mismatch")
+                    }
+
+                    AuraFxLogger.i(
+                        "OracleDriveSandbox",
+                        "Applied: ${mod.targetPath} (${mod.modifiedContent.size} bytes)"
+                    )
+
+                } catch (e: Exception) {
+                    AuraFxLogger.e("OracleDriveSandbox", "Modification failed for ${mod.targetPath}", e)
+                    throw Exception("Application phase failed at ${mod.targetPath}: ${e.message}")
+                }
+            }
+
+            // Phase 3: Success - log and return
+            AuraFxLogger.i(
+                "OracleDriveSandbox",
+                "SUCCESS: Applied ${appliedModifications.size} modifications"
+            )
+
+            ApplicationResult(
+                success = true,
+                failureReason = ""
+            )
+
+        } catch (e: Exception) {
+            // Phase 4: Rollback on any failure
+            AuraFxLogger.e("OracleDriveSandbox", "FAILURE - Initiating rollback", e)
+
+            var rollbackSuccess = true
+            backupMap.forEach { (path, backup) ->
+                try {
+                    val file = java.io.File(path)
+                    if (backup.isEmpty() && file.exists()) {
+                        // Was a new file, delete it
+                        file.delete()
+                        AuraFxLogger.d("OracleDriveSandbox", "Rollback: Deleted new file $path")
+                    } else if (backup.isNotEmpty()) {
+                        // Restore original content
+                        file.writeBytes(backup)
+                        AuraFxLogger.d("OracleDriveSandbox", "Rollback: Restored $path")
+                    }
+                } catch (rollbackError: Exception) {
+                    AuraFxLogger.e("OracleDriveSandbox", "Rollback failed for $path", rollbackError)
+                    rollbackSuccess = false
+                }
+            }
+
+            val failureMessage = if (rollbackSuccess) {
+                "Modification failed: ${e.message}. System rolled back successfully."
+            } else {
+                "CRITICAL: Modification failed AND rollback incomplete: ${e.message}"
+            }
+
+            ApplicationResult(
+                success = false,
+                failureReason = failureMessage
+            )
+        }
     }
 
     /**
