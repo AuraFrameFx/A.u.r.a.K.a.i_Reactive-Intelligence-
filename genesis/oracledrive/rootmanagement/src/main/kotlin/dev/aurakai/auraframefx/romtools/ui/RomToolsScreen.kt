@@ -1,6 +1,9 @@
 // File: romtools/src/main/kotlin/dev/aurakai/auraframefx/romtools/ui/RomToolsScreen.kt
 package dev.aurakai.auraframefx.romtools.ui
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,8 +28,11 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,6 +42,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,9 +56,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.aurakai.auraframefx.embodiment.retrobackdrop.MegaManBackdropRenderer
 import dev.aurakai.auraframefx.romtools.BackupInfo
 import dev.aurakai.auraframefx.romtools.RomCapabilities
 import dev.aurakai.auraframefx.romtools.RomToolsManager
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Main ROM Tools screen for Genesis AuraFrameFX.
@@ -62,27 +75,72 @@ fun RomToolsScreen(
 ) {
     val romToolsState by romToolsManager.romToolsState.collectAsStateWithLifecycle()
     val operationProgress by romToolsManager.operationProgress.collectAsStateWithLifecycle()
+    val coroutineScope = rememberCoroutineScope()
 
-    // Main column container
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color(0xFF0A0A0A))
+    // Backdrop enabled state (persists during session)
+    var backdropEnabled by remember { mutableStateOf(true) }
+
+    // File pickers for ROM and backup selection
+    val romPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let {
+            Timber.i("ROM file selected: $it")
+            // TODO: Wire up romToolsManager.flashRom() when it accepts Uri/path parameter
+            Timber.w("ROM flashing from URI requires RomToolsManager.flashRom(uri) implementation")
+        }
+    }
+
+    val backupPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let {
+            Timber.i("Backup file selected: $it")
+            // TODO: Wire up romToolsManager.restoreBackup() when it accepts Uri/path parameter
+            Timber.w("Backup restoration from URI requires RomToolsManager.restoreBackup(uri) implementation")
+        }
+    }
+
+    // Box container with animated backdrop
+    Box(
+        modifier = modifier.fillMaxSize()
     ) {
-        // Top App Bar
-        TopAppBar(
-            title = {
-                Text(
-                    text = "ROM Tools",
-                    color = Color(0xFFFF6B35),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Black.copy(alpha = 0.8f)
-            )
+        // Mega Man-style animated backdrop (behind everything)
+        MegaManBackdropRenderer(
+            operationProgress = operationProgress,
+            enabled = backdropEnabled
         )
+
+        // Main UI column (foreground) - semi-transparent to show backdrop
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f))  // Darken slightly for readability
+        ) {
+            // Top App Bar
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "ROM Tools",
+                        color = Color(0xFFFF6B35),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                },
+                actions = {
+                    // Backdrop toggle button
+                    IconButton(onClick = { backdropEnabled = !backdropEnabled }) {
+                        Icon(
+                            imageVector = if (backdropEnabled) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = if (backdropEnabled) "Hide Mega Man backdrop" else "Show Mega Man backdrop",
+                            tint = Color(0xFFFF6B35)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Black.copy(alpha = 0.8f)
+                )
+            )
 
         // Content area
         if (!romToolsState.isInitialized) {
@@ -90,7 +148,88 @@ fun RomToolsScreen(
             LoadingScreen()
         } else {
             // Main content
-            MainContent(romToolsState, operationProgress)
+            MainContent(
+                romToolsState = romToolsState,
+                operationProgress = operationProgress,
+                onActionClick = { actionType ->
+                    when (actionType) {
+                        RomActionType.FLASH_ROM -> {
+                            romPicker.launch(arrayOf(
+                                "application/zip",
+                                "application/octet-stream",
+                                "application/x-zip-compressed"
+                            ))
+                        }
+                        RomActionType.RESTORE_BACKUP -> {
+                            backupPicker.launch(arrayOf(
+                                "application/zip",
+                                "application/octet-stream"
+                            ))
+                        }
+                        else -> handleRomAction(
+                            actionType = actionType,
+                            romToolsManager = romToolsManager,
+                            coroutineScope = coroutineScope
+                        )
+                    }
+                }
+            )
+        }
+        }  // Column
+    }  // Box with backdrop
+}
+
+/**
+ * Handles ROM tool action clicks by dispatching to the appropriate RomToolsManager method.
+ *
+ * Note: FLASH_ROM and RESTORE_BACKUP are handled at the screen level via file pickers
+ * and are not processed by this function.
+ *
+ * @param actionType The type of ROM action to perform
+ * @param romToolsManager The manager instance to execute the operation
+ * @param coroutineScope The coroutine scope for launching suspend operations
+ */
+private fun handleRomAction(
+    actionType: RomActionType,
+    romToolsManager: RomToolsManager,
+    coroutineScope: kotlinx.coroutines.CoroutineScope
+) {
+    coroutineScope.launch {
+        when (actionType) {
+            RomActionType.CREATE_BACKUP -> {
+                // Generate a timestamp-based backup name
+                val backupName = "AuraKai_Backup_${System.currentTimeMillis()}"
+                val result = romToolsManager.createNandroidBackup(backupName)
+                result.onSuccess {
+                    Timber.i("Backup created successfully: ${it.name}")
+                }.onFailure { error ->
+                    Timber.e(error, "Backup creation failed")
+                }
+            }
+            RomActionType.UNLOCK_BOOTLOADER -> {
+                val result = romToolsManager.unlockBootloader()
+                result.onSuccess {
+                    Timber.i("✅ Bootloader unlocked successfully")
+                }.onFailure { error ->
+                    Timber.e(error, "❌ Bootloader unlock failed")
+                }
+            }
+            RomActionType.INSTALL_RECOVERY -> {
+                val result = romToolsManager.installRecovery()
+                result.onSuccess {
+                    Timber.i("✅ Custom recovery installed successfully")
+                }.onFailure { error ->
+                    Timber.e(error, "❌ Recovery installation failed")
+                }
+            }
+            RomActionType.GENESIS_OPTIMIZATIONS -> {
+                val result = romToolsManager.installGenesisOptimizations()
+                result.onSuccess {
+                    Timber.i("Genesis AI optimizations applied successfully")
+                }.onFailure { error ->
+                    Timber.e(error, "Genesis optimizations failed")
+                }
+            }
         }
     }
 }
@@ -121,7 +260,8 @@ private fun LoadingScreen() {
 @Composable
 private fun MainContent(
     romToolsState: dev.aurakai.auraframefx.romtools.RomToolsState,
-    operationProgress: dev.aurakai.auraframefx.romtools.OperationProgress?
+    operationProgress: dev.aurakai.auraframefx.romtools.OperationProgress?,
+    onActionClick: (RomActionType) -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -158,7 +298,7 @@ private fun MainContent(
                     action = action,
                     isEnabled = action.isEnabled(romToolsState.capabilities),
                     onClick = {
-                        // TODO: Handle ROM tool action click
+                        onActionClick(action.type)
                     }
                 )
             }

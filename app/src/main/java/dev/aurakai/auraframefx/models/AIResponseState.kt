@@ -2,22 +2,35 @@
 
 /**
  * Represents the state of an AI text response operation.
+ *
+ * States:
+ * - Idle: No operation in progress
+ * - Loading: Response generation in progress
+ * - Success: Response generated successfully with text content
+ * - Error: Response generation failed with error message
  */
 sealed class AIResponseState {
-    object Idle : AIResponseState()
-    object Loading : AIResponseState()
+    /**
+     * Initial state - no AI response operation in progress.
+     */
+    data object Idle : AIResponseState()
 
     /**
-     * Represents a successful text response.
-     * @param _text The response text. Parameter reported as unused.
+     * AI response generation is currently in progress.
      */
-    data class Success(val _text: String) :
-        AIResponseState() // TODO: Param _text reported as unused.
+    data object Loading : AIResponseState()
 
     /**
-     * Represents an error during text response generation.
-     * @param _message The error message. Parameter reported as unused.
+     * AI response generated successfully.
+     *
+     * @param text The generated response text from the AI
      */
-    data class Error(val _message: String) :
-        AIResponseState() // TODO: Param _message reported as unused.
+    data class Success(val text: String) : AIResponseState()
+
+    /**
+     * AI response generation failed with an error.
+     *
+     * @param message The error message describing what went wrong
+     */
+    data class Error(val message: String) : AIResponseState()
 }
