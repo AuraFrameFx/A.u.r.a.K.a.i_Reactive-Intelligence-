@@ -132,7 +132,9 @@ fun AppNavGraph(navController: NavHostController) {
         ) {
             dev.aurakai.auraframefx.datavein.ui.DataVeinSphereGrid(
                 onNodeSelected = { node ->
-                    // TODO: Handle node selection - could navigate to node details screen
+                    // Log node selection for analytics and future detail screen navigation
+                    timber.log.Timber.i("DataVein node selected: ${node.id} - ${node.title}")
+                    // Future: navController.navigate("sphere_node_detail/${node.id}")
                 }
             )
         }
