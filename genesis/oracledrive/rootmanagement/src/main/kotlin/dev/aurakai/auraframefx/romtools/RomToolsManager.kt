@@ -278,6 +278,60 @@ class RomToolsManager @Inject constructor(
     }
 
     /**
+     * Unlock the device bootloader.
+     *
+     * Updates operation progress during the unlock process.
+     *
+     * @return A Result containing `Unit` on success, or a failure with the encountered exception.
+     */
+    suspend fun unlockBootloader(): Result<Unit> {
+        return try {
+            updateOperationProgress(RomOperation.UNLOCKING_BOOTLOADER, 0f)
+
+            bootloaderManager.unlockBootloader().getOrThrow()
+
+            updateOperationProgress(RomOperation.COMPLETED, 100f)
+            clearOperationProgress()
+
+            Timber.i("✅ Bootloader unlocked successfully")
+            Result.success(Unit)
+
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to unlock bootloader")
+            updateOperationProgress(RomOperation.FAILED, 0f)
+            clearOperationProgress()
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Install a custom recovery (e.g., TWRP) on the device.
+     *
+     * Updates operation progress during installation.
+     *
+     * @return A Result containing `Unit` on success, or a failure with the encountered exception.
+     */
+    suspend fun installRecovery(): Result<Unit> {
+        return try {
+            updateOperationProgress(RomOperation.INSTALLING_RECOVERY, 0f)
+
+            recoveryManager.installCustomRecovery().getOrThrow()
+
+            updateOperationProgress(RomOperation.COMPLETED, 100f)
+            clearOperationProgress()
+
+            Timber.i("✅ Custom recovery installed successfully")
+            Result.success(Unit)
+
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to install custom recovery")
+            updateOperationProgress(RomOperation.FAILED, 0f)
+            clearOperationProgress()
+            Result.failure(e)
+        }
+    }
+
+    /**
      * Update the current operation progress state.
      *
      * Sets the internal operation progress StateFlow to the provided operation and progress value.

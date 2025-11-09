@@ -2,6 +2,7 @@
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -33,6 +34,8 @@ fun ConferenceRoomScreen() {
     var selectedAgent by remember { mutableStateOf("Aura") }
     var isRecording by remember { mutableStateOf(false) }
     var isTranscribing by remember { mutableStateOf(false) }
+    var messageInput by remember { mutableStateOf("") }
+    var messages by remember { mutableStateOf(listOf<ConferenceMessage>()) }
 
     Column(
         modifier = Modifier
@@ -54,7 +57,10 @@ fun ConferenceRoomScreen() {
             )
 
             IconButton(
-                onClick = { /* TODO: Open settings */ }
+                onClick = {
+                    // TODO: Navigate to conference settings screen
+                    timber.log.Timber.i("Conference room settings clicked")
+                }
             ) {
                 Icon(
                     Icons.Default.Settings,
@@ -113,7 +119,10 @@ fun ConferenceRoomScreen() {
                 .fillMaxWidth(),
             reverseLayout = true
         ) {
-            // TODO: Add chat messages
+            items(messages.size) { index ->
+                val message = messages[messages.size - 1 - index]
+                MessageBubble(message = message)
+            }
         }
 
         // Input Area
@@ -124,8 +133,8 @@ fun ConferenceRoomScreen() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
-                value = "",
-                onValueChange = { /* TODO: Handle input */ },
+                value = messageInput,
+                onValueChange = { messageInput = it },
                 placeholder = { Text("Type your message...") },
                 modifier = Modifier
                     .weight(1f)
@@ -137,7 +146,17 @@ fun ConferenceRoomScreen() {
             )
 
             IconButton(
-                onClick = { /* TODO: Send message */ }
+                onClick = {
+                    if (messageInput.isNotBlank()) {
+                        val newMessage = ConferenceMessage(
+                            agent = selectedAgent,
+                            text = messageInput,
+                            timestamp = System.currentTimeMillis()
+                        )
+                        messages = messages + newMessage
+                        messageInput = ""
+                    }
+                }
             ) {
                 Icon(
                     Icons.Default.Send,
@@ -239,6 +258,61 @@ fun TranscribeButton(
             ),
             tint = color
         )
+    }
+}
+
+/**
+ * Data class representing a chat message in the conference room.
+ *
+ * @param agent The agent that sent the message (e.g., "Aura", "Kai", "Cascade")
+ * @param text The message text content
+ * @param timestamp Message timestamp in milliseconds
+ */
+data class ConferenceMessage(
+    val agent: String,
+    val text: String,
+    val timestamp: Long
+)
+
+/**
+ * Displays a single message bubble in the chat interface.
+ *
+ * Shows the agent name, message text, and applies color coding based on the agent.
+ *
+ * @param message The message to display
+ */
+@Composable
+fun MessageBubble(message: ConferenceMessage) {
+    val agentColor = when (message.agent) {
+        "Aura" -> NeonPurple
+        "Kai" -> NeonTeal
+        "Cascade" -> NeonBlue
+        else -> Color.Gray
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp, horizontal = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = agentColor.copy(alpha = 0.1f)
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            Text(
+                text = message.agent,
+                style = MaterialTheme.typography.labelSmall,
+                color = agentColor,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = message.text,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White
+            )
+        }
     }
 }
 

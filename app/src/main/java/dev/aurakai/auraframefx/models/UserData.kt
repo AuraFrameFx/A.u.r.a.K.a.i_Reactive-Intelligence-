@@ -1,10 +1,52 @@
 ﻿package dev.aurakai.auraframefx.model
 
-// TODO: Class reported as unused or needs implementation. Ensure this is utilized by UserPreferences.
+/**
+ * Represents user profile and authentication data.
+ *
+ * Used by UserPreferences for storing and retrieving user information,
+ * including profile details and API credentials.
+ *
+ * All fields are nullable to support partial data scenarios and
+ * allow users to update individual fields independently.
+ */
 data class UserData(
-    val id: String? = null, // TODO: Reported as unused or needs implementation
-    val name: String? = null, // TODO: Reported as unused or needs implementation
-    val email: String? = null, // TODO: Reported as unused or needs implementation
-    val apiKey: String? = null, // TODO: Reported as unused or needs implementation
-    // TODO: Define actual properties based on what UserPreferences.getUserData() should return
+    /**
+     * Unique user identifier (UUID or database ID).
+     */
+    val id: String? = null,
+
+    /**
+     * User's display name or full name.
+     */
+    val name: String? = null,
+
+    /**
+     * User's email address for account identification and communication.
+     */
+    val email: String? = null,
+
+    /**
+     * API key for authenticated requests to AI services (Vertex AI, etc.).
+     */
+    val apiKey: String? = null,
+
+    /**
+     * User's avatar image URI or URL.
+     */
+    val avatarUrl: String? = null,
+
+    /**
+     * User preferences and settings JSON blob.
+     */
+    val preferences: String? = null,
+
+    /**
+     * Account creation timestamp (milliseconds since epoch).
+     */
+    val createdAt: Long? = null,
+
+    /**
+     * Last updated timestamp (milliseconds since epoch).
+     */
+    val updatedAt: Long? = null
 )

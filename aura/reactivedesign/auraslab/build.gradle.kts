@@ -42,7 +42,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.okhttp)
     implementation("com.squareup.retrofit2:converter-moshi:3.0.0")
-    implementation("com.squareup.retrofit2:converter-kotlinx-serialization:1.0.0")
+    implementation("com.squareup.retrofit2:converter-kotlinx-serialization:3.0.0")
     implementation("com.squareup.okhttp3:logging-interceptor:${libs.versions.okhttp.get()}")
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.security.crypto)

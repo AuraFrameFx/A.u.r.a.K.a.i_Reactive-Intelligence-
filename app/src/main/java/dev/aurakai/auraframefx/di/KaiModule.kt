@@ -7,29 +7,28 @@ import dagger.hilt.components.SingletonComponent
 import dev.aurakai.auraframefx.ui.KaiController
 import javax.inject.Singleton
 
-// import android.content.Context // If KaiController needs context
-
 /**
- * Hilt Module for providing KaiController.
- * TODO: Reported as unused declaration. Ensure Hilt is set up and this module is processed.
+ * Hilt Module for providing KaiController as a singleton dependency.
+ *
+ * KaiController manages gesture-based interactions with the Kai assistant,
+ * including taps, long presses, and swipe gestures for navigation and control.
  */
 @Module
 @InstallIn(SingletonComponent::class)
 object KaiModule {
 
     /**
-     * Provides KaiController.
-     * @param _context Application context, if KaiController requires it. Parameter reported as unused.
-     * @return A KaiController instance.
-     * TODO: Reported as unused. Implement if KaiController is used.
+     * Provides a singleton instance of KaiController.
+     *
+     * KaiController is a stateful controller with no external dependencies,
+     * managing its own internal state for Kai UI elements and gesture interactions.
+     *
+     * @return A KaiController instance for managing Kai assistant interactions
      */
     @Provides
     @Singleton
-    fun provideKaiController(
-        // @ApplicationContext _context: Context // Example if context is needed by KaiController
-    ): KaiController? { // Returning KaiController? to allow null placeholder
-        // TODO: If KaiController takes dependencies, provide them here.
-        // Example: return KaiController(_context)
-        return null // Placeholder, as KaiController itself is a placeholder.
+    fun provideKaiController(): KaiController {
+        // KaiController has no dependencies - it manages its own state internally
+        return KaiController()
     }
 }

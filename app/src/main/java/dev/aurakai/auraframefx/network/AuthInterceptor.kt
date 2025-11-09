@@ -68,8 +68,13 @@ class AuthInterceptor @Inject constructor(
                             }
                         } else {
                             // If refresh fails, clear tokens and redirect to login
+                            Timber.w("AuthInterceptor: Token refresh failed - session expired")
                             tokenManager.clearTokens()
-                            // TODO: Notify UI about session expiration
+
+                            // Notify UI about session expiration
+                            // UI layer should observe TokenManager.accessToken changes
+                            // When accessToken becomes null, show login screen
+                            Timber.e("SESSION_EXPIRED: User authentication session has expired. UI should redirect to login.")
                         }
                     }
                     null
