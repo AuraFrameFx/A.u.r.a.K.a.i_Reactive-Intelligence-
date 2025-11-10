@@ -84,8 +84,8 @@ work = "2.11.0"
 # ============================================================================
 # Compose
 # ============================================================================
-# Compose BOM - Latest: 2025.10.01 (Oct 30, 2025)
-compose-bom = "2025.11.00"
+# Compose BOM - Latest: 2024.11.00 (Nov 2024)
+compose-bom = "2024.11.00"
 
 # Compose Compiler - NO LONGER NEEDED with Kotlin 2.0+
 # Starting with Kotlin 2.0, Compose compiler is built-in via:

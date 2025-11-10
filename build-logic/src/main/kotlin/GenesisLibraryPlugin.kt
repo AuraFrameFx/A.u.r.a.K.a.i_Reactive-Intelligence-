@@ -136,7 +136,8 @@ class GenesisLibraryPlugin : Plugin<Project> {
 
             // Universal Xposed/LSPosed API access for all library modules
             dependencies.add("compileOnly", "de.robv.android.xposed:api:82")
-            dependencies.add("compileOnly", "io.github.libxposed:api:100")
+            // Note: io.github.libxposed is not yet published to Maven Central
+            // Use de.robv.android.xposed:api:82 for Xposed module development
             dependencies.add("implementation", "com.github.kyuubiran:EzXHelper:2.2.0")
         }
     }
