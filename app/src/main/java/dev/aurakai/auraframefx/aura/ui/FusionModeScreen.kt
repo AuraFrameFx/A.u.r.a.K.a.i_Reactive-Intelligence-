@@ -38,6 +38,8 @@ import kotlin.math.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FusionModeScreen(
+    onNavigateToAgents: () -> Unit = {},
+    onNavigateToConsciousness: () -> Unit = {},
     onFusionComplete: (FusionResult) -> Unit = {},
     modifier: Modifier = Modifier
 ) {

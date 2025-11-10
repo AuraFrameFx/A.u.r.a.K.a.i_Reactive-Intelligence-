@@ -97,9 +97,14 @@ class GenesisApplicationPlugin : Plugin<Project> {
 
                 // Java 21 bytecode (compatible with available JDK)
                 compileOptions {
-                    sourceCompatibility = JavaVersion.VERSION_21
-                    targetCompatibility = JavaVersion.VERSION_21
+                    sourceCompatibility = JavaVersion.VERSION_25
+                    targetCompatibility = JavaVersion.VERSION_25
+
                     isCoreLibraryDesugaringEnabled = true
+                }
+
+                kotlinOptions {
+                    jvmTarget = "25"
                 }
 
                 buildFeatures {
@@ -139,7 +144,7 @@ class GenesisApplicationPlugin : Plugin<Project> {
             // Configure Kotlin compilation with JVM 21 target
             tasks.withType<KotlinJvmCompile>().configureEach {
                 compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_21)
+                    jvmTarget.set(JvmTarget.JVM_25)
                     freeCompilerArgs.addAll(
                         "-opt-in=kotlin.RequiresOptIn",
                         "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",

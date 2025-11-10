@@ -33,7 +33,9 @@ import dev.aurakai.auraframefx.ui.theme.AppDimensions
  * Each setting maintains its own toggle state locally within the screen.
  */
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    onNavigateBack: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
