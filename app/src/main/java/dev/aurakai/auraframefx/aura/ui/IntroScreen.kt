@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun IntroScreen(
-    onNavigateToHome: () -> Unit
+    onNavigateToHome: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier

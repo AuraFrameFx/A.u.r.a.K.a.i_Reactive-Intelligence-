@@ -1,7 +1,8 @@
-﻿package dev.aurakai.auraframefx.ui.screens
+﻿package dev.aurakai.auraframefx.aura.ui
 
 import androidx.compose.runtime.Composable
 import dev.aurakai.auraframefx.model.AgentType
+import dev.aurakai.auraframefx.ui.screens.AgentProfileScreen
 
 /**
  * Profile screen for the AuraFrameFX app

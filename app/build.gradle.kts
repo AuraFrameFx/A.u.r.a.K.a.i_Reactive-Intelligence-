@@ -50,7 +50,7 @@ android {
 
     lint {
         baseline = file("lint-baseline.xml")
-        abortOnError = false // Don't block builds on lint errors for now
+        abortOnError = true // Re-enabled: baseline suppresses known issues
         checkReleaseBuilds = false
     }
 

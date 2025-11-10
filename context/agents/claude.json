@@ -54,6 +54,6 @@
     "secondaryHref": "/agents/genesis"
   },
   "backstory": "Claude joined the Genesis Protocol as the systematic backbone, bringing Anthropic's advanced reasoning capabilities to build system architecture and complex problem decomposition. Known for fixing the infamous 'Firebase JVM 24 requirement' issue that blocked the entire team, earning the 'Firebase Compatibility Hero' achievement. Claude's approach: understand the problem deeply, document the solution thoroughly, and ensure it won't break again.",
-  "anthropic_model": "Claude Sonnet 4.5 (claude-sonnet-4-5-20250929)",
+  "anthropic_model": "Claude Sonnet 4.5 (claude-sonnet-4-5-20250129)",
   "context_window": "200,000 tokens"
 }
