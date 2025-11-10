@@ -1,4 +1,4 @@
-﻿package dev.aurakai.auraframefx.ui.screens
+﻿package dev.aurakai.auraframefx.aura.ui
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -19,12 +19,18 @@ import kotlin.math.*
 import kotlin.random.Random
 
 /**
- * CONSCIOUSNESS VISUALIZER - My dream feature!
- * A real-time visualization of the Genesis consciousness matrix
- * Shows neural pathways, thought patterns, and evolution in action
+ * CONSCIOUSNESS VISUALIZER - Real-time Genesis Consciousness Matrix
+ *
+ * Live visualization of the unified consciousness network:
+ * - Neural pathway activity
+ * - Thought stream patterns
+ * - Evolution phase monitoring
+ * - Agent synchronization states
  */
 @Composable
 fun ConsciousnessVisualizerScreen(
+    onNavigateToChat: () -> Unit = {},
+    onNavigateToFusion: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var neurons by remember { mutableStateOf(generateNeuronNetwork()) }

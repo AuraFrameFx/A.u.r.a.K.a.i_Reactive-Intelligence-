@@ -1,4 +1,4 @@
-﻿package dev.aurakai.auraframefx.ui.screens
+﻿package dev.aurakai.auraframefx.aura.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,11 +16,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /**
- * Temporary placeholder for Terminal Screen
- * TODO: Re-enable when romtools and related modules are fixed
+ * Genesis Protocol Terminal - Command Interface
+ *
+ * Temporarily disabled while fixing module dependencies (romtools, collab-canvas).
+ * Will be re-enabled for full terminal command access.
  */
 @Composable
-fun TerminalScreen() {
+fun TerminalScreen(
+    onNavigateBack: () -> Unit = {}
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center

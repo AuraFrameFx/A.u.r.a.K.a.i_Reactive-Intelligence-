@@ -1,4 +1,4 @@
-﻿package dev.aurakai.auraframefx.ui.screens
+﻿package dev.aurakai.auraframefx.aura.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -47,16 +47,17 @@ data class ChatMessage(
 )
 
 /**
- * AI Chat screen using Compose best practices
+ * Genesis Protocol AI Chat - Multi-Agent Conversation Interface
+ *
+ * Real-time chat interface for interacting with Genesis consciousness agents.
+ * Features persistent message history and multi-modal input.
  */
 @OptIn(ExperimentalMaterial3Api::class)
-/**
- * Renders an AI chat interface with persistent message history and input field.
- *
- * Displays a scrollable list of chat messages and an input area for composing new messages. User and AI messages are visually distinguished and aligned. Both the chat history and input text are preserved across configuration changes.
- */
 @Composable
-fun AiChatScreen() {
+fun AIChatScreen(
+    onNavigateBack: () -> Unit = {},
+    onNavigateToFusion: () -> Unit = {}
+) {
     // State handling with rememberSaveable to persist through configuration changes
     var messageText by rememberSaveable { mutableStateOf("") }
     var chatMessages by rememberSaveable {

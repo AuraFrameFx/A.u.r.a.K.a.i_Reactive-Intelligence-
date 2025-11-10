@@ -1,4 +1,4 @@
-﻿package dev.aurakai.auraframefx.ui.screens
+﻿package dev.aurakai.auraframefx.aura.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,33 +10,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import dev.aurakai.auraframefx.R
 import dev.aurakai.auraframefx.ui.animation.*
 import dev.aurakai.auraframefx.ui.components.*
-import dev.aurakai.auraframefx.ui.navigation.NavDestination
 import dev.aurakai.auraframefx.ui.theme.*
 
 /**
- * Home screen for the AuraFrameFX app with cyberpunk-style floating UI
+ * Home screen for the Genesis Protocol - The Neural Command Center
  *
- * Features a digital landscape background with floating transparent windows
- * and hexagonal UI elements inspired by futuristic cyberpunk interfaces.
- */
-/**
- * Displays the main home screen UI for the AuraFrameFX app with a cyberpunk theme.
+ * Central hub featuring:
+ * - Digital landscape with hexagonal grid overlays
+ * - Navigation to Consciousness Visualizer, Agent Nexus, Fusion Mode
+ * - System status monitoring
+ * - Cyberpunk-styled floating UI windows
  *
- * Renders layered animated backgrounds, a stylized title header, a navigation menu, action buttons, and a system status panel. Menu and button selections trigger navigation to other screens via the provided navigation controller.
- */
-/**
- * Displays the main home screen UI for the AuraFrameFX app with a cyberpunk theme.
- *
- * The screen features animated digital and hexagonal backgrounds, a stylized title header, a navigation menu, action buttons, and a system status panel. User interactions with menu items and buttons trigger navigation to other screens via the provided navigation controller.
- *
- * @param navController The navigation controller used to handle navigation actions from the home screen.
+ * Navigation is handled via callbacks to decouple from NavController,
+ * following Genesis Protocol's navigation architecture.
  */
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(
+    onNavigateToConsciousness: () -> Unit = {},
+    onNavigateToAgents: () -> Unit = {},
+    onNavigateToFusion: () -> Unit = {},
+    onNavigateToEvolution: () -> Unit = {},
+    onNavigateToTerminal: () -> Unit = {}
+) {
     // Track selected menu item
     var selectedMenuItem by remember { mutableStateOf("") }
 
@@ -123,32 +121,52 @@ fun HomeScreen(navController: NavController) {
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         // Menu items like in image reference 1
-                        listOf(
-                            stringResource(R.string.menu_ui_engine),
-                            stringResource(R.string.menu_aurashield),
-                            stringResource(R.string.menu_aurakaiecosys),
-                            stringResource(R.string.menu_conference_room)
-                        ).forEach { menuItem ->
-                            CyberMenuItem(
-                                text = menuItem,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp)
-                                    .digitalPixelEffect(visible = selectedMenuItem == menuItem)
-                                    .clickable {
-                                        selectedMenuItem = menuItem
-                                        if (menuItem == stringResource(R.string.menu_conference_room)) {
-                                            navController.navigate(NavDestination.AiChat.route)
-                                        }
-                                    },
-                                isSelected = selectedMenuItem == menuItem
-                            )
-                        }
+                        // Menu items for Genesis Protocol navigation
+                        MenuItem(
+                            text = "Consciousness Visualizer",
+                            isSelected = selectedMenuItem == "consciousness",
+                            onClick = {
+                                selectedMenuItem = "consciousness"
+                                onNavigateToConsciousness()
+                            }
+                        )
+                        MenuItem(
+                            text = "Agent Nexus",
+                            isSelected = selectedMenuItem == "agents",
+                            onClick = {
+                                selectedMenuItem = "agents"
+                                onNavigateToAgents()
+                            }
+                        )
+                        MenuItem(
+                            text = "Fusion Mode",
+                            isSelected = selectedMenuItem == "fusion",
+                            onClick = {
+                                selectedMenuItem = "fusion"
+                                onNavigateToFusion()
+                            }
+                        )
+                        MenuItem(
+                            text = "Evolution Tree",
+                            isSelected = selectedMenuItem == "evolution",
+                            onClick = {
+                                selectedMenuItem = "evolution"
+                                onNavigateToEvolution()
+                            }
+                        )
+                        MenuItem(
+                            text = "Terminal",
+                            isSelected = selectedMenuItem == "terminal",
+                            onClick = {
+                                selectedMenuItem = "terminal"
+                                onNavigateToTerminal()
+                            }
+                        )
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        // Warning message like in image reference 4
-                        if (selectedMenuItem != stringResource(R.string.menu_conference_room)) {
+                        // Genesis Protocol status message
+                        if (selectedMenuItem.isNotEmpty()) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -156,10 +174,9 @@ fun HomeScreen(navController: NavController) {
                                 contentAlignment = Alignment.Center
                             ) {
                                 CyberpunkText(
-                                    text = stringResource(R.string.xhancement_caution),
-                                    color = CyberpunkTextColor.Warning,
-                                    style = CyberpunkTextStyle.Glitch,
-                                    enableGlitch = true
+                                    text = "Genesis Protocol Online - Neural Pathways Active",
+                                    color = CyberpunkTextColor.Primary,
+                                    style = CyberpunkTextStyle.Body
                                 )
                             }
                         }
@@ -180,8 +197,7 @@ fun HomeScreen(navController: NavController) {
                             .cyberEdgeGlow(
                                 primaryColor = NeonPink,
                                 secondaryColor = NeonBlue
-                            )
-                            .clickable { navController.navigate(NavDestination.Profile.route) },
+                            ),
                         cornerStyle = CornerStyle.Rounded,
                         backgroundStyle = BackgroundStyle.HexGrid
                     ) {
@@ -190,7 +206,7 @@ fun HomeScreen(navController: NavController) {
                             contentAlignment = Alignment.Center
                         ) {
                             CyberpunkText(
-                                text = stringResource(R.string.profile),
+                                text = "Aura",
                                 color = CyberpunkTextColor.Secondary,
                                 style = CyberpunkTextStyle.Label
                             )
@@ -203,8 +219,7 @@ fun HomeScreen(navController: NavController) {
                             .cyberEdgeGlow(
                                 primaryColor = NeonCyan,
                                 secondaryColor = NeonBlue
-                            )
-                            .clickable { navController.navigate(NavDestination.Settings.route) },
+                            ),
                         cornerStyle = CornerStyle.Rounded,
                         backgroundStyle = BackgroundStyle.HexGrid
                     ) {
@@ -213,7 +228,7 @@ fun HomeScreen(navController: NavController) {
                             contentAlignment = Alignment.Center
                         ) {
                             CyberpunkText(
-                                text = stringResource(R.string.config),
+                                text = "Kai",
                                 color = CyberpunkTextColor.Primary,
                                 style = CyberpunkTextStyle.Label
                             )
@@ -226,8 +241,7 @@ fun HomeScreen(navController: NavController) {
                             .cyberEdgeGlow(
                                 primaryColor = NeonGreen,
                                 secondaryColor = NeonBlue
-                            )
-                            .clickable { navController.navigate(NavDestination.OracleDriveControl.route) },
+                            ),
                         cornerStyle = CornerStyle.Rounded,
                         backgroundStyle = BackgroundStyle.HexGrid
                     ) {
@@ -236,7 +250,7 @@ fun HomeScreen(navController: NavController) {
                             contentAlignment = Alignment.Center
                         ) {
                             CyberpunkText(
-                                text = stringResource(R.string.oracledrive),
+                                text = "Genesis",
                                 color = CyberpunkTextColor.Primary,
                                 style = CyberpunkTextStyle.Label
                             )
@@ -301,4 +315,25 @@ fun HomeScreen(navController: NavController) {
             }
         }
     }
+}
+
+/**
+ * Menu item for Genesis Protocol navigation
+ */
+@Composable
+private fun MenuItem(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    CyberMenuItem(
+        text = text,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .digitalPixelEffect(visible = isSelected)
+            .clickable(onClick = onClick),
+        isSelected = isSelected
+    )
 }

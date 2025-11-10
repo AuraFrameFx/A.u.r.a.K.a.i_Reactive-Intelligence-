@@ -58,6 +58,8 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 fun EvolutionTreeScreen(
+    onNavigateToAgents: () -> Unit = {},
+    onNavigateToFusion: () -> Unit = {},
     modifier: Modifier = Modifier,
     onNodeSelected: (EvolutionNode) -> Unit = {}
 ) {
