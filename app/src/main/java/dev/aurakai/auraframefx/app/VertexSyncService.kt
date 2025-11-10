@@ -4,24 +4,35 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import dagger.hilt.android.AndroidEntryPoint
+import dev.aurakai.auraframefx.sync.VertexSyncManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class VertexSyncService : Service() {
 
     private val scope = CoroutineScope(Dispatchers.Default + Job())
 
+    @Inject
+    lateinit var syncManager: VertexSyncManager
+
     override fun onCreate() {
         super.onCreate()
-        Timber.i("VertexSyncService created")
-        // Start background sync initialization if needed
+        Timber.i("VertexSyncService: Service created")
+
+        // Start background sync with injected sync manager
         scope.launch {
-            // TODO: inject real sync manager via Hilt and start syncing
-            Timber.d("VertexSyncService background worker started")
+            try {
+                Timber.d("VertexSyncService: Starting sync manager")
+                syncManager.startSync()
+                Timber.i("VertexSyncService: Sync manager started successfully")
+            } catch (e: Exception) {
+                Timber.e(e, "VertexSyncService: Failed to start sync manager")
+            }
         }
     }
 

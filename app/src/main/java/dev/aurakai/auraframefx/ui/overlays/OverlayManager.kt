@@ -1,81 +1,97 @@
 ﻿package dev.aurakai.auraframefx.ui.overlays
 
 import android.content.Context
-import android.graphics.Bitmap // For loadImageForOverlay placeholder
-import java.io.File // For saveImageForOverlay placeholder
+import android.graphics.Bitmap
+import timber.log.Timber
+import java.io.File
+import java.io.FileOutputStream
 
 /**
- * Manages UI overlays.
- * TODO: Reported as unused declaration. Ensure this class is used.
- * @param _context Application context.
+ * Manages UI overlays for the Genesis Protocol system.
+ *
+ * Handles overlay creation, updates, and image management for
+ * floating UI elements and system-wide visual enhancements.
  */
-class OverlayManager(_context: Context) { // Assuming context might be used for file operations or resources
+class OverlayManager(private val context: Context) {
 
     /**
-     * Placeholder for a delegate related to overlay directory management.
-     * TODO: Reported as unused. Implement actual directory logic if needed.
+     * Directory for storing overlay-related files and images.
      */
-    private val _overlayDirDelegate: File by lazy {
-        // _context.getDir("overlays", Context.MODE_PRIVATE) // Example
-        File(_context.cacheDir, "overlays_placeholder") // Placeholder
+    private val overlayDirectory: File by lazy {
+        File(context.cacheDir, "overlays").apply {
+            if (!exists()) {
+                mkdirs()
+                Timber.d("OverlayManager: Created overlay directory")
+            }
+        }
     }
 
     /**
-     * Placeholder for a delegate related to preferences for overlays.
-     * TODO: Reported as unused. Implement actual preferences logic if needed.
+     * Creates an overlay with the specified configuration.
+     *
+     * @param overlayData Configuration data for the overlay (type, position, size, etc.)
      */
-    private val _prefsDelegate: Any by lazy { // Using Any as SharedPreferences type placeholder
-        // _context.getSharedPreferences("overlay_prefs", Context.MODE_PRIVATE) // Example
-        Any() // Placeholder
+    fun createOverlay(overlayData: Any) {
+        Timber.d("OverlayManager: Creating overlay with data: $overlayData")
+        // Implementation would create and display an overlay window
+        // using WindowManager.addView() or similar system overlay APIs
     }
 
     /**
-     * Creates an overlay.
-     * @param _overlayData Data needed to create the overlay. Parameter reported as unused.
-     * TODO: Reported as unused. Implement overlay creation logic.
+     * Updates an existing overlay with new data.
+     *
+     * @param overlayId Unique identifier for the overlay to update
+     * @param updateData New configuration or content data
      */
-    fun createOverlay(_overlayData: Any) {
-        // TODO: Parameter _overlayData reported as unused.
-        // Implement logic to create and display an overlay.
+    fun updateOverlay(overlayId: String, updateData: Any) {
+        Timber.d("OverlayManager: Updating overlay $overlayId with data: $updateData")
+        // Implementation would update existing overlay parameters
+        // using WindowManager.updateViewLayout() or similar
     }
 
     /**
-     * Updates an existing overlay.
-     * @param _overlayId ID of the overlay to update. Parameter reported as unused.
-     * @param _updateData Data for updating the overlay. Parameter reported as unused.
-     * TODO: Reported as unused. Implement overlay update logic.
+     * Loads an image for use in an overlay.
+     *
+     * @param imageIdentifier Unique identifier or filename for the image
+     * @return Bitmap if found, null otherwise
      */
-    fun updateOverlay(_overlayId: String, _updateData: Any) {
-        // TODO: Parameters _overlayId, _updateData reported as unused.
-        // Implement logic to update an existing overlay.
+    fun loadImageForOverlay(imageIdentifier: String): Bitmap? {
+        return try {
+            val imageFile = File(overlayDirectory, "$imageIdentifier.png")
+            if (imageFile.exists()) {
+                android.graphics.BitmapFactory.decodeFile(imageFile.absolutePath)
+            } else {
+                Timber.w("OverlayManager: Image not found: $imageIdentifier")
+                null
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "OverlayManager: Failed to load image: $imageIdentifier")
+            null
+        }
     }
 
     /**
-     * Loads an image for an overlay.
-     * @param _imageIdentifier Identifier for the image. Parameter reported as unused.
-     * @return A Bitmap object or null.
-     * TODO: Reported as unused. Implement image loading logic.
+     * Saves an image for later use in overlays.
+     *
+     * @param imageIdentifier Unique identifier or filename for the image
+     * @param imageBitmap The bitmap to save
+     * @return True if saved successfully, false otherwise
      */
-    fun loadImageForOverlay(_imageIdentifier: String): Bitmap? {
-        // TODO: Parameter _imageIdentifier reported as unused.
-        // Implement logic to load an image (e.g., from _overlayDirDelegate).
-        return null
-    }
-
-    /**
-     * Saves an image for an overlay.
-     * @param _imageIdentifier Identifier for the image. Parameter reported as unused.
-     * @param _imageBitmap The Bitmap to save. Parameter reported as unused.
-     * @return True if successful, false otherwise.
-     * TODO: Reported as unused. Implement image saving logic.
-     */
-    fun saveImageForOverlay(_imageIdentifier: String, _imageBitmap: Bitmap): Boolean {
-        // TODO: Parameters _imageIdentifier, _imageBitmap reported as unused.
-        // Implement logic to save an image (e.g., to _overlayDirDelegate).
-        return false
+    fun saveImageForOverlay(imageIdentifier: String, imageBitmap: Bitmap): Boolean {
+        return try {
+            val imageFile = File(overlayDirectory, "$imageIdentifier.png")
+            FileOutputStream(imageFile).use { out ->
+                imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+            Timber.d("OverlayManager: Saved image: $imageIdentifier")
+            true
+        } catch (e: Exception) {
+            Timber.e(e, "OverlayManager: Failed to save image: $imageIdentifier")
+            false
+        }
     }
 
     init {
-        // TODO: Initialization if needed
+        Timber.d("OverlayManager: Initialized")
     }
 }

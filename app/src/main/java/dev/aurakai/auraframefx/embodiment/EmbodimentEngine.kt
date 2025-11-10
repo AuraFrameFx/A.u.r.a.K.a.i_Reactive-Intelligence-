@@ -416,10 +416,26 @@ fun rememberEmbodimentEngine(
     }
 }
 
+// Cached idle duration tracker
+private var lastActivityTimestamp: Long = System.currentTimeMillis()
+
+/**
+ * Updates the last user activity timestamp.
+ * Should be called on touch events, key presses, etc.
+ */
+fun recordUserActivity() {
+    lastActivityTimestamp = System.currentTimeMillis()
+}
+
 /**
  * Get user idle duration (helper)
+ *
+ * Tracks user activity based on last recorded interaction.
+ * Call recordUserActivity() from UI event handlers to update.
+ *
+ * @return Duration since last user activity
  */
 fun getUserIdleDuration(): Duration {
-    // TODO: Implement actual user activity tracking
-    return 0.seconds
+    val idleMillis = System.currentTimeMillis() - lastActivityTimestamp
+    return idleMillis.milliseconds
 }

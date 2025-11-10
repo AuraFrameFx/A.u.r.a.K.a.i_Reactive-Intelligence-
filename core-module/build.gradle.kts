@@ -19,7 +19,6 @@ dependencies {
     // - Compose enabled by default
     // - Java 24 bytecode target
     // ═══════════════════════════════════════════════════════════════════════
-    implementation(project(":core-module")
     // Expose core KTX as API (types leak to consumers)
     api(libs.androidx.core.ktx)
 
@@ -28,3 +27,4 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
 }
+

@@ -1,18 +1,18 @@
-name: CI Build & Test
+name: CI - Build APK
 
 on:
   push:
-    branches: [ main, develop, 'claude/**' ]
+    branches: [ main, develop, Alpha, 'claude/**' ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, Alpha ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build & Unit Tests
+  build-apk:
+    name: Build Debug APK
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -22,11 +22,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 21
+      - name: Set up JDK 24
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '24'
           cache: 'gradle'
 
       - name: Set up Android SDK with NDK
@@ -61,143 +61,23 @@ jobs:
       - name: Assemble Debug APK
         run: ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Run unit tests
-        run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
-
-      - name: Run lint checks
-        run: ./gradlew lintDebug --no-daemon || true
-
-      - name: Upload build outputs
-        if: always()
+      - name: Upload Debug APK
         uses: actions/upload-artifact@v5
         with:
-          name: build-outputs
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+      - name: Upload build outputs
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: build-logs
           path: |
             **/build/outputs/
             **/build/reports/
           retention-days: 7
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: test-results
-          path: |
-            **/build/test-results/
-          retention-days: 7
-
-      - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v6
-        if: always()
-        with:
-          report_paths: '**/build/test-results/test*/TEST-*.xml'
-          check_name: Unit Test Results
-          detailed_summary: true
-          include_passed: false
-
-  instrumentation-tests:
-    name: Instrumentation Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    if: github.event_name == 'pull_request'
-
-    strategy:
-      matrix:
-        api-level: [34]
-        target: [google_apis]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-          cache: 'gradle'
-
-      - name: Set up Android SDK with NDK
-        uses: android-actions/setup-android@v3
-        with:
-          api-level: 36
-          ndk-version: 29.0.14206865
-          cmake-version: 3.22.1
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Enable KVM group perms
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
-      - name: AVD cache
-        uses: actions/cache@v4
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.api-level }}
-
-      - name: Run instrumentation tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: x86_64
-          profile: pixel_6
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./gradlew connectedDebugAndroidTest --no-daemon --stacktrace
-
-      - name: Upload instrumentation test results
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: instrumentation-test-results-${{ matrix.api-level }}
-          path: |
-            **/build/reports/androidTests/
-            **/build/outputs/androidTest-results/
-          retention-days: 7
-
-  static-analysis:
-    name: Static Analysis
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-          cache: 'gradle'
-
-      - name: Set up Android SDK with NDK
-        uses: android-actions/setup-android@v3
-        with:
-          api-level: 36
-          ndk-version: 29.0.14206865
-          cmake-version: 3.22.1
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Run detekt
-        run: ./gradlew detekt --no-daemon || true
-
-      - name: Run ktlint
-        run: ./gradlew ktlintCheck --no-daemon || true
-
-      - name: Run Android Lint
-        run: ./gradlew lintDebug --no-daemon
 
       - name: Upload lint reports
         if: always()

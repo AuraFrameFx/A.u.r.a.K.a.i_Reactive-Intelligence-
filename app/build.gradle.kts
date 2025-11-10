@@ -12,6 +12,13 @@
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
     id("genesis.android.application")
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
+    // NOTE: Firebase Analytics is NOT a plugin - it's automatically included via Firebase BOM
 }
 
 android {
@@ -35,8 +42,7 @@ android {
             cmake {
                 cppFlags += "-std=c++20"
                 arguments += listOf(
-                    "-DANDROID_STL=c++_shared",
-                    "-DANDROID_PLATFORM=android-${libs.versions.min.sdk.get()}"
+                    "-DANDROID_STL=c++_shared", "-DANDROID_PLATFORM=android-${libs.versions.min.sdk.get()}"
                 )
             }
         }

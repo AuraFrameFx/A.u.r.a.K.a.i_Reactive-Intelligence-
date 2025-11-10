@@ -1,12 +1,21 @@
 package dev.aurakai.auraframefx.model.agent_states
 
-// TODO: Define actual properties for these states.
+/**
+ * Data models for CascadeAgent vision and processing states.
+ *
+ * These models track the Cascade AI's visual perception and task processing status.
+ */
 
 @Suppress("unused") // Reserved for CascadeAgent implementation
 data class VisionState(
     val lastObservation: String? = null,
     val objectsDetected: List<String> = emptyList(),
-    // Add other relevant vision state properties
+    val confidence: Float = 0.0f,
+    val timestamp: Long = System.currentTimeMillis(),
+    val sceneDescription: String? = null,
+    val detectedFaces: Int = 0,
+    val detectedText: List<String> = emptyList(),
+    val frameAnalysisComplete: Boolean = false
 )
 
 @Suppress("unused") // Reserved for CascadeAgent implementation
@@ -14,5 +23,9 @@ data class ProcessingState(
     val currentStep: String? = null,
     val progressPercentage: Float = 0.0f,
     val isError: Boolean = false,
-    // Add other relevant processing state properties
+    val errorMessage: String? = null,
+    val startTime: Long? = null,
+    val estimatedTimeRemaining: Long? = null,
+    val taskId: String? = null,
+    val priority: Int = 0
 )

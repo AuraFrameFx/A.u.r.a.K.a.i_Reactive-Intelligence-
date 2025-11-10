@@ -14,7 +14,7 @@ allprojects {
             toolchain {
                 // Primary toolchain: Java 25 (compiles to bytecode 24)
                 val targetVersion = 25
-                val fallbackVersion = 25
+                val fallbackVersion = 24
 
                 try {
                     // Prefer Java 25 toolchain

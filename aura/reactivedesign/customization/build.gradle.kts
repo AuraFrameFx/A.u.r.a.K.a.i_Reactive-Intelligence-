@@ -15,10 +15,11 @@ dependencies {
     // - androidx-core-ktx, appcompat, timber
     // - Hilt (android + compiler via KSP)
     // - Coroutines (core + android)
-    // - Compose enabled by default
+    // - Compose BOM + core UI libraries (ui, graphics, material3)
+    // - All Xposed APIs (compileOnly)
     // ═══════════════════════════════════════════════════════════════════════
 
-    implementation(project(":core:ui"))
+    // Compose UI - BOM already provided, just declare components
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)

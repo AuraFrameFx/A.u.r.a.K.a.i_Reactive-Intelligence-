@@ -8,6 +8,18 @@ plugins {
 android {
     namespace = "dev.aurakai.auraframefx.genesis.oracledrive.rootmanagement"
     // Java 24 compileOptions are set by genesis.android.base
+
+    // Disable androidTest to avoid dependency resolution issues with local JARs
+    sourceSets {
+        getByName("androidTest") {
+            java.setSrcDirs(emptyList<String>())
+            kotlin.setSrcDirs(emptyList<String>())
+        }
+    }
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = false
+    }
 }
 
 dependencies {
@@ -59,6 +71,11 @@ dependencies {
 // Force a single annotations artifact to avoid duplicate-class errors
 // Updated to 26.0.2-1 to match project dependencies
 configurations.all {
+    // Skip androidTest configurations to avoid issues with local JARs
+    if (name.contains("AndroidTest")) {
+        return@all
+    }
+
     resolutionStrategy {
         force("org.jetbrains:annotations:26.0.2-1")
     }
