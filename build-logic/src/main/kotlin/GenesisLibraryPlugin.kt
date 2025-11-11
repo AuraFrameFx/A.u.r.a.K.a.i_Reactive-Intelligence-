@@ -37,8 +37,9 @@ class GenesisLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         with(project) {
             // Apply plugins in correct order
-            // Note: kotlin-android plugin removed - AGP 9.0 has built-in Kotlin support
+            // Note: Using EXTERNAL kotlin-android plugin (android.builtInKotlin=false for Hilt compatibility)
             pluginManager.apply("com.android.library")
+            pluginManager.apply("org.jetbrains.kotlin.android")
             pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
             pluginManager.apply("com.google.dagger.hilt.android")
             pluginManager.apply("com.google.devtools.ksp")
