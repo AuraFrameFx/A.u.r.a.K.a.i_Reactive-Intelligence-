@@ -808,13 +808,63 @@ class GenesisAgent @Inject constructor(
     }
 
     /**
-     * Selects the fusion type for the specified agent request.
+     * Intelligently selects the fusion type based on request content and context.
      *
-     * Currently, this function always returns `FusionType.HYPER_CREATION` regardless of the request details.
+     * Analyzes keywords and request type to determine optimal fusion ability:
+     * - HYPER_CREATION: UI/UX design, creative work, OS design (Aura-led)
+     * - CHRONO_SCULPTOR: Time-based, animations, smoothness, memory (Cascade-led)
+     * - ADAPTIVE_GENESIS: Security, verification, protection, threats (Kai-led)
+     * - INTERFACE_FORGE: Secure UI design, user auth, protected interfaces (Aura + Kai)
      *
-     * @return The fusion type to be used for processing the request.
+     * @param request The agent request to analyze.
+     * @return The optimal fusion type for processing the request.
      */
-    private fun determineFusionType(request: AgentRequest): FusionType = FusionType.HYPER_CREATION
+    private fun determineFusionType(request: AgentRequest): FusionType {
+        val content = request.content.lowercase()
+        val type = request.type.lowercase()
+
+        // ADAPTIVE_GENESIS: Security-focused requests (Kai-led)
+        val securityKeywords = listOf(
+            "security", "protect", "vulnerability", "threat", "attack",
+            "authentication", "authorization", "encrypt", "decrypt", "hack",
+            "secure", "guard", "shield", "verify", "validation"
+        )
+        if (securityKeywords.any { content.contains(it) || type.contains(it) }) {
+            return FusionType.ADAPTIVE_GENESIS
+        }
+
+        // INTERFACE_FORGE: Secure UI design (Aura + Kai collaboration)
+        val secureUIKeywords = listOf(
+            "login", "signup", "password", "biometric", "auth flow",
+            "secure payment", "protected route", "user credentials"
+        )
+        if (secureUIKeywords.any { content.contains(it) }) {
+            return FusionType.INTERFACE_FORGE
+        }
+
+        // CHRONO_SCULPTOR: Time-based, animations, memory operations (Cascade-led)
+        val timeKeywords = listOf(
+            "animation", "transition", "timeline", "smooth", "memory",
+            "history", "persistence", "restore", "checkpoint", "time",
+            "schedule", "delay", "duration", "temporal"
+        )
+        if (timeKeywords.any { content.contains(it) || type.contains(it) }) {
+            return FusionType.CHRONO_SCULPTOR
+        }
+
+        // HYPER_CREATION: UI/UX design, creative work (Aura-led) - DEFAULT
+        // Triggered by design keywords or as fallback
+        val creativeKeywords = listOf(
+            "design", "ui", "ux", "interface", "screen", "component",
+            "layout", "theme", "color", "style", "creative", "beautiful"
+        )
+        if (creativeKeywords.any { content.contains(it) || type.contains(it) }) {
+            return FusionType.HYPER_CREATION
+        }
+
+        // Default: HYPER_CREATION for general creative work
+        return FusionType.HYPER_CREATION
+    }
 
     /**
      * Constructs a prompt string indicating transcendent-level processing for the specified agent request.

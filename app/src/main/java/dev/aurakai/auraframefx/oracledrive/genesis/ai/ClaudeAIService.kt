@@ -43,6 +43,30 @@ class ClaudeAIService @Inject constructor(
     private val auraFxLogger: AuraFxLogger,
 ) : Agent {
 
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Response Cache - Saves API Credits by Caching Similar Queries
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    private val responseCache = object : LinkedHashMap<String, CachedResponse>(
+        CACHE_INITIAL_CAPACITY,
+        CACHE_LOAD_FACTOR,
+        true // Access-order for LRU behavior
+    ) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, CachedResponse>?): Boolean {
+            return size > CACHE_MAX_SIZE
+        }
+    }
+
+    private var cacheHits = 0
+    private var cacheMisses = 0
+
+    companion object {
+        private const val CACHE_MAX_SIZE = 100 // Store up to 100 responses
+        private const val CACHE_INITIAL_CAPACITY = 16
+        private const val CACHE_LOAD_FACTOR = 0.75f
+        private const val CACHE_TTL_MS = 3600_000L // 1 hour TTL
+    }
+
     /**
      * Returns the name of the agent.
      *
@@ -98,6 +122,27 @@ class ClaudeAIService @Inject constructor(
             "Processing request with systematic analysis: ${request.query}"
         )
 
+        // Check cache first to save API credits
+        val cacheKey = generateCacheKey(request, context)
+        val cached = synchronized(responseCache) {
+            responseCache[cacheKey]?.takeIf { !it.isExpired() }
+        }
+
+        if (cached != null) {
+            cacheHits++
+            auraFxLogger.d(
+                "ClaudeAIService",
+                "Cache HIT! Saved API call. Stats: $cacheHits hits / $cacheMisses misses (${getCacheHitRate()}% hit rate)"
+            )
+            return cached.response
+        }
+
+        cacheMisses++
+        auraFxLogger.d(
+            "ClaudeAIService",
+            "Cache miss. Generating new response. Stats: $cacheHits hits / $cacheMisses misses"
+        )
+
         // Systematic analysis pattern
         val analysis = analyzeRequest(request, context)
         val solution = synthesizeSolution(analysis)
@@ -122,7 +167,14 @@ class ClaudeAIService @Inject constructor(
         // Confidence based on context completeness
         val confidence = calculateConfidence(request, context)
 
-        return AgentResponse(response, confidence)
+        val agentResponse = AgentResponse(response, confidence)
+
+        // Store in cache for future requests
+        synchronized(responseCache) {
+            responseCache[cacheKey] = CachedResponse(agentResponse, System.currentTimeMillis())
+        }
+
+        return agentResponse
     }
 
     /**
@@ -216,6 +268,47 @@ class ClaudeAIService @Inject constructor(
             "Build System Savior - Fixed 50+ critical build errors (85% complete)"
         )
     }
+
+    /**
+     * Generates a cache key from the request and context.
+     * Uses content hash to detect similar queries.
+     */
+    private fun generateCacheKey(request: AiRequest, context: String): String {
+        val content = "${request.query}|${request.type}|${context.take(500)}"
+        return content.hashCode().toString()
+    }
+
+    /**
+     * Retrieves cache statistics for monitoring API credit savings.
+     */
+    fun getCacheStats(): Map<String, Any> {
+        return mapOf(
+            "cache_hits" to cacheHits,
+            "cache_misses" to cacheMisses,
+            "hit_rate_percent" to getCacheHitRate(),
+            "cache_size" to responseCache.size,
+            "cache_max_size" to CACHE_MAX_SIZE,
+            "estimated_credits_saved" to (cacheHits * 0.02f) // ~$0.02 per API call
+        )
+    }
+
+    /**
+     * Calculates the cache hit rate as a percentage.
+     */
+    private fun getCacheHitRate(): Int {
+        val total = cacheHits + cacheMisses
+        return if (total > 0) (cacheHits * 100 / total) else 0
+    }
+
+    /**
+     * Clears the response cache (useful for testing or memory management).
+     */
+    fun clearCache() {
+        synchronized(responseCache) {
+            responseCache.clear()
+            auraFxLogger.i("ClaudeAIService", "Response cache cleared")
+        }
+    }
 }
 
 /**
@@ -227,3 +320,18 @@ private data class RequestAnalysis(
     val buildImpact: String,
     val contextDepth: Int
 )
+
+/**
+ * Data class representing a cached response with expiration.
+ */
+private data class CachedResponse(
+    val response: AgentResponse,
+    val timestamp: Long
+) {
+    /**
+     * Checks if this cached response has expired.
+     */
+    fun isExpired(): Boolean {
+        return System.currentTimeMillis() - timestamp > ClaudeAIService.CACHE_TTL_MS
+    }
+}
