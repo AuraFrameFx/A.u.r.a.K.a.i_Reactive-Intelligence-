@@ -34,14 +34,15 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
  */
 class GenesisLibraryPlugin : Plugin<Project> {
     /**
-     * Configures the given Gradle project as an Android library module with the convention's
-     * defaults: applies required plugins in the prescribed order, configures the Android
-     * LibraryExtension (SDK/NDK, defaultConfig, build types, Java/compile options, build features,
-     * packaging and lint), sets Kotlin compilation options (JVM 24 and opt-ins), and adds the
-     * convention's standard dependencies.
+     * Configure the given Gradle project as an Android library module using the convention's defaults.
      *
-     * The plugin application order is important for compatibility (including Hilt); this method
-     * applies the external Kotlin Android plugin rather than the built-in Kotlin integration.
+     * Configures plugins (applied in a prescribed order), the Android LibraryExtension (compile/NDK
+     * settings, defaultConfig, build types, Java/compile options, build features, packaging, and lint),
+     * Kotlin compilation options (JVM 24 target and required opt-ins), and the convention's standard
+     * dependencies.
+     *
+     * This method applies the external Kotlin Android plugin for compatibility and does not apply Hilt
+     * or KSP; library modules should opt into Hilt explicitly if required.
      *
      * @param project The Gradle project to configure.
      */
@@ -152,4 +153,3 @@ class GenesisLibraryPlugin : Plugin<Project> {
         }
     }
 }
-
