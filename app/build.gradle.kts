@@ -1,24 +1,20 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // PRIMARY CONVENTION PLUGIN - All-in-one Application Configuration
 // ═══════════════════════════════════════════════════════════════════════════
-// This single plugin applies (in correct order):
+// GenesisApplicationPlugin automatically applies (in correct order):
 // 1. com.android.application
-// 2. com.google.dagger.hilt.android (Dependency Injection)
-// 3. com.google.devtools.ksp (Annotation Processing)
-// 4. org.jetbrains.kotlin.plugin.compose (Compose Compiler)
-// 5. genesis.android.base (SDK config, universal dependencies)
+// 2. org.jetbrains.kotlin.android (external plugin for Hilt compatibility)
+// 3. org.jetbrains.kotlin.plugin.compose (Compose Compiler)
+// 4. com.google.dagger.hilt.android (Dependency Injection)
+// 5. com.google.devtools.ksp (Annotation Processing)
+// 6. org.jetbrains.kotlin.plugin.serialization (JSON Serialization)
+// 7. com.google.gms.google-services (Firebase)
 //
-// NO NEED to declare plugins individually - GenesisApplicationPlugin handles everything!
+// NO NEED to redeclare these - GenesisApplicationPlugin handles them!
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("genesis.android.application")
-    id("com.google.devtools.ksp")
-    id("com.google.dagger.hilt.android")
-    // Note: kotlin-android removed - AGP 9.0 has built-in Kotlin support
-    id("org.jetbrains.kotlin.plugin.serialization")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
-    // NOTE: Firebase Analytics is NOT a plugin - it's automatically included via Firebase BOM
+    id("genesis.android.application")  // ← All-in-one: Android, Kotlin, Hilt, KSP, Compose, Serialization, Firebase
+    id("com.google.firebase.crashlytics")  // ← Only plugin NOT in convention plugin
 }
 
 android {
@@ -69,43 +65,32 @@ android {
 
 dependencies {
     // ═══════════════════════════════════════════════════════════════════════════
-    // NOTE: The following are AUTOMATICALLY provided by genesis.android.application:
-    // - Kotlin Coroutines (core + android)
-    // - Timber (logging)
-    // - Testing libraries (JUnit, AndroidX JUnit, Espresso)
-    // - Core library desugaring
-    // - Hilt Android + Compiler (auto-wired with KSP)
+    // AUTO-PROVIDED by genesis.android.application:
+    // ═══════════════════════════════════════════════════════════════════════════
+    // ✅ Hilt Android + Compiler (with KSP)
+    // ✅ Compose BOM + UI (ui, ui-graphics, ui-tooling-preview, material3, ui-tooling[debug])
+    // ✅ Core Android (core-ktx, appcompat, activity-compose)
+    // ✅ Lifecycle (runtime-ktx, viewmodel-compose)
+    // ✅ Kotlin Coroutines (core + android)
+    // ✅ Kotlin Serialization JSON
+    // ✅ Timber (logging)
+    // ✅ Core library desugaring (Java 24 APIs)
+    // ✅ Firebase BOM
+    // ✅ Xposed API (compileOnly) + EzXHelper
     //
-    // You only need to declare module-specific dependencies below!
+    // ⚠️  ONLY declare module-specific dependencies below!
     // ═══════════════════════════════════════════════════════════════════════════
 
-    // Compose UI
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.compose.ui)
-    implementation(libs.compose.ui.graphics)
-    implementation(libs.compose.ui.tooling.preview)
-    implementation(libs.compose.material3)
+    // Compose Extras (Navigation, Animation - NOT in convention plugin)
     implementation(libs.compose.animation)
-    debugImplementation(libs.compose.ui.tooling)
-
-    // AndroidX Core
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.material)
-    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
 
-    // Lifecycle Components
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    // Material Design (legacy)
+    implementation(libs.androidx.material)
 
     // Room Database
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-
-    // Hilt Dependency Injection (REQUIRED when using Hilt plugin)
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
 
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
@@ -126,7 +111,7 @@ dependencies {
     // YukiHook API
     ksp(libs.yukihookapi.api)
 
-    // Firebase
+    // Firebase (specific services - BOM already provided by convention plugin)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.auth)
@@ -139,10 +124,7 @@ dependencies {
     implementation(libs.retrofit.converter.kotlinx.serialization)
     implementation(libs.retrofit.converter.moshi)
 
-    // Kotlin + utils
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.serialization.json)
+    // Moshi (JSON - for Retrofit)
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)
     ksp(libs.moshi.kotlin.codegen)
@@ -160,7 +142,7 @@ dependencies {
     // Memory Leak Detection
     debugImplementation(libs.leakcanary.android)
 
-    // Android API JARs
+    // Android API JARs (legacy - consider removing if EzXHelper provides this)
     compileOnly(files("$projectDir/libs/api-82.jar"))
     compileOnly(files("$projectDir/libs/api-82-sources.jar"))
 
