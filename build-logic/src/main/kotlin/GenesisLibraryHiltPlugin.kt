@@ -9,50 +9,43 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 /**
  * ===================================================================
- * GENESIS LIBRARY CONVENTION PLUGIN
+ * GENESIS LIBRARY CONVENTION PLUGIN WITH HILT
  * ===================================================================
  *
- * Convention plugin for Android library modules.
+ * Convention plugin for Android library modules that REQUIRE Hilt dependency injection.
  *
- * This plugin configures:
- * - Android library plugin and extensions
- * - Kotlin Android support with Compose compiler
- * - Jetpack Compose (built-in compiler with Kotlin 2.0+)
- * - Java 24 bytecode target (Firebase compatible)
- * - Consistent build configuration across library modules
+ * This plugin configures everything from GenesisLibraryPlugin PLUS:
+ * - Hilt dependency injection
+ * - KSP annotation processing for Hilt
  *
  * Plugin Application Order (Critical!):
  * 1. com.android.library
  * 2. org.jetbrains.kotlin.android
- * 3. org.jetbrains.kotlin.plugin.compose (Built-in Compose compiler)
- * 4. org.jetbrains.kotlin.plugin.serialization
+ * 3. org.jetbrains.kotlin.plugin.compose
+ * 4. com.google.dagger.hilt.android (HILT - only in this variant)
+ * 5. com.google.devtools.ksp (KSP - only in this variant)
+ * 6. org.jetbrains.kotlin.plugin.serialization
  *
- * Note: Hilt and KSP are NOT applied in library modules per AGP 9.0 workaround.
- * Individual library modules that need Hilt should apply it explicitly
+ * Usage:
+ * plugins {
+ *     id("genesis.android.library.hilt")  // Use this variant for modules needing Hilt
+ * }
  *
  * @since Genesis Protocol 2.0 (AGP 9.0.0-alpha14 Compatible)
  */
-class GenesisLibraryPlugin : Plugin<Project> {
+class GenesisLibraryHiltPlugin : Plugin<Project> {
     /**
-     * Configures the given Gradle project as an Android library module with the convention's
-     * defaults: applies required plugins in the prescribed order, configures the Android
-     * LibraryExtension (SDK/NDK, defaultConfig, build types, Java/compile options, build features,
-     * packaging and lint), sets Kotlin compilation options (JVM 24 and opt-ins), and adds the
-     * convention's standard dependencies.
-     *
-     * The plugin application order is important for compatibility (including Hilt); this method
-     * applies the external Kotlin Android plugin rather than the built-in Kotlin integration.
-     *
-     * @param project The Gradle project to configure.
+     * Configures the given Gradle project as an Android library module with Hilt support.
      */
     override fun apply(project: Project) {
         with(project) {
             // Apply plugins in correct order
             // Note: Using EXTERNAL kotlin-android plugin (android.builtInKotlin=false for Hilt compatibility)
-            // Note: Hilt NOT applied here - library modules apply it explicitly if needed per AGP 9.0 workaround
             pluginManager.apply("com.android.library")
             pluginManager.apply("org.jetbrains.kotlin.android")
             pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
+            pluginManager.apply("com.google.dagger.hilt.android")  // ← HILT PLUGIN
+            pluginManager.apply("com.google.devtools.ksp")         // ← KSP FOR HILT
             pluginManager.apply("org.jetbrains.kotlin.plugin.serialization")
 
             extensions.configure<LibraryExtension> {
@@ -85,8 +78,6 @@ class GenesisLibraryPlugin : Plugin<Project> {
                     isCoreLibraryDesugaringEnabled = true
                 }
 
-                // Note: kotlinOptions removed - using modern compilerOptions in tasks below
-
                 buildFeatures {
                     compose = true
                     buildConfig = true
@@ -110,7 +101,7 @@ class GenesisLibraryPlugin : Plugin<Project> {
                 }
             }
 
-            // Configure Kotlin compilation with JVM 24 target (Kotlin 2.2.x/2.3.x maximum)
+            // Configure Kotlin compilation with JVM 24 target
             tasks.withType<KotlinJvmCompile>().configureEach {
                 compilerOptions {
                     jvmTarget.set(JvmTarget.JVM_24)
@@ -125,7 +116,10 @@ class GenesisLibraryPlugin : Plugin<Project> {
             // ═══════════════════════════════════════════════════════════════════════════
             // Auto-configured dependencies (provided by convention plugin)
             // ═══════════════════════════════════════════════════════════════════════════
-            // Note: Hilt dependencies REMOVED - use genesis.android.library.hilt for Hilt support
+
+            // ✅ Hilt Dependency Injection (ONLY in Hilt variant)
+            dependencies.add("implementation", "com.google.dagger:hilt-android:2.57.2")
+            dependencies.add("ksp", "com.google.dagger:hilt-android-compiler:2.57.2")
 
             // Core Android libraries
             dependencies.add("implementation", "androidx.core:core-ktx:1.17.0")
@@ -146,10 +140,7 @@ class GenesisLibraryPlugin : Plugin<Project> {
 
             // Universal Xposed/LSPosed API access for all library modules
             dependencies.add("compileOnly", "de.robv.android.xposed:api:82")
-            // Note: io.github.libxposed is not yet published to Maven Central
-            // Use de.robv.android.xposed:api:82 for Xposed module development
             dependencies.add("implementation", "com.github.kyuubiran:EzXHelper:2.2.0")
         }
     }
 }
-

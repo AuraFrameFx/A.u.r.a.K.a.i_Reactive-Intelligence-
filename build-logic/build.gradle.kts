@@ -25,6 +25,10 @@ gradlePlugin {
             id = "genesis.android.library"
             implementationClass = "GenesisLibraryPlugin"
         }
+        register("genesisLibraryHilt") {
+            id = "genesis.android.library.hilt"
+            implementationClass = "GenesisLibraryHiltPlugin"
+        }
     }
 }
 
@@ -60,9 +64,14 @@ dependencies {
 //       id("genesis.android.application")  // All-in-one: Android, Hilt, KSP, Compose, Serialization, Firebase
 //   }
 //
-// For standard library module:
+// For standard library module WITHOUT Hilt:
 //   plugins {
-//       id("genesis.android.library")  // All-in-one: Android, Hilt, Compose, KSP
+//       id("genesis.android.library")  // Base library: Android, Compose, Serialization (NO Hilt)
+//   }
+//
+// For library module WITH Hilt:
+//   plugins {
+//       id("genesis.android.library.hilt")  // Library with Hilt DI + KSP
 //   }
 //
 // For YukiHook/Xposed module:
