@@ -99,7 +99,7 @@ class GenesisApplicationPlugin : Plugin<Project> {
                     isCoreLibraryDesugaringEnabled = true
                 }
 
-                // Note: kotlinOptions removed - using modern compilerOptions in tasks below
+
 
                 buildFeatures {
                     compose = true

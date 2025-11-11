@@ -8,7 +8,7 @@ agp = "9.0.0-alpha14"
 # Gradle - Latest: 9.2.0
 gradle = "9.2.0"
 gradleCore = "9.2.0"
-
+generativeai = "1.0.0"
 # Foojay Toolchain Resolver - Required for Gradle 8.0+
 foojayResolver = "1.0.0"
 
@@ -105,7 +105,6 @@ firebaseBom = "34.5.0"
 # Google AI & ML
 # ============================================================================
 # Google AI Client SDK (Gemini API) - Latest: 0.9.0
-generativeai = "0.9.0"
 
 # ============================================================================
 # Networking Libraries
