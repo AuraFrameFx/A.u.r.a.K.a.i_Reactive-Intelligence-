@@ -350,8 +350,8 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 android-test = { id = "com.android.test", version.ref = "agp" }
 
 # Kotlin Plugins
-# Note: kotlin-android removed - AGP 9.0 has built-in Kotlin support
-# kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+# Note: Using EXTERNAL kotlin-android plugin (android.builtInKotlin=false for Hilt compatibility)
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }

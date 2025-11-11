@@ -13,7 +13,8 @@ pluginManagement {
     plugins {
         id("com.android.application") version "9.0.0-alpha13" apply false
         id("com.android.library") version "9.0.0-alpha13" apply false
-        // Note: kotlin-android removed - AGP 9.0 has built-in Kotlin support
+        // Note: Using EXTERNAL kotlin-android plugin (android.builtInKotlin=false for Hilt compatibility)
+        id("org.jetbrains.kotlin.android") version "2.3.0-Beta2" apply false
         id("org.jetbrains.kotlin.plugin.compose") version "2.3.0-Beta2" apply false
         id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0-Beta2" apply false
         id("org.jetbrains.kotlin.plugin.parcelize") version "2.3.0-Beta2" apply false
