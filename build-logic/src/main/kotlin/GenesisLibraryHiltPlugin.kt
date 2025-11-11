@@ -71,7 +71,7 @@ class GenesisLibraryHiltPlugin : Plugin<Project> {
                     }
                 }
 
-                // Java 24 bytecode (Firebase + AGP 9.0 compatible)
+                // Java 21 bytecode (Compatible with current JVM)
                 compileOptions {
                     sourceCompatibility = JavaVersion.VERSION_24
                     targetCompatibility = JavaVersion.VERSION_24

@@ -13,13 +13,21 @@
 // NO NEED to redeclare these - GenesisApplicationPlugin handles them!
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("genesis.android.application")  // ← All-in-one: Android, Kotlin, Hilt, KSP, Compose, Serialization, Firebase
-    id("com.google.firebase.crashlytics")  // ← Only plugin NOT in convention plugin
+    id("com.android.application")
+    id("com.google.dagger.hilt.android")
+    id("com.google.devtools.ksp")
+
+    // Note: kotlin-android removed - AGP 9.0 has built-in Kotlin support
+    id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
+    // NOTE: Firebase Analytics is NOT a plugin - it's automatically included via Firebase BOM
 }
 
 android {
     namespace = "dev.aurakai.auraframefx"
     ndkVersion = libs.versions.ndk.get()
+        compileSdk = libs.versions.compile.sdk.get().toInt()
 
     defaultConfig {
         applicationId = "dev.aurakai.auraframefx"
@@ -84,7 +92,13 @@ dependencies {
     // Compose Extras (Navigation, Animation - NOT in convention plugin)
     implementation(libs.compose.animation)
     implementation(libs.androidx.navigation.compose)
+// ═══════════════════════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Hilt Dependency Injection (MUST be added before afterEvaluate)
+    dependencies.add("implementation", "com.google.dagger:hilt-android:2.57.2")
+    dependencies.add("ksp", "com.google.dagger:hilt-android-compiler:2.57.2")
     // Material Design (legacy)
     implementation(libs.androidx.material)
 
@@ -99,7 +113,6 @@ dependencies {
     // DataStore
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore.core)
-
     // Security
     implementation(libs.androidx.security.crypto)
 

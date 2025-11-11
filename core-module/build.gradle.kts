@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "dev.aurakai.auraframefx.coremodule"
+    namespace = "dev.aurakai.auraframefx.core.module"
     // Java 24 compileOptions are set by genesis.android.base
 }
 
