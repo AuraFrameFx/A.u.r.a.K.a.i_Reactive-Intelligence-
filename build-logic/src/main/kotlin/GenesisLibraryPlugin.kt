@@ -17,8 +17,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
  * This plugin configures:
  * - Android library plugin and extensions
  * - Kotlin Android support with Compose compiler
- * - Hilt dependency injection
- * - KSP annotation processing
  * - Jetpack Compose (built-in compiler with Kotlin 2.0+)
  * - Java 24 bytecode target (Firebase compatible)
  * - Consistent build configuration across library modules
@@ -27,9 +25,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
  * 1. com.android.library
  * 2. org.jetbrains.kotlin.android
  * 3. org.jetbrains.kotlin.plugin.compose (Built-in Compose compiler)
- * 4. com.google.dagger.hilt.android
- * 5. com.google.devtools.ksp
- * 6. org.jetbrains.kotlin.plugin.serialization
+ * 4. org.jetbrains.kotlin.plugin.serialization
+ *
+ * Note: Hilt and KSP are NOT applied in library modules per AGP 9.0 workaround.
+ * Individual library modules that need Hilt should apply it explicitly
  *
  * @since Genesis Protocol 2.0 (AGP 9.0.0-alpha14 Compatible)
  */
@@ -44,17 +43,16 @@ class GenesisLibraryPlugin : Plugin<Project> {
      * The plugin application order is important for compatibility (including Hilt); this method
      * applies the external Kotlin Android plugin rather than the built-in Kotlin integration.
      *
-     * @param project The Gradle project to configure. 
+     * @param project The Gradle project to configure.
      */
     override fun apply(project: Project) {
         with(project) {
             // Apply plugins in correct order
             // Note: Using EXTERNAL kotlin-android plugin (android.builtInKotlin=false for Hilt compatibility)
+            // Note: Hilt NOT applied here - library modules apply it explicitly if needed per AGP 9.0 workaround
             pluginManager.apply("com.android.library")
             pluginManager.apply("org.jetbrains.kotlin.android")
             pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
-            pluginManager.apply("com.google.dagger.hilt.android")
-            pluginManager.apply("com.google.devtools.ksp")
             pluginManager.apply("org.jetbrains.kotlin.plugin.serialization")
 
             extensions.configure<LibraryExtension> {
