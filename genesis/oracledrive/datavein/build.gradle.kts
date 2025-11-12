@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
     id("genesis.android.library")
+    id("com.google.devtools.ksp")  // Required for YukiHook annotation processing
 }
 
 android {

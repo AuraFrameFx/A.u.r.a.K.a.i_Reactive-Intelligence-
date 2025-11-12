@@ -2,7 +2,7 @@
 // Oracle Drive - DataVein Oracle Native
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("genesis.android.library")
+    id("genesis.android.library.hilt")  // Uses Hilt DI (includes KSP)
 }
 
 android {
