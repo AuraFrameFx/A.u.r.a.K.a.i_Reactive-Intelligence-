@@ -42,10 +42,16 @@ dependencies {
     implementation("org.jetbrains.kotlin:compose-compiler-gradle-plugin:2.3.0-Beta2")
     implementation("org.jetbrains.kotlin:kotlin-serialization:2.3.0-Beta2")
 
-    // Hilt Gradle Plugin - exclude Android runtime (AAR) dependencies
+    // Hilt Gradle Plugin - exclude ALL Android runtime (AAR) dependencies
     // build-logic is JVM-only and cannot consume Android AAR files
+    // Must exclude all AndroidX transitive dependencies pulled by hilt-android-gradle-plugin
     implementation("com.google.dagger:hilt-android-gradle-plugin:2.57.2") {
         exclude(group = "com.google.dagger", module = "hilt-android")
+        exclude(group = "androidx.activity")
+        exclude(group = "androidx.fragment")
+        exclude(group = "androidx.lifecycle")
+        exclude(group = "androidx.savedstate")
+        exclude(group = "androidx.annotation")
     }
 
     implementation("com.google.devtools.ksp:symbol-processing-gradle-plugin:2.3.2")
