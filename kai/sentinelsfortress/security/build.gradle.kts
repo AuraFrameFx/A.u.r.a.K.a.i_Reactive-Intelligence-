@@ -2,7 +2,7 @@
 // Secure Communication Module - Encrypted communication layer
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("genesis.android.library")
+    id("genesis.android.library.hilt")  // Uses Hilt DI + YukiHook KSP
 }
 
 android {
@@ -12,9 +12,9 @@ android {
 
 dependencies {
     // ═══════════════════════════════════════════════════════════════════════
-    // AUTO-PROVIDED by genesis.android.library:
+    // AUTO-PROVIDED by genesis.android.library.hilt:
     // - androidx-core-ktx, appcompat, timber
-    // - Hilt (android + compiler via KSP)
+    // - Hilt (android + compiler via KSP)  ✅ Provided by .hilt variant
     // - Coroutines (core + android)
     // - Compose enabled by default
     // - Java 24 bytecode target

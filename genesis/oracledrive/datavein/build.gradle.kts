@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
     id("genesis.android.library")
+    alias(libs.plugins.ksp)  // Required for YukiHook code generation
 }
 
 android {
@@ -13,9 +14,9 @@ dependencies {
     // ═══════════════════════════════════════════════════════════════════════
     // AUTO-PROVIDED by genesis.android.library:
     // - androidx-core-ktx, appcompat, timber
-    // - Hilt (android + compiler via KSP)
     // - Coroutines (core + android)
     // - Compose enabled by default
+    // Note: Hilt NOT included - use genesis.android.library.hilt if needed
     // ═══════════════════════════════════════════════════════════════════════
 
     // Expose core KTX as API
