@@ -33,17 +33,17 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
  */
 class GenesisLibraryPlugin : Plugin<Project> {
     /**
-     * Configure the given Gradle project as an Android library module using the convention's defaults.
+     * Configures the given Gradle project as an Android library module using the convention's defaults.
      *
-     * Configures plugins (applied in a prescribed order), the Android LibraryExtension (compile/NDK
-     * settings, defaultConfig, build types, Java/compile options, build features, packaging, and lint),
-     * Kotlin compilation options (JVM 24 target and required opt-ins), and the convention's standard
-     * dependencies.
+     * Applies the Android library, Compose, and Kotlin serialization plugins, configures the
+     * Android LibraryExtension (compile/NDK settings, defaultConfig, build types, Java/compile options,
+     * build features, packaging, and lint), sets Kotlin JVM compilation options, and adds the
+     * convention's standard dependencies.
      *
-     * This method configures the Android library extension and does not apply Hilt
-     * or KSP; library modules should opt into Hilt explicitly if required.
+     * This function does not apply Hilt or KSP; library modules should opt into DI tooling explicitly
+     * (for example via the dedicated genesis.android.library.hilt convention).
      *
-     * @param project The Gradle project to configure.
+     * @param project The Gradle project to configure as an Android library module.
      */
     override fun apply(project: Project) {
         with(project) {

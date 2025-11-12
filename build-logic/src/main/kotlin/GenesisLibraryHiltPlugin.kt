@@ -34,7 +34,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
  */
 class GenesisLibraryHiltPlugin : Plugin<Project> {
     /**
-     * Configures the given Gradle project as an Android library module with Hilt support.
+     * Configure the Gradle project as an Android library module with Hilt, KSP, Compose, and Kotlin serialization support.
+     *
+     * Sets up required plugins, configures the Android Library extension (SDK levels, NDK, build types, compile options, build features,
+     * packaging exclusions, and lint), adjusts Kotlin JVM target and compiler opt-ins, and adds convention-managed dependencies including Hilt and its KSP compiler.
+     *
+     * @param project The Gradle project to configure.
      */
     override fun apply(project: Project) {
         with(project) {
