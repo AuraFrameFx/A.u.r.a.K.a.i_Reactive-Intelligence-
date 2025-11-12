@@ -3,6 +3,7 @@ plugins {
 }
 
 // Configure Kotlin compilation to match Java toolchain
+// MUST match the target used in GenesisApplicationPlugin and GenesisLibraryHiltPlugin (JVM 24)
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_24)
@@ -41,7 +42,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:compose-compiler-gradle-plugin:2.3.0-Beta2")
     implementation("org.jetbrains.kotlin:kotlin-serialization:2.3.0-Beta2")
 
-    // Exclude hilt-android transitive dependency - build-logic only needs the Gradle plugin, not Android runtime
+    // Hilt Gradle Plugin - exclude Android runtime (AAR) dependencies
+    // build-logic is JVM-only and cannot consume Android AAR files
     implementation("com.google.dagger:hilt-android-gradle-plugin:2.57.2") {
         exclude(group = "com.google.dagger", module = "hilt-android")
     }
