@@ -22,13 +22,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
  * - Consistent build configuration across library modules
  *
  * Plugin Application Order (Critical!):
- * 1. com.android.library
- * 2. org.jetbrains.kotlin.android
- * 3. org.jetbrains.kotlin.plugin.compose (Built-in Compose compiler)
- * 4. org.jetbrains.kotlin.plugin.serialization
+ * 1. com.android.library (provides built-in Kotlin since AGP 9.0)
+ * 2. org.jetbrains.kotlin.plugin.compose (Built-in Compose compiler)
+ * 3. org.jetbrains.kotlin.plugin.serialization
  *
- * Note: Hilt and KSP are NOT applied in library modules per AGP 9.0 workaround.
- * Individual library modules that need Hilt should apply it explicitly
+ * Note: Kotlin is built into AGP 9.0.0-alpha14+ (android.builtInKotlin=true)
+ * Note: Hilt and KSP are NOT applied - use genesis.android.library.hilt for DI
  *
  * @since Genesis Protocol 2.0 (AGP 9.0.0-alpha14 Compatible)
  */
@@ -41,7 +40,7 @@ class GenesisLibraryPlugin : Plugin<Project> {
      * Kotlin compilation options (JVM 24 target and required opt-ins), and the convention's standard
      * dependencies.
      *
-     * This method applies the external Kotlin Android plugin for compatibility and does not apply Hilt
+     * This method configures the Android library extension and does not apply Hilt
      * or KSP; library modules should opt into Hilt explicitly if required.
      *
      * @param project The Gradle project to configure.
@@ -49,10 +48,9 @@ class GenesisLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         with(project) {
             // Apply plugins in correct order
-            // Note: Using EXTERNAL kotlin-android plugin (android.builtInKotlin=false for Hilt compatibility)
-            // Note: Hilt NOT applied here - library modules apply it explicitly if needed per AGP 9.0 workaround
+            // Note: Kotlin is built into AGP 9.0.0-alpha14+ (android.builtInKotlin=true)
+            // Note: Hilt NOT applied - use genesis.android.library.hilt for DI
             pluginManager.apply("com.android.library")
-            pluginManager.apply("org.jetbrains.kotlin.android")
             pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
             pluginManager.apply("org.jetbrains.kotlin.plugin.serialization")
 

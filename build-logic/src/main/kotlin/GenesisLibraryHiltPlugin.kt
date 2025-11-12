@@ -19,12 +19,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
  * - KSP annotation processing for Hilt
  *
  * Plugin Application Order (Critical!):
- * 1. com.android.library
- * 2. org.jetbrains.kotlin.android
- * 3. org.jetbrains.kotlin.plugin.compose
- * 4. com.google.dagger.hilt.android (HILT - only in this variant)
- * 5. com.google.devtools.ksp (KSP - only in this variant)
- * 6. org.jetbrains.kotlin.plugin.serialization
+ * 1. com.android.library (provides built-in Kotlin since AGP 9.0)
+ * 2. org.jetbrains.kotlin.plugin.compose
+ * 3. com.google.dagger.hilt.android (HILT - only in this variant)
+ * 4. com.google.devtools.ksp (KSP - only in this variant)
+ * 5. org.jetbrains.kotlin.plugin.serialization
  *
  * Usage:
  * plugins {
@@ -40,9 +39,8 @@ class GenesisLibraryHiltPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         with(project) {
             // Apply plugins in correct order
-            // Note: Using EXTERNAL kotlin-android plugin (android.builtInKotlin=false for Hilt compatibility)
+            // Note: Kotlin is built into AGP 9.0.0-alpha14+ (android.builtInKotlin=true)
             pluginManager.apply("com.android.library")
-            pluginManager.apply("org.jetbrains.kotlin.android")
             pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
             pluginManager.apply("com.google.dagger.hilt.android")  // ← HILT PLUGIN
             pluginManager.apply("com.google.devtools.ksp")         // ← KSP FOR HILT
