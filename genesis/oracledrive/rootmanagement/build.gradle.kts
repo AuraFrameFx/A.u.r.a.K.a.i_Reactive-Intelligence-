@@ -31,6 +31,7 @@ dependencies {
     // - Coroutines (core + android)
     // - Compose enabled by default
     // - Java 24 bytecode target
+    // - KSP plugin for annotation processing
     // ═══════════════════════════════════════════════════════════════════════
 
     // Expose core KTX as API
