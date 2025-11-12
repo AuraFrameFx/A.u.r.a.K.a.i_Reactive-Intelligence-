@@ -14,9 +14,11 @@ dependencies {
     // ═══════════════════════════════════════════════════════════════════════
     // AUTO-PROVIDED by genesis.android.library:
     // - androidx-core-ktx, appcompat, timber
-    // - Hilt (android + compiler via KSP)
     // - Coroutines (core + android)
     // - Compose enabled by default
+    // 
+    // NOTE: Hilt is NOT auto-provided by genesis.android.library
+    // Use genesis.android.library.hilt if Hilt dependency injection is needed
     // ═══════════════════════════════════════════════════════════════════════
 
     // Expose core KTX as API
