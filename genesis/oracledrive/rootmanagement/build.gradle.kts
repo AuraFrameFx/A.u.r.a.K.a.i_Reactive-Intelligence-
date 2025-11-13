@@ -5,8 +5,7 @@ import org.jetbrains.kotlin.gradle.idea.proto.com.google.protobuf.LazyStringArra
 // ROM Tools Module - System and ROM modification utilities
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("genesis.android.library")
-    alias(libs.plugins.ksp)  // Required for Hilt + Room code generation
+    id("genesis.android.library.hilt")  // Use Hilt-enabled variant for dependency injection
 
 }
 

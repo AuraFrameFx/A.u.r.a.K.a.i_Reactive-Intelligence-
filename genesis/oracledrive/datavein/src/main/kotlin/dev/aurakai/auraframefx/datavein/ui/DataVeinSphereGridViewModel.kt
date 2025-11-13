@@ -1,7 +1,6 @@
 package dev.aurakai.auraframefx.datavein.ui
 
-// Temporarily removed Hilt to resolve build issues
-// import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.aurakai.auraframefx.datavein.model.DataVeinNode
@@ -16,16 +15,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-
-// import javax.inject.Inject
+import javax.inject.Inject
 
 /**
  * ViewModel for managing DataVein Sphere Grid state
  * Handles node interactions, progression, and real-time updates
- * Note: Hilt integration temporarily disabled for build resolution
+ * Now using Hilt dependency injection
  */
-// @HiltViewModel
-class DataVeinSphereGridViewModel /* @Inject constructor() */ : ViewModel() {
+@HiltViewModel
+class DataVeinSphereGridViewModel @Inject constructor() : ViewModel() {
 
     private val _selectedNode = MutableStateFlow<DataVeinNode?>(null)
     val selectedNode: StateFlow<DataVeinNode?> = _selectedNode.asStateFlow()
