@@ -31,10 +31,10 @@ import org.gradle.kotlin.dsl.configure
  */
 class GenesisLibraryHiltPlugin : Plugin<Project> {
     /**
-     * Configure the Gradle project as an Android library module with Hilt, KSP, Compose, and Kotlin serialization support.
+     * Configures the given Gradle project as an Android library module with Hilt, KSP, Jetpack Compose, and Kotlin serialization support.
      *
-     * Sets up required plugins, configures the Android Library extension (SDK levels, NDK, build types, compile options, build features,
-     * packaging exclusions, and lint), adjusts Kotlin JVM target and compiler opt-ins, and adds convention-managed dependencies including Hilt and its KSP compiler.
+     * Configures the Android Library extension (SDK/NDK, build types, compile options, build features, packaging exclusions, and lint),
+     * delegates Kotlin/JVM toolchain and compiler settings to GenesisJvmConfig, and adds convention-managed dependencies including Hilt and its KSP compiler.
      *
      * @param project The Gradle project to configure.
      */
