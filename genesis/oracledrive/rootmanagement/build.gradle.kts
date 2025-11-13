@@ -14,8 +14,8 @@ android {
     // Disable androidTest to avoid dependency resolution issues with local JARs
     sourceSets {
         getByName("androidTest") {
-            java.setSrcDirs(emptyList<String>())
-            kotlin.setSrcDirs(emptyList<String>())
+            java.destinationDirectory.set(file("$layoutDirectory/generated/source/androidTest"))
+            kotlin.destinationDirectory.set(file("layoutDirectory/generated/source/androidTest"))
         }
     }
 

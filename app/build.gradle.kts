@@ -1,26 +1,26 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // PRIMARY CONVENTION PLUGIN - All-in-one Application Configuration
 // ═══════════════════════════════════════════════════════════════════════════
-// GenesisApplicationPlugin automatically applies (in correct order):
-// 1. com.android.application
-// 2. com.google.dagger.hilt.android (Dependency Injection)
-// 3. com.google.devtools.ksp (Annotation Processing)
-// 4. org.jetbrains.kotlin.plugin.compose (Compose Compiler)
-// 5. genesis.android.base (SDK config, universal dependencies)
-//
-// NO NEED to redeclare these - GenesisApplicationPlugin handles them!
-// ═══════════════════════════════════════════════════════════════════════════
+// Plugins are now versioned in the root build.gradle.kts
+// All plugin versions are managed centrally in the root project
 plugins {
+    // Core Android and Kotlin plugins
     id("com.android.application")
-    id("com.google.dagger.hilt.android") version "2.57.2"
+
+    // Compose and serialization
+    alias(libs.plugins.kotlin.compose)
+    id("org.jetbrains.kotlin.plugin.serialization")
+
+    // Dependency injection and code generation
+    id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
 
-    // Note: kotlin-android removed - AGP 9.0 has built-in Kotlin support
-    id("org.jetbrains.kotlin.plugin.serialization")
+    // Firebase and analytics
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-    alias(libs.plugins.kotlin.compose)
-    // NOTE: Firebase Analytics is NOT a plugin - it's automatically included via Firebase BOM
+
+    // Compose tooling support
+
 }
 
 android {
@@ -123,7 +123,10 @@ dependencies {
     // YukiHook API
     ksp(libs.yukihookapi.api)
 
-    // Firebase (specific services - BOM already provided by convention plugin)
+    // Firebase BOM (Bill of Materials) for version management
+    implementation(platform(libs.firebase.bom))
+    
+    // Firebase dependencies (versions managed by BOM)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.auth)
@@ -158,8 +161,9 @@ dependencies {
     compileOnly(files("$projectDir/libs/api-82.jar"))
     compileOnly(files("$projectDir/libs/api-82-sources.jar"))
 
-    // AI & ML
+    // AI & ML - Google Generative AI SDK
     implementation(libs.generativeai)
+    implementation(libs.generativeai.ktx)
 
     // Internal Project Modules - Core
 

@@ -252,15 +252,16 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 # Firebase (via BOM - KTX artifacts now in main modules)
 # ============================================================================
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
-firebase-auth = { module = "com.google.firebase:firebase-auth" }
-firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
+firebase-auth = { module = "com.google.firebase:firebase-auth-ktx" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore-ktx" }
 
 # ============================================================================
 # Google AI & ML
 # ============================================================================
 generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
+generativeai-ktx = { group = "com.google.ai.client.generativeai", name = "generativeai-ktx", version.ref = "generativeai" }
 
 # ============================================================================
 # Hilt (Dependency Injection)

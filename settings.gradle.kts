@@ -2,6 +2,7 @@
 
 pluginManagement {
     includeBuild("build-logic")
+    
     repositories {
         gradlePluginPortal()
         google()
@@ -10,19 +11,8 @@ pluginManagement {
         maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") }
         maven { url = uri("https://jitpack.io") }
     }
-    plugins {
-        id("com.android.application") version "9.0.0-alpha14" apply false
-        id("com.android.library") version "9.0.0-alpha14" apply false
-        // Note: Using EXTERNAL kotlin-android plugin (android.builtInKotlin=false for Hilt compatibility)
-        id("org.jetbrains.kotlin.android") version "2.3.0-Beta2" apply false
-        id("org.jetbrains.kotlin.plugin.compose") version "2.3.0-Beta2" apply false
-        id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0-Beta2" apply false
-        id("org.jetbrains.kotlin.plugin.parcelize") version "2.3.0-Beta2" apply false
-        id("com.google.devtools.ksp") version "2.3.2" apply false
-        id("com.google.dagger.hilt.android") version "2.57.2" apply false
-        id("com.google.gms.google-services") version "4.4.4" apply false
-        id("com.google.firebase.crashlytics") version "3.0.6" apply false
-    }
+    
+    // Plugin versions are now managed in the root build.gradle.kts
 }
 
 plugins {
@@ -130,6 +120,6 @@ plugins {
     include(":extendsysd")
     include(":extendsyse")
     include(":extendsysf")
-}
+
 
 // Note: Do NOT include ':build-logic' here. It is handled by includeBuild.
