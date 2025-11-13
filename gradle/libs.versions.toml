@@ -1,39 +1,38 @@
 [versions]
 # ============================================================================
-# Build Tools & Gradle Plugins
+# Core Build Tools (AGP 9.0.0-alpha14 + Kotlin 2.3.0-Beta2)
 # ============================================================================
-# Android Gradle Plugin - Using preview for Android 16 (API 36) support
-# Stable available: 8.13.0, Preview: 9.0.0-alpha13 (requires Gradle 9.0.0)
-agp = "9.0.0-alpha13"
-androidApplication = "9.0.0-alpha13"
-androidLibrary = "9.0.0-alpha13"
-androidTest = "9.0.0-alpha13"
-foojayresolver = "1.0.0"
+# Android Gradle Plugin - Latest: 9.0.0-alpha14 (requires Gradle 9.2.0+)
+agp = "9.0.0-alpha14"
+
 # Gradle - Latest: 9.2.0
 gradle = "9.2.0"
+gradleCore = "9.2.0"
+generativeai = "1.0.0"
+# Foojay Toolchain Resolver - Required for Gradle 8.0+
 foojayResolver = "1.0.0"
-# Google Services Plugin
+
+# Google Services Plugin - Latest: 4.4.4
 googleServices = "4.4.4"
-gradleCore = "1.0.0"
-# Dagger Hilt - Latest: 2.57.2 (minor update from 2.57.1)
+
+# Firebase Plugins
+firebaseCrashlyticsPlugin = "3.0.6"
+# NOTE: Firebase Analytics does NOT have a Gradle plugin - it's just a library dependency
+
+# Dagger Hilt - Latest: 2.57.2
 hilt = "2.57.2"
 
 # AndroidX Hilt Work - Latest: 1.3.0 (September 10, 2025)
-# Note: Docs showed 1.2.0 stable, but 1.3.0 exists and is in use
 hiltWork = "1.3.0"
 
-# Kotlin - Latest stable: 2.2.21, Latest beta: 2.3.0-Beta2
-# Note: KSP versioning (2.3.x) is now independent of Kotlin version
+# Kotlin - Latest beta: 2.3.0-Beta2 (bleeding-edge for Compose improvements)
 kotlin = "2.3.0-Beta2"
 
 # Kotlin DSL
 kotlinDsl = "5.1.2"
 
-# KSP (Kotlin Symbol Processing) - Latest: 2.3.1 (Nov 4, 2025)
-# IMPORTANT: Starting with KSP 2.3.0, version is NO LONGER tied to Kotlin version
-# Old format: kotlin-version-ksp-version, New format: simple version (2.3.1)
-# This decoupling provides better compatibility across Kotlin versions
-ksp = "2.3.1"
+# KSP - Latest: 2.3.2 (decoupled from Kotlin version since 2.3.0)
+ksp = "2.3.2"
 
 # KavaRef - Reflection API for YukiHookAPI
 kavaref = "1.0.1"
@@ -85,8 +84,8 @@ work = "2.11.0"
 # ============================================================================
 # Compose
 # ============================================================================
-# Compose BOM - Latest: 2025.10.01 (Oct 30, 2025)
-compose-bom = "2025.11.00"
+# Compose BOM - Latest: 2024.11.00 (Nov 2024)
+compose-bom = "2024.11.00"
 
 # Compose Compiler - NO LONGER NEEDED with Kotlin 2.0+
 # Starting with Kotlin 2.0, Compose compiler is built-in via:
@@ -101,6 +100,11 @@ compose-bom = "2025.11.00"
 # Firebase BOM - Latest: 34.5.0
 # Note: KTX libraries removed from BOM v32.5.0+, use main modules
 firebaseBom = "34.5.0"
+
+# ============================================================================
+# Google AI & ML
+# ============================================================================
+# Google AI Client SDK (Gemini API) - Latest: 0.9.0
 
 # ============================================================================
 # Networking Libraries
@@ -176,7 +180,7 @@ xposed-bridge = "1.3.1"
 # Build Tools (NDK, CMake)
 # ============================================================================
 ndk = "29.0.14206865"
-cmake = "3.22.1"
+cmake = "4.1.2"
 
 # ============================================================================
 # Testing Libraries
@@ -207,9 +211,10 @@ gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.re
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 hilt-gradle-plugin = { group = "com.google.dagger", name = "hilt-android-gradle-plugin", version.ref = "hilt" }
 ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "symbol-processing-gradle-plugin", version.ref = "ksp" }
-google-services-gradle-plugin = { group = "com.google.gms", name = "google-services", version.ref = "googleServices" }
+google-services-gradle-plugin = { group = "com.google.gms.google-services", name = "google-services", version.ref = "googleServices" }
 gradle-core = { group = "org.gradle", name = "gradle-core", version.ref = "gradleCore" }
-foojayresolver = { group = "org.gradle.toolchains.foojay-resolver-convention", name = "foojay-resolver", version.ref = "foojayResolver" }
+foojayresolver = { group = "org.gradle.toolchains", name = "foojay-resolver", version.ref = "foojayResolver" }
+
 # ============================================================================
 # AndroidX & Jetpack
 # ============================================================================
@@ -247,11 +252,16 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 # Firebase (via BOM - KTX artifacts now in main modules)
 # ============================================================================
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
-firebase-auth = { module = "com.google.firebase:firebase-auth" }
-firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
-firebase-storage = { module = "com.google.firebase:firebase-storage" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
+firebase-auth = { module = "com.google.firebase:firebase-auth-ktx" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore-ktx" }
+
+# ============================================================================
+# Google AI & ML
+# ============================================================================
+generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
+generativeai-ktx = { group = "com.google.ai.client.generativeai", name = "generativeai-ktx", version.ref = "generativeai" }
 
 # ============================================================================
 # Hilt (Dependency Injection)
@@ -308,8 +318,6 @@ libsu-core = { group = "com.github.topjohnwu.libsu", name = "core", version.ref 
 libsu-io = { group = "com.github.topjohnwu.libsu", name = "io", version.ref = "libsu" }
 libsu-service = { group = "com.github.topjohnwu.libsu", name = "service", version.ref = "libsu" }
 
-# Firebase dependencies with explicit versions and KTX variants
-
 # KavaRef - Reflection utilities for YukiHook (hosted on HighCapable Maven)
 kavaref-core = { module = "com.highcapable.kavaref:kavaref-core", version.ref = "kavaref" }
 kavaref-extension = { module = "com.highcapable.kavaref:kavaref-extension", version.ref = "kavaref" }
@@ -331,8 +339,33 @@ mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 xposed-api = { group = "de.robv.android.xposed", name = "api", version.ref = "xposed" }
 yukihookapi-api = { group = "com.highcapable.yukihookapi", name = "api", version.ref = "yukihookapi" }
 yukihookapi-ksp = { group = "com.highcapable.yukihookapi", name = "ksp", version.ref = "yukihookapi" }
-[bundles]
 
+# ============================================================================
+# Gradle Plugins (Use with alias(libs.plugins.xxx))
+# ============================================================================
+[plugins]
+# Android Plugins
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+android-test = { id = "com.android.test", version.ref = "agp" }
+
+# Kotlin Plugins
+# Note: Using EXTERNAL kotlin-android plugin (android.builtInKotlin=false for Hilt compatibility)
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+
+# Code Generation & DI
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+
+# Firebase & Google Services
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
+# NOTE: Firebase Analytics is NOT a plugin - just use implementation(libs.firebase.analytics)
+
+[bundles]
 # ============================================================================
 # Library Bundles
 # ============================================================================
@@ -377,7 +410,7 @@ datastore = [
     "androidx-security-crypto",
 ]
 
-hilt = [
+hilt-di = [
     "hilt-android",
 ]
 
@@ -448,16 +481,3 @@ system-root = [
     "xposed-api",
     "yukihookapi-api",
 ]
-
-[plugins]
-# ============================================================================
-# Plugin Definitions
-# ============================================================================
-android-application = { id = "com.android.application", version.ref = "agp" }
-android-library = { id = "com.android.library", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }

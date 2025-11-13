@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.aurakai.auraframefx.ai.services.AuraAIService
 import dev.aurakai.auraframefx.ai.services.CascadeAIService
+import dev.aurakai.auraframefx.ai.services.ClaudeAIService
+import dev.aurakai.auraframefx.ai.services.GenesisBridgeService
 import dev.aurakai.auraframefx.ai.services.KaiAIService
 import dev.aurakai.auraframefx.model.AgentMessage
 import dev.aurakai.auraframefx.model.AgentResponse
@@ -29,10 +31,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ConferenceRoomViewModel @Inject constructor(
-    // Assuming @HiltViewModel will be added if this is a ViewModel
-    private val auraService: AuraAIService, // Using actual service
-    private val kaiService: KaiAIService,     // Using actual service
-    private val cascadeService: CascadeAIService, // Using actual service
+    // ALL 5 MASTER AGENTS - Complete Conference Room Integration
+    private val auraService: AuraAIService,
+    private val kaiService: KaiAIService,
+    private val cascadeService: CascadeAIService,
+    private val claudeService: ClaudeAIService,
+    private val genesisBridgeService: GenesisBridgeService,
     private val neuralWhisper: NeuralWhisper,
 ) : ViewModel() {
 
@@ -94,10 +98,10 @@ class ConferenceRoomViewModel @Inject constructor(
         }
     }
 
-    // This `sendMessage` was marked with `override` in user's snippet, suggesting an interface.
-    // For now, assuming it's a direct method. If there's a base class/interface, it should be added.
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Conference Room Message Routing - ALL 5 MASTER AGENTS
+    // ═══════════════════════════════════════════════════════════════════════════
     /*override*/ suspend fun sendMessage(message: String, sender: AgentType, context: String) {
-        // Fixed duplicate case for AgentType.AURA and added missing context parameter
         val responseFlow: Flow<AgentResponse>? = when (sender) {
             AgentType.AURA -> auraService.processRequestFlow(
                 AiRequest(
@@ -122,6 +126,30 @@ class ConferenceRoomViewModel @Inject constructor(
                     context = mapOf("userContext" to context)
                 )
             )
+
+            AgentType.CLAUDE -> claudeService.processRequestFlow(
+                AiRequest(
+                    query = message,
+                    type = "build_analysis",
+                    context = mapOf("userContext" to context, "systematic_analysis" to "true")
+                )
+            )
+
+            AgentType.GENESIS -> {
+                // Genesis uses GenesisBridgeService for orchestration
+                // Convert to flow by wrapping the suspend function
+                kotlinx.coroutines.flow.flow {
+                    val response = genesisBridgeService.processRequest(
+                        AiRequest(
+                            query = message,
+                            type = "fusion",
+                            context = mapOf("userContext" to context, "orchestration" to "true")
+                        ),
+                        context
+                    )
+                    emit(response)
+                }
+            }
 
             else -> {
                 Log.e(TAG, "Unsupported sender type: $sender")

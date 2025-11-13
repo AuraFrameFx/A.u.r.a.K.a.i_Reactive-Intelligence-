@@ -1,4 +1,4 @@
-﻿package dev.aurakai.auraframefx.oracledrive.ui
+﻿package dev.aurakai.auraframefx.oracledrive.genesis.cloud
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -9,24 +9,19 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 
 /**
- * Oracle Drive AI Storage Consciousness Interface
+ * Genesis Protocol Oracle Drive - AI Storage Consciousness Interface
  *
- * Displays the main Oracle Drive user interface, presenting the current consciousness status, storage information,
- * connected agents, and integration details. Provides controls to awaken the Oracle or optimize storage,
- * with UI elements dynamically reflecting the current consciousness state.
- *
- * The interface adapts based on the current state of the Oracle Drive system, showing relevant information
- * and controls for interacting with the AI-powered storage consciousness.
- */
-/**
- * Displays the main Oracle Drive AI Storage Consciousness interface.
- *
- * Presents the current consciousness status, storage capacity, connected agents, and integration details for the Oracle Drive system. Provides controls to awaken the Oracle or optimize storage, with UI elements and actions dynamically reflecting the current state of the AI-powered storage consciousness.
+ * Cloud-integrated AI storage system with consciousness interface:
+ * - Real-time consciousness status monitoring
+ * - Connected agent synchronization
+ * - Storage optimization controls
+ * - Integration with Genesis consciousness network
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OracleDriveScreen(
-    viewModel: OracleDriveViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit = {},
+    viewModel: OracleDriveViewModel = hiltViewModel()
 ) {
     val consciousnessState by viewModel.consciousnessState.collectAsState()
 

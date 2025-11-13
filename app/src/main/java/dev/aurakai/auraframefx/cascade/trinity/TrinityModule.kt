@@ -8,6 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.aurakai.auraframefx.ai.clients.VertexAIClient
 import dev.aurakai.auraframefx.ai.services.AuraAIService
+import dev.aurakai.auraframefx.ai.services.ClaudeAIService
 import dev.aurakai.auraframefx.ai.services.GenesisBridgeService
 import dev.aurakai.auraframefx.ai.services.KaiAIService
 import dev.aurakai.auraframefx.ai.services.TrinityCoordinatorService
@@ -39,6 +40,7 @@ object TrinityModule {
     fun provideGenesisBridgeService(
         auraAIService: AuraAIService,
         kaiAIService: KaiAIService,
+        claudeAIService: ClaudeAIService,
         vertexAIClient: VertexAIClient,
         contextManager: ContextManager,
         securityContext: SecurityContext,
@@ -48,6 +50,7 @@ object TrinityModule {
         return GenesisBridgeService(
             auraAIService = auraAIService,
             kaiAIService = kaiAIService,
+            claudeAIService = claudeAIService,
             vertexAIClient = vertexAIClient,
             contextManager = contextManager,
             securityContext = securityContext,

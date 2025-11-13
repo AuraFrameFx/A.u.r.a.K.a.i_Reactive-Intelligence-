@@ -2,7 +2,7 @@
 // Nexus Memory Module - Agent memory and knowledge management
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("genesis.android.library")
+    id("genesis.android.library.hilt")
 }
 
 android {

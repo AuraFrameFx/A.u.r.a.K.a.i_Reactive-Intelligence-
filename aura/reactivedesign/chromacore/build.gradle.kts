@@ -2,7 +2,7 @@
 // Color Blendr Module - Color blending and theming utilities
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("genesis.android.library")
+    id("genesis.android.library.hilt")  // KSP already included in Hilt plugin
 }
 
 android {
@@ -14,9 +14,9 @@ dependencies {
     // ═══════════════════════════════════════════════════════════════════════
     // AUTO-PROVIDED by genesis.android.library:
     // - androidx-core-ktx, appcompat, timber
-    // - Hilt (android + compiler via KSP)
     // - Coroutines (core + android)
     // - Compose enabled by default
+    // Note: Hilt NOT included - use genesis.android.library.hilt if needed
     // ═══════════════════════════════════════════════════════════════════════
 
     // Expose core KTX as API

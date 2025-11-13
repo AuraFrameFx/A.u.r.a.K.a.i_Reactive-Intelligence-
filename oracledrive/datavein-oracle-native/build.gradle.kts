@@ -3,6 +3,8 @@
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
     id("genesis.android.library")
+    alias(libs.plugins.ksp)  // Required for Hilt + Room code generation
+
 }
 
 android {

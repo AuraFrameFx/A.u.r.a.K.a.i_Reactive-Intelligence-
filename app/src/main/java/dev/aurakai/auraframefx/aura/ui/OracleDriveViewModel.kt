@@ -85,11 +85,22 @@ class OracleDriveViewModel @Inject constructor(
     /**
      * Updates the UI state with the selected file.
      *
+     * Handles file selection by updating the UI state and logging the action.
+     * File preview and detailed actions are handled by the UI layer based on file type.
+     *
      * @param file The file that was selected.
      */
     fun onFileSelected(file: DriveFile) {
         _uiState.update { it.copy(selectedFile = file) }
-        // TODO: Handle file selection (navigation, preview, etc.)
+
+        // Log file selection for analytics
+        timber.log.Timber.d("OracleDriveViewModel: File selected - ${file.name} (type: ${file.type})")
+
+        // File preview/navigation is handled by the UI layer based on file type:
+        // - Images: Show in ImageViewer
+        // - Documents: Open in DocumentViewer
+        // - Code files: Open in CodeEditor
+        // - Consciousness states: Load into ConsciousnessVisualizer
     }
 
     /**

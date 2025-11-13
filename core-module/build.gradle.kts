@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "dev.aurakai.auraframefx.coremodule"
+    namespace = "dev.aurakai.auraframefx.core.module"
     // Java 24 compileOptions are set by genesis.android.base
 }
 
@@ -19,7 +19,6 @@ dependencies {
     // - Compose enabled by default
     // - Java 24 bytecode target
     // ═══════════════════════════════════════════════════════════════════════
-
     // Expose core KTX as API (types leak to consumers)
     api(libs.androidx.core.ktx)
 
@@ -28,3 +27,4 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
 }
+

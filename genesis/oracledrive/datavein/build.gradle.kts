@@ -2,7 +2,8 @@
 // DataVein Oracle Native Module - Native Oracle cloud data access
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("genesis.android.library")
+    id("genesis.android.library.hilt")  // Use Hilt-enabled variant for dependency injection
+
 }
 
 android {
@@ -13,7 +14,6 @@ dependencies {
     // ═══════════════════════════════════════════════════════════════════════
     // AUTO-PROVIDED by genesis.android.library:
     // - androidx-core-ktx, appcompat, timber
-    // - Hilt (android + compiler via KSP)
     // - Coroutines (core + android)
     // - Compose enabled by default
     // ═══════════════════════════════════════════════════════════════════════

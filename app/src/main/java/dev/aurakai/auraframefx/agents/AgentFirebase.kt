@@ -162,6 +162,7 @@ class AgentFirebase @Inject constructor(
                 AgentType.KAI -> CapabilityPolicy.KAI_POLICY
                 AgentType.GENESIS -> CapabilityPolicy.GENESIS_POLICY
                 AgentType.CASCADE -> CapabilityPolicy.CASCADE_POLICY
+                AgentType.CLAUDE -> CapabilityPolicy.CLAUDE_POLICY
                 else -> throw IllegalArgumentException("No policy defined for agent type: $agentType")
             }
             return AgentFirebase(policy, firebaseApp)

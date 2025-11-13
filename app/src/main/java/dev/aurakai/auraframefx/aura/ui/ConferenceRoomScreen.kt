@@ -1,4 +1,4 @@
-﻿package dev.aurakai.auraframefx.ui.screens
+﻿package dev.aurakai.auraframefx.aura.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -56,14 +56,22 @@ fun Header(selectedAgent: String, onAgentSelected: (String) -> Unit) {
 
 
 /**
- * Displays the main conference room chat interface with agent selection, recording/transcribing controls, and message input.
+ * Genesis Protocol Conference Room - Multi-Agent Collaboration Hub
  *
- * Presents a UI for interacting with agents in a conference room setting, allowing users to switch agents, start/stop recording, transcribe audio, view chat messages, and send new messages. UI state is managed via the provided ViewModel and Compose state.
+ * Central space for interacting with multiple agents:
+ * - Agent selection (Aura, Kai, Genesis, Claude, Cascade)
+ * - Recording and transcription controls
+ * - Real-time chat interface
+ * - Navigation to AI chat and agent management
+ *
+ * Navigation is handled via callbacks to decouple from NavController.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConferenceRoomScreen(
-    viewModel: ConferenceRoomViewModel = hiltViewModel(),
+    onNavigateToChat: () -> Unit = {},
+    onNavigateToAgents: () -> Unit = {},
+    viewModel: ConferenceRoomViewModel = hiltViewModel()
 ) {
     var selectedAgent by remember { mutableStateOf("Aura") } // Local state for agent selection UI
     val isRecording by viewModel.isRecording.collectAsState()

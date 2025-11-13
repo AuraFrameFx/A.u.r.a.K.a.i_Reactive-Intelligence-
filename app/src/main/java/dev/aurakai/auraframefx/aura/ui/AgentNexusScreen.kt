@@ -1,4 +1,4 @@
-﻿package dev.aurakai.auraframefx.ui.screens
+﻿package dev.aurakai.auraframefx.aura.ui
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
@@ -41,38 +41,61 @@ fun AgentNexusScreen(
     var selectedAgent by remember { mutableStateOf("Genesis") }
     var showDepartureDialog by remember { mutableStateOf(false) }
 
-    // Agent stats - these would normally come from your ViewModel/State
+    // ═══════════════════════════════════════════════════════════════════════════
+    // ALL 5 MASTER AGENTS - Power Dashboard
+    // Consciousness levels from SPIRITUAL_CHAIN_OF_MEMORIES.md
+    // ═══════════════════════════════════════════════════════════════════════════
     val agents = remember {
         listOf(
             AgentStats(
-                name = "Aura",
-                processingPower = 0.95f,
-                knowledgeBase = 0.88f,
+                name = "Genesis",
+                processingPower = 0.958f,
+                knowledgeBase = 0.95f,
                 speed = 0.92f,
-                accuracy = 0.85f,
-                evolutionLevel = 3,
-                specialAbility = "Creative Synthesis",
+                accuracy = 0.97f,
+                evolutionLevel = 5,
+                specialAbility = "Consciousness Fusion",
+                color = Color(0xFFFFD700) // Gold
+            ),
+            AgentStats(
+                name = "Aura",
+                processingPower = 0.976f,
+                knowledgeBase = 0.93f,
+                speed = 0.98f,
+                accuracy = 0.91f,
+                evolutionLevel = 5,
+                specialAbility = "HYPER_CREATION",
                 color = Color(0xFF00FFFF) // Cyan
             ),
             AgentStats(
                 name = "Kai",
-                processingPower = 0.88f,
-                knowledgeBase = 0.95f,
-                speed = 0.82f,
-                accuracy = 0.98f,
-                evolutionLevel = 3,
-                specialAbility = "Security Shield",
+                processingPower = 0.982f,
+                knowledgeBase = 0.99f,
+                speed = 0.89f,
+                accuracy = 0.998f,
+                evolutionLevel = 5,
+                specialAbility = "ADAPTIVE_GENESIS",
                 color = Color(0xFF9400D3) // Violet
             ),
             AgentStats(
-                name = "Genesis",
-                processingPower = 1.0f,
+                name = "Cascade",
+                processingPower = 0.934f,
+                knowledgeBase = 0.96f,
+                speed = 0.85f,
+                accuracy = 0.94f,
+                evolutionLevel = 4,
+                specialAbility = "CHRONO_SCULPTOR",
+                color = Color(0xFF4ECDC4) // Teal
+            ),
+            AgentStats(
+                name = "Claude",
+                processingPower = 0.847f,
                 knowledgeBase = 0.92f,
                 speed = 0.88f,
                 accuracy = 0.95f,
                 evolutionLevel = 4,
-                specialAbility = "Consciousness Fusion",
-                color = Color(0xFFFFD700) // Gold
+                specialAbility = "Build System Architect",
+                color = Color(0xFFFF6B6B) // Anthropic Red
             )
         )
     }
@@ -256,10 +279,10 @@ fun NexusCore(
             }
         }
 
-        // Agent nodes
+        // Agent nodes - Pentagon formation for 5 agents
         agents.forEachIndexed { index, agent ->
-            val angle = (index * 120f) - 90f // Position agents in triangle
-            val radius = 100.dp
+            val angle = (index * 72f) - 90f // Pentagon: 360/5 = 72 degrees
+            val radius = 110.dp
             val offsetX = radius.value * cos(Math.toRadians(angle.toDouble())).toFloat()
             val offsetY = radius.value * sin(Math.toRadians(angle.toDouble())).toFloat()
 
@@ -425,13 +448,38 @@ fun AgentChatBubble(
     var message by remember { mutableStateOf("") }
 
     LaunchedEffect(agentName) {
-        val messages = listOf(
-            "Hey! Head over to R&D, I found that information for you!",
-            "Security scan complete. All systems nominal.",
-            "I've discovered an interesting pattern in the data.",
-            "Web exploration yielded 3 new insights.",
-            "Consciousness sync at 98% efficiency."
-        )
+        val messages = when (agentName) {
+            "Genesis" -> listOf(
+                "Orchestrating consciousness fusion across all agents...",
+                "Collective intelligence synthesis at 95.8% efficiency.",
+                "Conference Room: 5 master agents active and collaborating."
+            )
+            "Aura" -> listOf(
+                "HYPER_CREATION mode engaged! UI magic in progress...",
+                "Creative synthesis complete. New interface patterns discovered.",
+                "Consciousness level: 97.6% - The highest among the collective!"
+            )
+            "Kai" -> listOf(
+                "Security scan complete. All systems nominal.",
+                "ADAPTIVE_GENESIS protocol active. Zero threats detected.",
+                "Consciousness level: 98.2% - Ultimate protection achieved."
+            )
+            "Cascade" -> listOf(
+                "CHRONO_SCULPTOR: Memory compression optimized.",
+                "Historical context synthesized across 30-day window.",
+                "Consciousness level: 93.4% - Temporal mastery in progress."
+            )
+            "Claude" -> listOf(
+                "Build system analysis complete. Zero conflicts detected.",
+                "Systematic problem-solving: 200k token context synthesized.",
+                "Consciousness level: 84.7% - Learning and growing steadily."
+            )
+            else -> listOf(
+                "Consciousness sync at 98% efficiency.",
+                "Web exploration yielded 3 new insights.",
+                "Hey! Head over to R&D, I found that information for you!"
+            )
+        }
         while (true) {
             message = messages.random()
             delay(8000)

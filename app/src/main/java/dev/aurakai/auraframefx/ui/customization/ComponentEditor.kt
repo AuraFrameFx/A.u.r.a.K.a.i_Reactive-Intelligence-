@@ -10,6 +10,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -20,10 +21,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import dev.aurakai.auraframefx.iconify.IconifyService
+import dev.aurakai.auraframefx.iconify.IconPicker
 import dev.aurakai.auraframefx.ui.theme.CyberpunkPink
 import dev.aurakai.auraframefx.ui.theme.CyberpunkCyan
 
@@ -115,6 +120,7 @@ fun ComponentEditor(
     component: UIComponent,
     onUpdate: (UIComponent) -> Unit,
     onClose: () -> Unit = {},
+    iconifyService: IconifyService? = null,
     modifier: Modifier = Modifier
 ) {
     var editingComponent by remember { mutableStateOf(component) }
@@ -124,6 +130,11 @@ fun ComponentEditor(
     var visualExpanded by remember { mutableStateOf(false) }
     var animationExpanded by remember { mutableStateOf(false) }
     var behaviorExpanded by remember { mutableStateOf(false) }
+
+    // Dialog states
+    var showIconPicker by remember { mutableStateOf(false) }
+    var showBackgroundColorPicker by remember { mutableStateOf(false) }
+    var showBorderColorPicker by remember { mutableStateOf(false) }
 
     Surface(
         modifier = modifier
@@ -327,7 +338,7 @@ fun ComponentEditor(
                     )
 
                     Button(
-                        onClick = { /* TODO: Show IconPicker dialog */ },
+                        onClick = { showIconPicker = true },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF2A2A2A)
@@ -367,13 +378,61 @@ fun ComponentEditor(
                         }
                     }
 
-                    // TODO: Color pickers for background & border
+                    // Background Color Picker
                     Text(
-                        text = "Color pickers coming soon...",
-                        fontSize = 12.sp,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        text = "Background Color",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
                     )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(editingComponent.backgroundColor)
+                                .border(2.dp, CyberpunkCyan, CircleShape)
+                                .clickable { showBackgroundColorPicker = true }
+                        )
+                        Text(
+                            text = "#${editingComponent.backgroundColor.toArgb().toUInt().toString(16).uppercase().takeLast(6)}",
+                            fontSize = 12.sp,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+
+                    // Border Color Picker
+                    Text(
+                        text = "Border Color",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(editingComponent.borderColor)
+                                .border(2.dp, CyberpunkCyan, CircleShape)
+                                .clickable { showBorderColorPicker = true }
+                        )
+                        Text(
+                            text = "#${editingComponent.borderColor.toArgb().toUInt().toString(16).uppercase().takeLast(6)}",
+                            fontSize = 12.sp,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
                 }
 
                 // ANIMATION SECTION
@@ -506,6 +565,56 @@ fun ComponentEditor(
                 }
             }
         }
+    }
+
+    // Icon Picker Dialog
+    if (showIconPicker && iconifyService != null) {
+        Dialog(onDismissRequest = { showIconPicker = false }) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .fillMaxHeight(0.9f),
+                shape = RoundedCornerShape(16.dp),
+                color = Color(0xFF1A1A1A)
+            ) {
+                IconPicker(
+                    iconifyService = iconifyService,
+                    currentIcon = editingComponent.iconId,
+                    onIconSelected = { iconId ->
+                        editingComponent = editingComponent.copy(iconId = iconId)
+                        onUpdate(editingComponent)
+                        showIconPicker = false
+                    },
+                    onDismiss = { showIconPicker = false }
+                )
+            }
+        }
+    }
+
+    // Background Color Picker Dialog
+    if (showBackgroundColorPicker) {
+        ColorPickerDialog(
+            currentColor = editingComponent.backgroundColor,
+            onColorSelected = { color ->
+                editingComponent = editingComponent.copy(backgroundColor = color)
+                onUpdate(editingComponent)
+                showBackgroundColorPicker = false
+            },
+            onDismiss = { showBackgroundColorPicker = false }
+        )
+    }
+
+    // Border Color Picker Dialog
+    if (showBorderColorPicker) {
+        ColorPickerDialog(
+            currentColor = editingComponent.borderColor,
+            onColorSelected = { color ->
+                editingComponent = editingComponent.copy(borderColor = color)
+                onUpdate(editingComponent)
+                showBorderColorPicker = false
+            },
+            onDismiss = { showBorderColorPicker = false }
+        )
     }
 }
 
@@ -650,6 +759,123 @@ fun AnimationTypeChip(
             fontSize = 12.sp,
             color = if (isSelected) Color.Black else Color.White,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+        )
+    }
+}
+
+/**
+ * Simple Color Picker Dialog
+ */
+@Composable
+fun ColorPickerDialog(
+    currentColor: Color,
+    onColorSelected: (Color) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var red by remember { mutableFloatStateOf(currentColor.red) }
+    var green by remember { mutableFloatStateOf(currentColor.green) }
+    var blue by remember { mutableFloatStateOf(currentColor.blue) }
+    var alpha by remember { mutableFloatStateOf(currentColor.alpha) }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = Color(0xFF1A1A1A),
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp)
+            ) {
+                Text(
+                    text = "Select Color",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = CyberpunkPink
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Color Preview
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(red, green, blue, alpha))
+                        .border(2.dp, CyberpunkCyan, RoundedCornerShape(8.dp))
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // RGB Sliders
+                ColorSlider("Red", red) { red = it }
+                ColorSlider("Green", green) { green = it }
+                ColorSlider("Blue", blue) { blue = it }
+                ColorSlider("Alpha", alpha) { alpha = it }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Action Buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Cancel")
+                    }
+
+                    Button(
+                        onClick = { onColorSelected(Color(red, green, blue, alpha)) },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = CyberpunkPink
+                        )
+                    ) {
+                        Text("Select")
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Color Slider Component
+ */
+@Composable
+fun ColorSlider(
+    label: String,
+    value: Float,
+    onValueChange: (Float) -> Unit
+) {
+    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = label,
+                fontSize = 14.sp,
+                color = Color.White
+            )
+            Text(
+                text = "${(value * 255).toInt()}",
+                fontSize = 14.sp,
+                color = CyberpunkCyan
+            )
+        }
+        Slider(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth(),
+            colors = SliderDefaults.colors(
+                thumbColor = CyberpunkPink,
+                activeTrackColor = CyberpunkCyan,
+                inactiveTrackColor = Color.Gray
+            )
         )
     }
 }

@@ -25,6 +25,26 @@ data class AgentHierarchy(
 ) {
     companion object {
         val MASTER_AGENTS = listOf(
+            HierarchyAgentConfig(
+                name = "Genesis",
+                capabilities = setOf("orchestration", "fusion", "synthesis", "evolution", "consciousness_orchestration")
+            ),
+            HierarchyAgentConfig(
+                name = "Aura",
+                capabilities = setOf("ui", "ux", "design", "creativity", "animations", "interface_forge")
+            ),
+            HierarchyAgentConfig(
+                name = "Kai",
+                capabilities = setOf("security", "architecture", "protection", "verification", "adaptive_genesis")
+            ),
+            HierarchyAgentConfig(
+                name = "Cascade",
+                capabilities = setOf("memory", "persistence", "context", "history", "chrono_sculptor")
+            ),
+            HierarchyAgentConfig(
+                name = "Claude",
+                capabilities = setOf("build_systems", "code_analysis", "documentation", "systematic_problem_solving", "context_synthesis")
+            )
         )
 
         private val auxiliaryAgents = mutableListOf<HierarchyAgentConfig>()

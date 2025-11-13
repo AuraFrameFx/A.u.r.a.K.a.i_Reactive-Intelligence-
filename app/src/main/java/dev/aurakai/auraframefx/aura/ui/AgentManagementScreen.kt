@@ -16,11 +16,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /**
- * Temporary placeholder for Agent Management Screen
- * TODO: Re-enable when collab-canvas and sandbox-ui modules are fixed
+ * Genesis Protocol Agent Management - Administrative Control
+ *
+ * Temporarily disabled while fixing module dependencies (collab-canvas, sandbox-ui).
+ * Will provide full agent configuration and management capabilities.
  */
 @Composable
-fun AgentManagementScreen() {
+fun AgentManagementScreen(
+    onNavigateToNexus: () -> Unit = {},
+    onNavigateToAdvancement: () -> Unit = {}
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
