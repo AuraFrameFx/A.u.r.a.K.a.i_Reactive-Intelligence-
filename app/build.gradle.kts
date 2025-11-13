@@ -125,12 +125,7 @@ dependencies {
 
     // Firebase BOM (Bill of Materials) for version management
     implementation(platform(libs.firebase.bom))
-    
-    // Firebase dependencies (versions managed by BOM)
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.crashlytics)
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
+    //using BOM do not call dependencies Gradle will read toml after confirming BOM//
 
     // Networking
     implementation(libs.okhttp)
@@ -162,8 +157,7 @@ dependencies {
     compileOnly(files("$projectDir/libs/api-82-sources.jar"))
 
     // AI & ML - Google Generative AI SDK
-    implementation(libs.generativeai)
-    implementation(libs.generativeai.ktx)
+    //same as Firebase BOM do not call from app module gradle will confirm BOM and check toml//
 
     // Internal Project Modules - Core
 
@@ -195,4 +189,6 @@ dependencies {
     implementation(project(":agents:growthmetrics:identity"))
     implementation(project(":agents:growthmetrics:progression"))
     implementation(project(":agents:growthmetrics:tasker"))
+
 }
+

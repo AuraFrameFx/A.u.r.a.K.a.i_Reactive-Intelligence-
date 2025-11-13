@@ -70,7 +70,6 @@ dependencies {
 
     // Firebase (via BOM)
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
 
     // Root Access (LibSu)
     implementation(libs.libsu.core)
