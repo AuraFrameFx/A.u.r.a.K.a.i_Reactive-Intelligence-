@@ -3,10 +3,6 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 /**
  * ===================================================================
@@ -105,22 +101,8 @@ class GenesisLibraryHiltPlugin : Plugin<Project> {
                 }
             }
 
-            // Configure Kotlin JVM toolchain to match Java toolchain (uses foojay-resolver)
-            extensions.configure<KotlinAndroidProjectExtension> {
-                jvmToolchain(24)
-            }
-
-            // Configure Kotlin compilation with JVM 24 target
-            tasks.withType<KotlinJvmCompile>().configureEach {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_24)
-                    freeCompilerArgs.addAll(
-                        "-opt-in=kotlin.RequiresOptIn",
-                        "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-                        "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api"
-                    )
-                }
-            }
+            // Configure Kotlin JVM toolchain and compilation options
+            GenesisJvmConfig.configureKotlinJvm(project)
 
             // ═══════════════════════════════════════════════════════════════════════════
             // Auto-configured dependencies (provided by convention plugin)
