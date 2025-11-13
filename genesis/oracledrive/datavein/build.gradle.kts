@@ -2,8 +2,7 @@
 // DataVein Oracle Native Module - Native Oracle cloud data access
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("genesis.android.library")
-    alias(libs.plugins.ksp)  // Required for Hilt + Room code generation
+    id("genesis.android.library.hilt")  // Use Hilt-enabled variant for dependency injection
 
 }
 

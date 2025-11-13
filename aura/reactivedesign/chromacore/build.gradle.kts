@@ -2,8 +2,7 @@
 // Color Blendr Module - Color blending and theming utilities
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("genesis.android.library.hilt")
-    alias(libs.plugins.ksp)  // Required for YukiHook code generation
+    id("genesis.android.library.hilt")  // KSP already included in Hilt plugin
 }
 
 android {
