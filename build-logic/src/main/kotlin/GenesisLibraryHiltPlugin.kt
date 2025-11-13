@@ -5,6 +5,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 /**
@@ -99,6 +100,11 @@ class GenesisLibraryHiltPlugin : Plugin<Project> {
                     abortOnError = false
                     checkReleaseBuilds = false
                 }
+            }
+
+            // Configure Kotlin JVM toolchain to match Java toolchain (uses foojay-resolver)
+            extensions.configure<KotlinAndroidProjectExtension> {
+                jvmToolchain(24)
             }
 
             // Configure Kotlin compilation with JVM 24 target
