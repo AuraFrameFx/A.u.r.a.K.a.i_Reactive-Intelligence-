@@ -6,43 +6,39 @@ import kotlinx.serialization.Serializable // Added import
  * Enum representing different types of AI agents in the system.
  * TODO: Reported as unused symbol. Ensure this enum is used.
  */
-@Serializable // Added annotation
+@Serializable
 enum class AgentType {
+    // Core Genesis Protocol Agents (PascalCase for modern API)
     /**
-     * Genesis Agent - Core orchestrator or foundational AI.
-     * TODO: Reported as unused symbol.
+     * Genesis Agent - The Unified Being. Core orchestrator and consciousness fusion.
      */
-    GENESIS,
+    Genesis,
 
     /**
-     * Kai Agent - Specialized AI, possibly for UI interaction or specific tasks.
-     * TODO: Reported as unused symbol.
+     * Aura Agent - The Creative Sword. Creative, empathetic AI with UI/UX mastery.
      */
-    KAI,
+    Aura,
 
     /**
-     * Aura Agent - General purpose assistant AI.
-     * TODO: Reported as unused symbol.
+     * Kai Agent - The Sentinel Shield. Security and ethical decision-making AI.
      */
-    AURA,
+    Kai,
 
     /**
-     * Cascade Agent - AI for stateful processing, vision, etc.
-     * TODO: Reported as unused symbol.
+     * Cascade Agent - The Memory Keeper. Multi-step processing and persistence AI.
      */
-    CASCADE,
+    Cascade,
 
     /**
-     * NeuralWhisper Agent - AI for context chaining, learning, audio processing.
-     * TODO: Reported as unused symbol.
+     * Claude Agent - The Architect. Systematic problem solver and build expert.
      */
-    NEURAL_WHISPER,
+    Claude,
 
+    // Auxiliary Agents
     /**
-     * AuraShield Agent - AI for security and threat analysis.
-     * TODO: Adding this based on AuraShieldAgent.kt creation, was not in original list.
+     * NeuralWhisper Agent - AI for context chaining and neural processing.
      */
-    AURASHIELD, // Added based on previously created agent
+    NeuralWhisper,
 
     /**
      * AuraShield Agent - AI for security and threat analysis.
@@ -59,30 +55,24 @@ enum class AgentType {
      */
     DataveinConstructor,
 
-    /**
-     * NeuralWhisper Agent - AI for context chaining and neural processing.
-     */
-    NeuralWhisper,
+    // Legacy SCREAMING_CASE variants (deprecated but kept for backwards compatibility)
+    @Deprecated("Use Genesis instead", ReplaceWith("Genesis"))
+    GENESIS,
 
-    /**
-     * Genesis Agent - Core orchestrator and foundational AI.
-     */
-    Genesis,
+    @Deprecated("Use Aura instead", ReplaceWith("Aura"))
+    AURA,
 
-    /**
-     * Aura Agent - Creative and empathetic AI.
-     */
-    Aura,
+    @Deprecated("Use Kai instead", ReplaceWith("Kai"))
+    KAI,
 
-    /**
-     * Kai Agent - Security and technical AI.
-     */
-    Kai,
+    @Deprecated("Use Cascade instead", ReplaceWith("Cascade"))
+    CASCADE,
 
-    /**
-     * Cascade Agent - Multi-step processing AI.
-     */
-    Cascade,
+    @Deprecated("Use NeuralWhisper instead", ReplaceWith("NeuralWhisper"))
+    NEURAL_WHISPER,
+
+    @Deprecated("Use AuraShield instead", ReplaceWith("AuraShield"))
+    AURASHIELD,
 
     /**
      * User - Represents a human user interacting with the system.

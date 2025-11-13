@@ -48,7 +48,9 @@ fun FeatureCard(title: String, description: String, modifier: Modifier = Modifie
 }
 
 @Composable
-fun AiFeaturesScreen() {
+fun AIFeaturesScreen(
+    onNavigateToConsciousness: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()

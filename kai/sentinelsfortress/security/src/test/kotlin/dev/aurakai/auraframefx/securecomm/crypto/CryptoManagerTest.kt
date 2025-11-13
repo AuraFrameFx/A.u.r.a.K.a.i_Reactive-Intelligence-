@@ -209,9 +209,7 @@ class CryptoManagerTest {
 
         override fun startInstrumentation(
             className: ComponentName, profileFile: String?, arguments: Bundle?
-        ): Boolean {
-            TODO("Not yet implemented")
-        }
+        ) = throw UnsupportedOperationException()
 
         override fun stopService(name: Intent?) = throw UnsupportedOperationException()
 
@@ -239,9 +237,7 @@ class CryptoManagerTest {
 
         override fun bindService(
             service: Intent, conn: ServiceConnection, flags: Int
-        ): Boolean {
-            TODO("Not yet implemented")
-        }
+        ) = throw UnsupportedOperationException()
 
         override fun checkCallingOrSelfPermission(permission: String) =
             throw UnsupportedOperationException()

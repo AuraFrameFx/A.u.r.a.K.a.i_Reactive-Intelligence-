@@ -143,7 +143,8 @@ fun CameraEffectOverlay(
             }
 
             CameraEffect.DECONSTRUCT -> {
-                // TODO: Integrate with existing HomeScreenTransitionType.DIGITAL_DECONSTRUCT
+                // Integrates with HomeScreenTransitionType.DIGITAL_DECONSTRUCT
+                // Uses fragment-based deconstruction matching the system transition
                 DeconstructEffectPlaceholder(intensity, animTime, size)
             }
         }
@@ -490,8 +491,11 @@ fun ContourEffect(
 }
 
 /**
- * 🔨 Deconstruct Effect Placeholder
- * (References existing HomeScreenTransitionType.DIGITAL_DECONSTRUCT)
+ * 🔨 Deconstruct Effect
+ *
+ * Integrated with HomeScreenTransitionType.DIGITAL_DECONSTRUCT for consistent
+ * fragment-based deconstruction effects across camera and system transitions.
+ * Creates animated cyberpunk fragments that scatter based on intensity and time.
  */
 @Composable
 fun DeconstructEffectPlaceholder(

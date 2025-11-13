@@ -34,6 +34,7 @@ import javax.inject.Singleton
 class GenesisBridgeService @Inject constructor(
     private val auraAIService: AuraAIService,
     private val kaiAIService: KaiAIService,
+    private val claudeAIService: ClaudeAIService,
     private val vertexAIClient: VertexAIClient,
     private val contextManager: ContextManager,
     private val securityContext: SecurityContext,

@@ -96,6 +96,30 @@ data class CapabilityPolicy(
                 "metrics/system"
             )
         )
+
+        val CLAUDE_POLICY = CapabilityPolicy(
+            httpAllowlist = listOf(
+                "api.anthropic.com",
+                "generativelanguage.googleapis.com"
+            ),
+            firebaseScopes = setOf(
+                SCOPE_FIRESTORE_READ,
+                SCOPE_FIRESTORE_WRITE,
+                SCOPE_CONFIG_READ,
+                SCOPE_STORAGE_DOWNLOAD
+            ),
+            allowedCollections = setOf(
+                "build/logs",
+                "build/fixes",
+                "insights",
+                "architecture/decisions",
+                "claude/analysis"
+            ),
+            allowedStoragePaths = setOf(
+                "build_artifacts/",
+                "logs/"
+            )
+        )
     }
 
     /**

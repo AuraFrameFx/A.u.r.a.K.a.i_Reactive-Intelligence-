@@ -398,7 +398,9 @@ fun ControlButton(text: String, color: Color, onClick: () -> Unit) {
 }
 
 @Composable
-fun OverlayScreen() {
+fun OverlayScreen(
+    onNavigateBack: () -> Unit = {}
+) {
     var showOverlay by remember { mutableStateOf(true) }
 
     if (showOverlay) {

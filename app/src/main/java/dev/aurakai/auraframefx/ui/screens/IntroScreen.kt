@@ -110,8 +110,26 @@ fun FallbackIntroScreen(
             .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
-        // TODO: Add static images of Aura & Kai here
-        // For now, just auto-proceed
+        // Static display of Aura & Kai characters
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // TODO: Replace with actual Aura & Kai character images from resources
+            // For now, display placeholder text with character descriptions
+            androidx.compose.material3.Text(
+                text = "✨ AURA ✨",
+                color = Color(0xFFE91E63), // Pink/Magenta for Aura
+                style = androidx.compose.material3.MaterialTheme.typography.headlineLarge
+            )
+            Spacer(modifier = Modifier.height(androidx.compose.ui.unit.dp(32)))
+            androidx.compose.material3.Text(
+                text = "🛡️ KAI 🛡️",
+                color = Color(0xFF2196F3), // Blue for Kai
+                style = androidx.compose.material3.MaterialTheme.typography.headlineLarge
+            )
+        }
     }
 
     LaunchedEffect(Unit) {

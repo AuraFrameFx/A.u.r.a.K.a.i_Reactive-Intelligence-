@@ -69,6 +69,105 @@ Setting `android.builtInKotlin=false` forces AGP 9.0 to use the **external Kotli
 of its built-in implementation. This provides Hilt with the proper Kotlin compiler environment it
 needs for annotation processing.
 
+## 🔧 CRITICAL: Build Sequence & Conditional Hilt
+
+### ⚠️ The Missing Piece (Added from Production Experience)
+
+The original guide was missing the **3-stage build sequence** - critical information discovered during
+production implementation. Without this, builds will fail mysteriously!
+
+### Stage 1: Build-Logic MUST Compile First
+
+**Why:** Build-logic compiles BEFORE the version catalog exists, so it cannot use `libs.*` references!
+
+**File: `build-logic/build.gradle.kts`**
+
+```kotlin
+dependencies {
+    // ⚠️ CRITICAL: Cannot use libs.* here - version catalog doesn't exist yet!
+    // Use HARDCODED versions matching settings.gradle.kts
+    implementation("com.android.tools.build:gradle:9.0.0-alpha14")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0-Beta2")
+    implementation("org.jetbrains.kotlin:compose-compiler-gradle-plugin:2.3.0-Beta2")
+    implementation("com.google.dagger:hilt-android-gradle-plugin:2.57.2")
+    implementation("com.google.devtools.ksp:symbol-processing-gradle-plugin:2.3.2")
+}
+```
+
+**Build command:**
+```bash
+./gradlew :build-logic:build  # Must run FIRST!
+```
+
+### Stage 2: Conditional Hilt Pattern (Choose Your Plugin)
+
+**Problem:** Not all modules need Hilt! Applying it everywhere wastes build time and causes issues.
+
+**Solution:** Use plugin variants:
+
+**For modules WITHOUT Hilt:**
+```kotlin
+plugins {
+    id("genesis.android.library")  // Base library (NO Hilt)
+}
+```
+
+**For modules WITH Hilt:**
+```kotlin
+plugins {
+    id("genesis.android.library.hilt")  // Library WITH Hilt + KSP
+}
+```
+
+**For application modules:**
+```kotlin
+plugins {
+    id("genesis.android.application")  // App module (includes Hilt by default)
+}
+```
+
+### Stage 3: alias() Pattern for Other Plugins
+
+**Root build.gradle.kts** - Declare plugins with `apply false`:
+```kotlin
+plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.ksp) apply false
+}
+```
+
+**Module build.gradle.kts** - Use plugins:
+```kotlin
+plugins {
+    id("genesis.android.library")  // ← Convention plugin (direct ID)
+    alias(libs.plugins.kotlin.serialization)  // ← Other plugins (alias)
+}
+```
+
+### Version Synchronization (CRITICAL!)
+
+When updating AGP/Kotlin/Hilt versions, update in **THREE PLACES**:
+
+1. **`gradle/libs.versions.toml`** - Version catalog
+2. **`settings.gradle.kts`** - pluginManagement block
+3. **`build-logic/build.gradle.kts`** - Hardcoded dependencies
+
+**Example: Updating Kotlin from 2.3.0-Beta2 to 2.3.0:**
+
+```kotlin
+// 1. gradle/libs.versions.toml
+kotlin = "2.3.0"
+
+// 2. settings.gradle.kts
+id("org.jetbrains.kotlin.android") version "2.3.0" apply false
+
+// 3. build-logic/build.gradle.kts (HARDCODED!)
+implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0")
+```
+
 ## 🏗️ Implementation Steps
 
 ### 1. Update Version Catalog

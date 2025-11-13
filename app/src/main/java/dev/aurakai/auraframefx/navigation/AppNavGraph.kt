@@ -115,6 +115,30 @@ fun AppNavGraph(navController: NavHostController) {
             JournalPDAScreen(navController = navController)
         }
 
+        // DataVein Hub - Entry point to data network visualization
+        composable(
+            route = NavDestination.DataVein.route
+        ) {
+            dev.aurakai.auraframefx.datavein.ui.SimpleDataVeinScreen(
+                onLaunchSphereGrid = {
+                    navController.navigate(NavDestination.SphereGrid.route)
+                }
+            )
+        }
+
+        // DataVein Sphere Grid - FFX-style progression interface
+        composable(
+            route = NavDestination.SphereGrid.route
+        ) {
+            dev.aurakai.auraframefx.datavein.ui.DataVeinSphereGrid(
+                onNodeSelected = { node ->
+                    // Log node selection for analytics and future detail screen navigation
+                    timber.log.Timber.i("DataVein node selected: ${node.id} - ${node.title}")
+                    // Future: navController.navigate("sphere_node_detail/${node.id}")
+                }
+            )
+        }
+
         // Add AI Content navigation
         // aiContentNavigation() // Disabled for beta - AI content will be in main chat
 

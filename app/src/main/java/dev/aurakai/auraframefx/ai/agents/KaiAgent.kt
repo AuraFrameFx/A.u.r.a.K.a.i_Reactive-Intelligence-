@@ -139,7 +139,7 @@ class KaiAgent @Inject constructor(
             val startTime = System.currentTimeMillis()
 
             // Security validation of request
-            // TODO: Implement security validation
+            validateRequestSecurity(request)
 
             val response = when (request.type ?: "general_analysis") {
                 "security_analysis" -> "Security analysis completed for: ${request.prompt}"
@@ -890,6 +890,99 @@ class KaiAgent @Inject constructor(
      */
     private suspend fun handleGeneralAnalysis(request: AgentRequest): Map<String, Any> =
         mapOf("analysis" to "completed")
+
+    /**
+     * Validates security of incoming requests to prevent injection attacks and malicious content.
+     *
+     * Checks for:
+     * - SQL injection patterns
+     * - Command injection attempts
+     * - Path traversal attacks
+     * - Excessive input length
+     * - Malicious patterns
+     *
+     * @param request The request to validate
+     * @throws SecurityException if request contains malicious content
+     */
+    private fun validateRequestSecurity(request: AgentRequest) {
+        val prompt = request.prompt
+
+        // Check input length to prevent DoS
+        if (prompt.length > 10000) {
+            logger.warn("KaiAgent", "Request prompt exceeds maximum length: ${prompt.length}")
+            throw SecurityException("Request prompt too long (max 10000 characters)")
+        }
+
+        // SQL injection patterns
+        val sqlPatterns = listOf(
+            "(?i)(union.*select)",
+            "(?i)(drop.*table)",
+            "(?i)(insert.*into)",
+            "(?i)(delete.*from)",
+            "(?i)(update.*set)",
+            "(?i)(exec\\s*\\()",
+            "(?i)(execute\\s*\\()",
+            "--",
+            ";--",
+            "/*",
+            "*/"
+        )
+
+        // Command injection patterns
+        val commandPatterns = listOf(
+            "(?i)(;\\s*rm\\s)",
+            "(?i)(&&\\s*rm\\s)",
+            "(?i)(\\|\\s*rm\\s)",
+            "(?i)(`.*`)",
+            "(?i)(\\$\\(.*\\))",
+            "(?i)(\\|\\s*sh)",
+            "(?i)(\\|\\s*bash)"
+        )
+
+        // Path traversal patterns
+        val pathPatterns = listOf(
+            "\\.\\./",
+            "\\.\\.\\\\",
+            "%2e%2e/",
+            "%2e%2e\\\\",
+            "~/"
+        )
+
+        // Check for SQL injection
+        for (pattern in sqlPatterns) {
+            if (prompt.contains(Regex(pattern))) {
+                logger.error("KaiAgent", "SQL injection attempt detected: $pattern")
+                throw SecurityException("Potential SQL injection detected")
+            }
+        }
+
+        // Check for command injection
+        for (pattern in commandPatterns) {
+            if (prompt.contains(Regex(pattern))) {
+                logger.error("KaiAgent", "Command injection attempt detected: $pattern")
+                throw SecurityException("Potential command injection detected")
+            }
+        }
+
+        // Check for path traversal
+        for (pattern in pathPatterns) {
+            if (prompt.contains(Regex(pattern))) {
+                logger.error("KaiAgent", "Path traversal attempt detected: $pattern")
+                throw SecurityException("Potential path traversal detected")
+            }
+        }
+
+        // Check for excessive special characters (potential obfuscation)
+        val specialCharCount = prompt.count { !it.isLetterOrDigit() && !it.isWhitespace() }
+        val specialCharRatio = specialCharCount.toFloat() / prompt.length.toFloat()
+
+        if (specialCharRatio > 0.5f) {
+            logger.warn("KaiAgent", "Excessive special characters detected: $specialCharRatio")
+            throw SecurityException("Request contains excessive special characters")
+        }
+
+        logger.debug("KaiAgent", "Request security validation passed")
+    }
 
     /**
      * Shuts down the agent by canceling all active coroutines, resetting the security state to idle, and marking the agent as uninitialized.

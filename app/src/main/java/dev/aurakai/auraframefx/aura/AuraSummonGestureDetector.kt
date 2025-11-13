@@ -1,39 +1,100 @@
 ﻿package dev.aurakai.auraframefx.ui.gestures
 
 import android.content.Context
-import android.util.Log
+import android.content.Intent
 import android.view.GestureDetector
 import android.view.MotionEvent
+import timber.log.Timber
 
 /**
  * Custom gesture detector for Aura summon actions.
- * Extends SimpleOnGestureListener to override only necessary methods.
+ *
+ * Handles gestures to activate and control the Aura AI assistant:
+ * - Double tap: Quick summon/activate Aura
+ * - Long press: Open Aura context menu or advanced options
  */
 class AuraSummonGestureDetector(
-    private val context: Context, // Example: if context is needed for resources or actions
+    private val context: Context,
+    private val onAuraSummoned: (() -> Unit)? = null,
+    private val onAuraContextMenu: (() -> Unit)? = null
 ) : GestureDetector.SimpleOnGestureListener() {
 
-    private val tag = "AuraSummonDetector"
+    companion object {
+        private const val ACTION_SUMMON_AURA = "dev.aurakai.auraframefx.ACTION_SUMMON_AURA"
+        private const val ACTION_AURA_CONTEXT_MENU = "dev.aurakai.auraframefx.ACTION_AURA_CONTEXT_MENU"
+    }
 
     override fun onDown(e: MotionEvent): Boolean {
         // Must return true here to ensure other gestures are detected.
         return true
     }
 
+    /**
+     * Handles double-tap gesture to summon Aura.
+     *
+     * Triggers Aura activation through:
+     * 1. Callback if provided
+     * 2. Broadcast intent for system-wide handling
+     *
+     * @param e The motion event
+     * @return true to indicate the event was consumed
+     */
     override fun onDoubleTap(e: MotionEvent): Boolean {
-        Log.d(tag, "onDoubleTap event detected.")
-        // TODO: Implement actual double tap logic for summoning Aura or other actions.
-        // This method returning true indicates the event was handled.
-        return true // As per error report: "Method 'onDoubleTap()' always returns 'true'"
+        Timber.i("AuraSummonDetector: Double tap detected - summoning Aura")
+
+        // Invoke callback if provided
+        onAuraSummoned?.invoke()
+
+        // Send broadcast for system-wide Aura activation
+        try {
+            val intent = Intent(ACTION_SUMMON_AURA).apply {
+                putExtra("summon_x", e.x)
+                putExtra("summon_y", e.y)
+                putExtra("summon_time", System.currentTimeMillis())
+            }
+            context.sendBroadcast(intent)
+            Timber.d("AuraSummonDetector: Broadcast sent for Aura summon")
+        } catch (e: Exception) {
+            Timber.e(e, "AuraSummonDetector: Failed to broadcast summon")
+        }
+
+        return true
     }
 
+    /**
+     * Handles long-press gesture for Aura context menu.
+     *
+     * Triggers advanced Aura options through:
+     * 1. Callback if provided
+     * 2. Broadcast intent for system-wide handling
+     *
+     * Opens context menu with options like:
+     * - Aura settings
+     * - Voice mode toggle
+     * - Agent switching
+     * - Quick actions
+     *
+     * @param e The motion event
+     */
     override fun onLongPress(e: MotionEvent) {
-        Log.d(tag, "onLongPress event detected.")
-        // TODO: Implement long press logic, e.g., for an alternative summon or context menu.
-    }
+        Timber.i("AuraSummonDetector: Long press detected - opening Aura context menu")
 
-    // You can override other gesture methods as needed:
-    // onSingleTapConfirmed, onScroll, onFling, onShowPress, onSingleTapUp, etc.
+        // Invoke callback if provided
+        onAuraContextMenu?.invoke()
+
+        // Send broadcast for system-wide context menu
+        try {
+            val intent = Intent(ACTION_AURA_CONTEXT_MENU).apply {
+                putExtra("menu_x", e.x)
+                putExtra("menu_y", e.y)
+                putExtra("menu_time", System.currentTimeMillis())
+            }
+            context.sendBroadcast(intent)
+            Timber.d("AuraSummonDetector: Broadcast sent for context menu")
+        } catch (e: Exception) {
+            Timber.e(e, "AuraSummonDetector: Failed to broadcast context menu")
+        }
+    }
 }
 
 // Example usage (typically in a View or Composable):

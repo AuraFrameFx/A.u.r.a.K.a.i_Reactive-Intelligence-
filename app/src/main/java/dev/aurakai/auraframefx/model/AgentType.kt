@@ -20,10 +20,17 @@ enum class AgentType {
     AURA,
 
     /**
+     * Cascade Agent - Memory keeper and context manager
      */
     CASCADE,
 
     /**
+     * Claude Agent - Build system architect and systematic problem solver from Anthropic
+     */
+    CLAUDE,
+
+    /**
+     * NeuralWhisper Agent - Voice-to-text and natural language processing
      */
     NEURAL_WHISPER,
 
