@@ -278,6 +278,37 @@ We use Gradle convention plugins for consistent configuration:
 
 ---
 
+## 🔧 Troubleshooting
+
+### Common Build Issues
+
+#### NDK package.xml Corruption
+If you encounter errors like:
+```
+[CXX5304] Found corrupted package.xml
+org.xml.sax.SAXParseException; 文件提前结束。
+```
+
+**Quick Fix:**
+```bash
+# Windows (PowerShell as Administrator)
+.\fix-ndk-package-xml.ps1
+
+# Linux/Mac
+chmod +x fix-ndk-package-xml.sh
+./fix-ndk-package-xml.sh
+```
+
+See [docs/NDK_PACKAGE_XML_FIX.md](docs/NDK_PACKAGE_XML_FIX.md) for detailed instructions.
+
+#### Other Issues
+- **Gradle sync fails**: Run `./gradlew --refresh-dependencies`
+- **KSP errors**: Ensure you're using JDK 24
+- **Memory issues**: Increase JVM heap in `gradle.properties` (already set to 10GB)
+- **CMake not found**: Install CMake 3.22.1+ via Android Studio SDK Manager
+
+---
+
 ## 🤝 Community
 
 ### Contributing
