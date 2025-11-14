@@ -5,6 +5,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -32,16 +33,8 @@ android {
 
 dependencies {
     // ═══════════════════════════════════════════════════════════════════════
-    // AUTO-PROVIDED by genesis.android.library.hilt:
-    // - androidx-core-ktx, appcompat, timber
-    // - Hilt (android + compiler via KSP)
-    // - Coroutines (core + android)
-    // - Compose enabled by default
-    // - Java 24 bytecode target
-    // - KSP plugin for annotation processing
-    // ═══════════════════════════════════════════════════════════════════════
-
     // Hilt Dependency Injection
+    // ═══════════════════════════════════════════════════════════════════════
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 

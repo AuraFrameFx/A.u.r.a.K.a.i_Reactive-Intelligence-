@@ -1,10 +1,13 @@
 package dev.aurakai.auraframefx.aura.reactivedesign.customization
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Redo
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -259,7 +262,7 @@ fun ComponentEditor(
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Undo,
+                    imageVector = Icons.AutoMirrored.Filled.Undo,
                     contentDescription = "Undo",
                     modifier = Modifier.size(18.dp)
                 )
@@ -273,7 +276,7 @@ fun ComponentEditor(
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Redo,
+                    imageVector = Icons.AutoMirrored.Filled.Redo,
                     contentDescription = "Redo",
                     modifier = Modifier.size(18.dp)
                 )
