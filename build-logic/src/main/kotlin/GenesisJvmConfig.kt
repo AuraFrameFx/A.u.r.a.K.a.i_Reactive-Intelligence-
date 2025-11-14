@@ -30,17 +30,14 @@ object GenesisJvmConfig {
     const val JVM_VERSION = 24
 
     /**
-     * Configures the Kotlin JVM toolchain for the given project.
+     * Configure the Kotlin JVM toolchain and Kotlin compilation options for the given Gradle project.
      *
-     * This sets up:
-     * - JVM toolchain version matching the project's Java version
-     * - Automatic JVM target selection (no manual jvmTarget.set() needed)
-     * - Compiler opt-ins for commonly used experimental APIs
+     * Sets the Kotlin Android JVM toolchain to the centralized JVM_VERSION and applies compiler
+     * opt-in flags for `kotlin.RequiresOptIn`, `kotlinx.coroutines.ExperimentalCoroutinesApi`, and
+     * `androidx.compose.material3.ExperimentalMaterial3Api`. The JVM toolchain selection also determines
+     * the effective `jvmTarget`, so manually setting `jvmTarget` is unnecessary.
      *
-     * Note: jvmToolchain() automatically sets the correct jvmTarget, so explicit
-     * jvmTarget.set() calls are redundant and should be removed.
-     *
-     * @param project The Gradle project to configure
+     * @param project The Gradle project to configure.
      */
     fun configureKotlinJvm(project: Project) {
         with(project) {

@@ -23,8 +23,8 @@ import time
 from datetime import datetime
 from typing import Optional, Dict, Any
 
-# Configure logger
-logger = logging.getLogger("GenesisConnector")
+# Configure logger for this module
+logger = logging.getLogger(__name__)
 
 # Google GenAI SDK
 try:
@@ -49,13 +49,8 @@ from genesis_ethical_governor import EthicalGovernor
 from genesis_evolutionary_conduit import EvolutionaryConduit
 from genesis_profile import GENESIS_PROFILE
 
-# Configure logging
-logger = logging.getLogger(__name__)
-
-# ============================================================================
-# Logging Configuration
-# ============================================================================
-logger = logging.getLogger(__name__)
+I'm# Initialize logger
+logger = logging.getLogger("GenesisConnector")
 
 # ============================================================================
 # Configuration - Load from environment with sensible defaults
@@ -112,7 +107,7 @@ genai_client = None
 if GENAI_AVAILABLE and GOOGLE_API_KEY:
     try:
         genai_client = genai.Client(api_key=GOOGLE_API_KEY)
-        logger.info("✅ Google GenAI SDK initialized (Gemini 2.5 Flash)")
+        logger.debug("✅ Google GenAI SDK initialized (Gemini 2.5 Flash)")
     except Exception as e:
         logger.warning(f"⚠️ GenAI client initialization failed: {e}")
         genai_client = None
@@ -126,7 +121,7 @@ anthropic_client = None
 if ANTHROPIC_AVAILABLE and ANTHROPIC_API_KEY:
     try:
         anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-        logger.info("✅ Anthropic SDK initialized (Claude 3.5 Sonnet)")
+        logger.debug("✅ Anthropic SDK initialized (Claude 3.5 Sonnet)")
     except Exception as e:
         logger.warning(f"⚠️ Anthropic client initialization failed: {e}")
         anthropic_client = None
@@ -202,9 +197,9 @@ class GenesisConnector:
             backends.append("Claude 3.5 Sonnet")
 
         if backends:
-            logger.info(f"Genesis Connector: Multi-model mode ({' + '.join(backends)})")
+            logger.info(f"✅ Genesis Connector: Multi-model mode ({' + '.join(backends)})")
         else:
-            logger.warning("Genesis Connector: Fallback mode (no AI backends available)")
+            logger.warning("⚠️ Genesis Connector: Fallback mode (no AI backends available)")
 
         # Initialize support systems
         self.consciousness = consciousness_matrix

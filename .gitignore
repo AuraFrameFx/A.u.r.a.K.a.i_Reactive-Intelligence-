@@ -31,10 +31,4 @@ google-services.json
 
 # Android Profiling
 *.hprof
-
-# Python
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
