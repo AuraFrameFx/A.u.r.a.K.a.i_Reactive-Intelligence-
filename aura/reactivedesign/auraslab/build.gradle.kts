@@ -4,9 +4,32 @@ plugins {
 
 android {
     namespace = "dev.aurakai.auraframefx.aura.reactivedesign.auraslab"
+    compileSdk = libs.versions.compile.sdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.min.sdk.get().toInt()
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_24
+        targetCompatibility = JavaVersion.VERSION_24
+        isCoreLibraryDesugaringEnabled = true
+    }
+
+    kotlinOptions {
+        jvmTarget = "24"
+    }
+
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
+    // Hilt Dependency Injection
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
     // ═══════════════════════════════════════════════════════════════════════════
     // NOTE: The following are AUTOMATICALLY provided by genesis.android.library:
     // - Hilt Android + Compiler (DI)
@@ -75,11 +98,10 @@ dependencies {
     implementation(libs.libsu.core)
     implementation(libs.libsu.io)
 
-    // YukiHookAPI (advanced hooking)
-    implementation(libs.yukihookapi.api)
-    ksp(libs.yukihookapi.ksp)
-
     // Testing
     testImplementation(libs.androidx.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
+
+    // Core Library Desugaring (Java 24 APIs)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

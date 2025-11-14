@@ -8,10 +8,33 @@ plugins {
 
 android {
     namespace = "dev.aurakai.auraframefx.aura.reactivedesign.collabcanvas"
+    compileSdk = libs.versions.compile.sdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.min.sdk.get().toInt()
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_24
+        targetCompatibility = JavaVersion.VERSION_24
+        isCoreLibraryDesugaringEnabled = true
+    }
+
+    kotlinOptions {
+        jvmTarget = "24"
+    }
+
+    buildFeatures {
+        compose = true
+    }
     // Java 24 compileOptions and Compose are set by genesis.android.base
 }
 
 dependencies {
+    // Hilt Dependency Injection
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
     // ═══════════════════════════════════════════════════════════════════════
     // AUTO-PROVIDED by genesis.android.library.hilt:
     // - androidx-core-ktx, appcompat, timber
@@ -45,6 +68,6 @@ dependencies {
     // Xposed API (compile-only, not bundled in APK)
     compileOnly(files("$projectDir/libs/api-82.jar"))
 
-    // YukiHook API Code Generation (Xposed framework)
-    ksp(libs.yukihookapi.ksp)
+    // Core Library Desugaring (Java 24 APIs)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
