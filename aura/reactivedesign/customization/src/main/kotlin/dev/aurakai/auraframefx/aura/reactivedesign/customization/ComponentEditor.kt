@@ -569,7 +569,15 @@ private fun PropertySlider(
 }
 
 /**
- * Preset card with load/delete actions
+ * Displays a compact card representing a saved property preset with actions to load or delete it.
+ *
+ * The card shows the preset's name and exposes two actions: tapping the card invokes [onLoad] to apply the preset,
+ * and tapping the delete icon invokes [onDelete] to remove the preset.
+ *
+ * @param preset The preset displayed by this card.
+ * @param onLoad Callback invoked when the card is tapped to load the preset.
+ * @param onDelete Callback invoked when the delete action is triggered for this preset.
+ * @param modifier Modifier applied to the card for layout/styling.
  */
 @Composable
 private fun PresetCard(
