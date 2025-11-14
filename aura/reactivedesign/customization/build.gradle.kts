@@ -44,6 +44,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons.extended) // For Material Icons
 
     // Core Library Desugaring (Java 24 APIs)
     coreLibraryDesugaring(libs.desugar.jdk.libs)

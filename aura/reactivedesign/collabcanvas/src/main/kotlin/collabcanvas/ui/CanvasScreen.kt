@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Clear
@@ -19,7 +20,6 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Rectangle
 import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Straighten
-import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
@@ -34,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
@@ -42,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import java.lang.Math.PI
-import java.lang.Math.atan2
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
@@ -106,7 +104,7 @@ fun CanvasScreen(
 
     // For collaboration
     LaunchedEffect(Unit) {
-        return@LaunchedEffect collaborationEvents?.collectLatest { operation -> paths.add(operation) }
+        collaborationEvents?.collectLatest { operation -> paths.add(operation) }
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -136,12 +134,12 @@ fun CanvasScreen(
                             }
                         },
                         onDragEnd = {
-                            val endPosition = it
+                            val endPosition = startPosition
                             when (currentTool) {
                                 DrawingTool.PEN, DrawingTool.ERASER, DrawingTool.HIGHLIGHTER -> {
                                     currentPath?.let { path ->
-                                        val op: Unit = DrawingOperation.PathOp(
-                                            path = android.graphics.Path(path),
+                                        val op = DrawingOperation.PathOp(
+                                            path = path,
                                             color = if (currentTool == DrawingTool.ERASER)
                                                 colorScheme.background else currentColor,
                                             strokeWidth = if (currentTool == DrawingTool.HIGHLIGHTER)
@@ -231,6 +229,10 @@ fun CanvasScreen(
                 )
             }
 
+            // Get window info at the composable level
+            val windowInfo = getWindowInfo()
+            val mousePos = windowInfo.mousePosition ?: startPosition
+
             // Draw shape preview
             if (currentPath == null && currentTool in listOf(
                     DrawingTool.LINE,
@@ -238,8 +240,6 @@ fun CanvasScreen(
                     DrawingTool.CIRCLE
                 ) && startPosition != Offset.Zero
             ) {
-                val windowInfo = getWindowInfo()
-                val mousePos = windowInfo.mousePosition ?: startPosition
                 val endPosition = windowInfo.keyboardModifiers?.takeIf { it.isShiftPressed }?.let {
                     // Snap to 45-degree angles when shift is held
                     val delta = mousePos.minus(startPosition)
@@ -302,7 +302,7 @@ fun CanvasScreen(
                     },
                     enabled = paths.isNotEmpty()
                 ) {
-                    Icon(Icons.Default.Undo, "Undo")
+                    Icon(Icons.AutoMirrored.Filled.Undo, "Undo")
                 }
                 IconButton(
                     onClick = {
@@ -342,7 +342,7 @@ fun CanvasScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                items(DrawingTool.values()) { tool ->
+                items(DrawingTool.entries.toTypedArray()) { tool ->
                     val isSelected = currentTool == tool
                     val tint = if (isSelected) colorScheme.primary else colorScheme.onSurfaceVariant
 
