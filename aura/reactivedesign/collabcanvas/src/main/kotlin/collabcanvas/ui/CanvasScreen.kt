@@ -85,6 +85,20 @@ enum class DrawingTool {
     PEN, ERASER, LINE, RECTANGLE, CIRCLE, HIGHLIGHTER
 }
 
+/**
+ * Displays an interactive drawing canvas with tool selection, undo/redo, stroke and color controls,
+ * shape previews (with Shift-to-snap), and optional real-time collaboration.
+ *
+ * The UI provides freehand drawing (pen, eraser, highlighter), basic shape tools (line, rectangle, circle),
+ * a stroke width slider, a color picker, undo/redo/clear actions, and a bottom tool bar. When a start point
+ * for a shape is set, holding Shift snaps the shape's angle to 45-degree increments for the preview.
+ * If `isCollaborative` is true a small "Collaborative Mode" badge is shown.
+ *
+ * @param modifier Modifier applied to the root container.
+ * @param onBack Callback invoked when the top app bar navigation (back) action is triggered.
+ * @param isCollaborative When true, shows a collaboration indicator in the UI.
+ * @param collaborationEvents Optional MutableSharedFlow used to receive remote DrawingOperation events and to emit local operations for real-time collaboration.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CanvasScreen(
