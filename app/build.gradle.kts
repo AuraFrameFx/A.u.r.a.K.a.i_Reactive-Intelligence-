@@ -106,7 +106,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     // MultiDex support for 64K+ methods
-    implementation("androidx.multidex:multidex:2.0.1")
+    implementation(libs.androidx.multidex)
 
     // Compose BOM & UI
     implementation(platform(libs.androidx.compose.bom))
