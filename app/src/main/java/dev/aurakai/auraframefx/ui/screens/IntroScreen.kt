@@ -1,5 +1,6 @@
 package dev.aurakai.auraframefx.ui.screens
 
+import android.net.Uri
 import android.view.ViewGroup
 import android.widget.VideoView
 import androidx.compose.foundation.background
@@ -9,7 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.net.toUri
 import kotlinx.coroutines.delay
 import timber.log.Timber
 
@@ -45,8 +48,8 @@ fun IntroScreen(
     ) {
         // Video player
         AndroidView(
-            factory = @UiComposable { ctx ->
-                return@AndroidView VideoView(ctx).apply {
+            factory = { ctx ->
+                VideoView(ctx).apply {
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
@@ -133,7 +136,7 @@ fun FallbackIntroScreen(
                 color = Color(0xFFE91E63), // Pink/Magenta for Aura
                 style = androidx.compose.material3.MaterialTheme.typography.headlineLarge
             )
-            Spacer(modifier = Modifier.height(androidx.compose.ui.unit.dp(32)))
+            Spacer(modifier = Modifier.height(32.dp))
             androidx.compose.material3.Text(
                 text = "🛡️ KAI 🛡️",
                 color = Color(0xFF2196F3), // Blue for Kai
