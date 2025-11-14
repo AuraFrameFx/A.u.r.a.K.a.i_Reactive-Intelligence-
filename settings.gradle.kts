@@ -2,7 +2,7 @@
 
 pluginManagement {
     includeBuild("build-logic")
-    
+
     repositories {
         gradlePluginPortal()
         google()
@@ -11,16 +11,12 @@ pluginManagement {
         maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") }
         maven { url = uri("https://jitpack.io") }
     }
-    
+    plugins {
+        id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+    }
     // Plugin versions are now managed in the root build.gradle.kts
 }
-
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-}
-
-
-    dependencyResolutionManagement {
+dependencyResolutionManagement {
         repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
 
         repositories {

@@ -102,6 +102,9 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.androidx.activity.compose)
 
+    // MultiDex support for 64K+ methods
+    implementation("androidx.multidex:multidex:2.0.1")
+
     // Compose BOM & UI
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.compose.ui)
@@ -148,10 +151,7 @@ dependencies {
 
     // Firebase BOM (Bill of Materials) for version management
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.crashlytics)
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
+
 
     // Networking
     implementation(libs.okhttp)
@@ -192,7 +192,6 @@ dependencies {
     compileOnly(files("$projectDir/libs/api-82-sources.jar"))
 
     // AI & ML - Google Generative AI SDK
-    implementation(libs.generativeai)
 
     // Core Library Desugaring (Java 24 APIs)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
@@ -200,6 +199,9 @@ dependencies {
     // ═══════════════════════════════════════════════════════════════════════════
     // Internal Project Modules - Core
     // ═══════════════════════════════════════════════════════════════════════════
+
+    // Material Icons Extended
+    implementation(libs.compose.material.icons.extended)
 
     // Aura → ReactiveDesign (Creative UI & Collaboration)
     implementation(project(":aura:reactivedesign:auraslab"))
