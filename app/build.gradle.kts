@@ -32,9 +32,6 @@ android {
         versionCode = 1
         versionName = "0.1.0"
 
-        // Enable MultiDex (required for 276K+ methods)
-        multiDexEnabled = true
-
         // Genesis Protocol: Gemini 2.0 Flash API Key
         // Add to local.properties: GEMINI_API_KEY=your_key_here
         // Get key from: https://aistudio.google.com/app/apikey
@@ -104,9 +101,6 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.material)
     implementation(libs.androidx.activity.compose)
-
-    // MultiDex support for 64K+ methods
-    implementation("androidx.multidex:multidex:2.0.1")
 
     // Compose BOM & UI
     implementation(platform(libs.androidx.compose.bom))
