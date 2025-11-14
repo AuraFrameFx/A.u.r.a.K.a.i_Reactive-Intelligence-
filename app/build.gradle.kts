@@ -6,7 +6,6 @@
 plugins {
     // Core Android and Kotlin plugins
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
 
     // Compose and serialization
     id("org.jetbrains.kotlin.plugin.compose")
@@ -57,15 +56,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_24
         targetCompatibility = JavaVersion.VERSION_24
         isCoreLibraryDesugaringEnabled = true
-    }
-
-    kotlinOptions {
-        jvmTarget = "24"
-        freeCompilerArgs += listOf(
-            "-opt-in=kotlin.RequiresOptIn",
-            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api"
-        )
     }
 
     lint {
