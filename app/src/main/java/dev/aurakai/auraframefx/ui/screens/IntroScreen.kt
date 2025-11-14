@@ -1,8 +1,6 @@
 package dev.aurakai.auraframefx.ui.screens
 
-import android.net.Uri
 import android.view.ViewGroup
-import android.widget.MediaController
 import android.widget.VideoView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -32,6 +30,14 @@ fun IntroScreen(
     val context = LocalContext.current
     var videoEnded by remember { mutableStateOf(false) }
 
+    // Log screen lifecycle
+    DisposableEffect(Unit) {
+        Timber.d("🎬 IntroScreen: Composed")
+        onDispose {
+            Timber.d("🎬 IntroScreen: Disposed")
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -39,8 +45,8 @@ fun IntroScreen(
     ) {
         // Video player
         AndroidView(
-            factory = { ctx ->
-                VideoView(ctx).apply {
+            factory = @UiComposable { ctx ->
+                return@AndroidView VideoView(ctx).apply {
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
@@ -49,10 +55,12 @@ fun IntroScreen(
                     // Load the intro video from assets
                     try {
                         val videoPath = "android.resource://${ctx.packageName}/raw/launch_screen_intro"
-                        val uri = Uri.parse(videoPath)
+                        val uri = videoPath.toUri()
+                        Timber.d("🎬 Attempting to load video from: $videoPath")
 
                         // If video is in assets, use this approach:
                         val assetPath = "file:///android_asset/intro/launch_screen_intro.mp4"
+                        Timber.d("🎬 Setting video path: $assetPath")
                         setVideoPath(assetPath)
 
                         // Optional: Add media controls for debugging
@@ -90,7 +98,9 @@ fun IntroScreen(
     // When video ends, transition to main app
     LaunchedEffect(videoEnded) {
         if (videoEnded) {
+            Timber.d("🎬 Video ended, preparing to complete intro")
             delay(500) // Small delay for smooth transition
+            Timber.d("🎬 Calling onIntroComplete")
             onIntroComplete()
         }
     }

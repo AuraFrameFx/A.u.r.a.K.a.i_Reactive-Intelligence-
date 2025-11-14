@@ -91,6 +91,7 @@ dependencies {
     // Compose Extras (Navigation, Animation - NOT in convention plugin)
     implementation(libs.compose.animation)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.compose.material3)
 // ═══════════════════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -148,6 +149,9 @@ dependencies {
 
     // Animations
     implementation(libs.lottie.compose)
+
+    // Logging
+    implementation(libs.timber)
 
     // Memory Leak Detection
     debugImplementation(libs.leakcanary.android)

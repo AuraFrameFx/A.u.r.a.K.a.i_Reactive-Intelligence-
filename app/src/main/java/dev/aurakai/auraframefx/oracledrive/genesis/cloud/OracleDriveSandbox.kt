@@ -574,7 +574,7 @@ class OracleDriveSandbox @Inject constructor(
         return try {
             AuraFxLogger.d("OracleDriveSandbox", "Reading original file: $targetFile")
 
-            val file = java.io.File(targetFile)
+            val file = File(targetFile)
 
             // Safety checks before reading
             if (!file.exists()) {

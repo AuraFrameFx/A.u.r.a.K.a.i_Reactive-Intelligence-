@@ -202,6 +202,7 @@ espresso = "3.7.0"
 
 # Benchmark - Latest: 1.4.1 (Sept 10, 2025)
 benchmark = "1.4.1"
+material3 = "1.4.0"
 
 [libraries]
 # ============================================================================
@@ -339,6 +340,7 @@ mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 xposed-api = { group = "de.robv.android.xposed", name = "api", version.ref = "xposed" }
 yukihookapi-api = { group = "com.highcapable.yukihookapi", name = "api", version.ref = "yukihookapi" }
 yukihookapi-ksp = { group = "com.highcapable.yukihookapi", name = "ksp", version.ref = "yukihookapi" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 # ============================================================================
 # Gradle Plugins (Use with alias(libs.plugins.xxx))

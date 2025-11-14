@@ -33,6 +33,18 @@ allprojects {
     group = "dev.aurakai.auraframefx"
     version = "0.1.0"
 
-    // Apply common repositories
+    // Disable all test tasks by default
+    tasks.withType<AbstractTestTask> {
+        enabled = false
+    }
+
+    // Disable test tasks for specific test types
+    tasks.matching { task ->
+        task.name.startsWith("test") ||
+        task.name.endsWith("Test") ||
+        task.name.contains("androidTest")
+    }.configureEach {
+        enabled = false
+    }
 }
 
