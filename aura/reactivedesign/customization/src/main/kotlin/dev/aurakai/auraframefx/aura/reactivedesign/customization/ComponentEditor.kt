@@ -134,15 +134,19 @@ class UndoRedoManager {
 }
 
 /**
- * Enhanced Component Editor with full property management
+ * Composable UI for editing a component's transform and appearance properties with undo/redo and preset management.
  *
- * @param componentId Unique identifier for the component being edited
- * @param initialProperties Initial property values (for binding to actual components)
- * @param presets Available property presets
- * @param onPropertyChanged Callback when property value changes
- * @param onPresetSave Callback to save new preset
- * @param onPresetLoad Callback when preset is loaded
- * @param onPresetDelete Callback to delete preset
+ * Provides controls for position (X/Y), size (width/height), rotation, z-index, and opacity; supports saving, loading,
+ * and deleting named presets and tracks changes via an undo/redo command stack.
+ *
+ * @param componentId Identifier of the component being edited.
+ * @param initialProperties Initial values for the editable properties.
+ * @param presets List of saved property presets available for loading.
+ * @param onPropertyChanged Callback invoked when a property value changes; receives the property name and its new value.
+ * @param onPresetSave Callback invoked to persist a newly created preset.
+ * @param onPresetLoad Callback invoked when a preset is loaded.
+ * @param onPresetDelete Callback invoked to request deletion of a preset by its id.
+ * @param modifier Optional [Modifier] to apply to the root layout.
  */
 @Composable
 fun ComponentEditor(

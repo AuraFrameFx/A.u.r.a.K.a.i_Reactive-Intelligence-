@@ -342,7 +342,7 @@ fun CanvasScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                items(DrawingTool.entries.toTypedArray()) { tool ->
+                items(DrawingTool.entries) { tool ->
                     val isSelected = currentTool == tool
                     val tint = if (isSelected) colorScheme.primary else colorScheme.onSurfaceVariant
 
