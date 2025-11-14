@@ -140,8 +140,8 @@ fun CanvasScreen(
                             when (currentTool) {
                                 DrawingTool.PEN, DrawingTool.ERASER, DrawingTool.HIGHLIGHTER -> {
                                     currentPath?.let { path ->
-                                        val op: Unit = DrawingOperation.PathOp(
-                                            path = android.graphics.Path(path),
+                                        val op = DrawingOperation.PathOp(
+                                            path = path,
                                             color = if (currentTool == DrawingTool.ERASER)
                                                 colorScheme.background else currentColor,
                                             strokeWidth = if (currentTool == DrawingTool.HIGHLIGHTER)
@@ -342,7 +342,7 @@ fun CanvasScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                items(DrawingTool.values()) { tool ->
+                items(DrawingTool.entries) { tool ->
                     val isSelected = currentTool == tool
                     val tint = if (isSelected) colorScheme.primary else colorScheme.onSurfaceVariant
 
