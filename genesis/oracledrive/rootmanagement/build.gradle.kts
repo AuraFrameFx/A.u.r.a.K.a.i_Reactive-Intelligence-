@@ -81,7 +81,6 @@ dependencies {
 
     // Xposed API (compile-only, not bundled in APK)
     compileOnly(libs.yukihookapi.api)
-    ksp(libs.yukihookapi.ksp)
 
     // Logging
     implementation(libs.timber)
