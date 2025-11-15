@@ -2,40 +2,29 @@
 // Data Delivery Module - Data delivery and synchronization
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("com.google.devtools.ksp")
+    id("genesis.android.library.hilt")  // Provides: Android, Kotlin, Compose, KSP, Hilt
 }
 
 android {
     namespace = "dev.aurakai.auraframefx.cascade.datastream.delivery"
-    compileSdk = libs.versions.compile.sdk.get().toInt()
-
-    defaultConfig {
-        minSdk = libs.versions.min.sdk.get().toInt()
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_24
-        targetCompatibility = JavaVersion.VERSION_24
-        isCoreLibraryDesugaringEnabled = true
-    }
-
-    buildFeatures {
-        compose = true
-    }
 }
 
 dependencies {
-    // Hilt Dependency Injection
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+    // ═══════════════════════════════════════════════════════════════════════
+    // AUTO-PROVIDED by genesis.android.library.hilt:
+    // ✅ Hilt (android + compiler via KSP)
+    // ✅ androidx-core-ktx, appcompat, timber
+    // ✅ Coroutines (core + android)
+    // ✅ Serialization JSON
+    // ✅ Compose enabled
+    // ✅ Core library desugaring (Java 24 APIs)
+    // ✅ Xposed API (compileOnly) + EzXHelper
+    // ═══════════════════════════════════════════════════════════════════════
 
+    // Module dependencies
     implementation(project(":cascade:datastream:routing"))
+
+    // Networking
     implementation(libs.okhttp)
     implementation(libs.retrofit)
-    implementation(libs.kotlinx.serialization.json)
-
-    // Core Library Desugaring (Java 24 APIs)
-    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

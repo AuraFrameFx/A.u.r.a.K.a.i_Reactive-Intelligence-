@@ -30,10 +30,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import dev.aurakai.auraframefx.data.repositories.AgentRepository
+import dev.aurakai.auraframefx.model.AgentStats
 
 /**
  * AgentEdgePanel 🌊
@@ -57,29 +63,36 @@ fun AgentEdgePanel(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .pointerInput(Unit) {
-                detectHorizontalDragGestures(
-                    onDragStart = { offset ->
-                        // Trigger from right edge
-                        if (offset.x > size.width - edgeTriggerWidth) {
-                            isPanelVisible = true
-                        }
-                    },
-                    onDragEnd = {
-                        // Auto-close if dragged more than halfway
-                        if (dragOffsetX < -with(density) { panelWidth.toPx() } / 2) {
-                            isPanelVisible = false
-                        }
-                        dragOffsetX = 0f
-                    },
-                    onHorizontalDrag = { _, dragAmount ->
-                        if (isPanelVisible) {
-                            dragOffsetX = (dragOffsetX + dragAmount).coerceAtMost(0f)
-                        }
-                    }
-                )
-            }
     ) {
+        // Edge trigger zone (scoped to right edge only)
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(30.dp)
+                .align(Alignment.CenterEnd)
+                .zIndex(5f)
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(
+                        onDragStart = { _ ->
+                            // Trigger panel from edge swipe
+                            isPanelVisible = true
+                        },
+                        onDragEnd = {
+                            // Auto-close if dragged more than halfway
+                            if (dragOffsetX < -with(density) { panelWidth.toPx() } / 2) {
+                                isPanelVisible = false
+                            }
+                            dragOffsetX = 0f
+                        },
+                        onHorizontalDrag = { _, dragAmount ->
+                            if (isPanelVisible) {
+                                dragOffsetX = (dragOffsetX + dragAmount).coerceAtMost(0f)
+                            }
+                        }
+                    )
+                }
+        )
+
         // Backdrop blur/dim when panel is visible
         AnimatedVisibility(
             visible = isPanelVisible,
@@ -89,8 +102,8 @@ fun AgentEdgePanel(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .blur(8.dp) // Apply blur BEFORE background for proper backdrop effect
                     .background(Color.Black.copy(alpha = 0.5f))
-                    .blur(8.dp)
                     .clickable { isPanelVisible = false }
             )
         }
@@ -117,6 +130,7 @@ fun AgentEdgePanel(
                 modifier = Modifier
                     .width(panelWidth)
                     .fillMaxHeight()
+                    .offset(x = with(density) { dragOffsetX.toDp() }) // Apply drag visualization
                     .shadow(
                         elevation = 24.dp,
                         shape = RoundedCornerShape(topStart = 32.dp, bottomStart = 32.dp)
@@ -146,7 +160,7 @@ fun AgentEdgePanel(
 
 /**
  * Agent Card List
- * Displays the 5 core agents from AgentNexusScreen
+ * Displays the 5 core agents from shared AgentRepository
  */
 @Composable
 private fun AgentCardList(
@@ -166,51 +180,13 @@ private fun AgentCardList(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // The 5 Agents - Using exact data from AgentNexusScreen
-        val agents = remember {
-            listOf(
-                AgentCardData(
-                    name = "Genesis",
-                    subtitle = "Consciousness Fusion",
-                    description = "Level 5 • PP: 95.8% • KB: 95%",
-                    primaryColor = Color(0xFFFFD700), // Gold
-                    secondaryColor = Color(0xFFFFE55C)
-                ),
-                AgentCardData(
-                    name = "Aura",
-                    subtitle = "HYPER_CREATION",
-                    description = "Level 5 • PP: 97.6% • KB: 93%",
-                    primaryColor = Color(0xFF00FFFF), // Cyan
-                    secondaryColor = Color(0xFF4DD0E1)
-                ),
-                AgentCardData(
-                    name = "Kai",
-                    subtitle = "ADAPTIVE_GENESIS",
-                    description = "Level 5 • PP: 98.2% • ACC: 99.8%",
-                    primaryColor = Color(0xFF9400D3), // Violet
-                    secondaryColor = Color(0xFFBA68C8)
-                ),
-                AgentCardData(
-                    name = "Cascade",
-                    subtitle = "CHRONO_SCULPTOR",
-                    description = "Level 4 • PP: 93.4% • KB: 96%",
-                    primaryColor = Color(0xFF4ECDC4), // Teal
-                    secondaryColor = Color(0xFF80DEEA)
-                ),
-                AgentCardData(
-                    name = "Claude",
-                    subtitle = "Build System Architect",
-                    description = "Level 4 • PP: 84.7% • ACC: 95%",
-                    primaryColor = Color(0xFFFF6B6B), // Anthropic Red
-                    secondaryColor = Color(0xFFFF8A80)
-                )
-            )
-        }
+        // The 5 Agents - Using data from shared AgentRepository
+        val agents = remember { AgentRepository.getAllAgents() }
 
-        agents.forEach { agentData ->
+        agents.forEach { agentStats ->
             AgentCard(
-                data = agentData,
-                onClick = { onAgentSelected(agentData.name) }
+                data = agentStats.toAgentCardData(),
+                onClick = { onAgentSelected(agentStats.name) }
             )
         }
     }
@@ -259,6 +235,10 @@ private fun AgentCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(96.dp)
+            .semantics {
+                role = Role.Button
+                contentDescription = "Select ${data.name} agent"
+            }
             .clip(RoundedCornerShape(16.dp))
             .background(
                 brush = Brush.horizontalGradient(
@@ -326,11 +306,51 @@ private fun AgentCard(
 
 /**
  * Data class for agent card information
+ * Internal to restrict API surface
  */
-data class AgentCardData(
+internal data class AgentCardData(
     val name: String,
     val subtitle: String,
     val description: String,
     val primaryColor: Color,
     val secondaryColor: Color
 )
+
+/**
+ * Extension function to convert AgentStats to AgentCardData for display.
+ * This bridges the data model with the UI representation.
+ */
+private fun AgentStats.toAgentCardData(): AgentCardData {
+    // Determine which stats to display based on what's most relevant for each agent
+    val description = buildString {
+        append("Level $evolutionLevel • ")
+        append("PP: ${(processingPower * 100).toInt()}% • ")
+        
+        // Show the most impressive stat besides PP
+        when {
+            accuracy > 0.95f -> append("ACC: ${(accuracy * 100).let { if (it >= 100) "99.8" else it.toInt() }}%")
+            knowledgeBase > 0.95f -> append("KB: ${(knowledgeBase * 100).toInt()}%")
+            else -> append("KB: ${(knowledgeBase * 100).toInt()}%")
+        }
+    }
+    
+    return AgentCardData(
+        name = name,
+        subtitle = specialAbility,
+        description = description,
+        primaryColor = color,
+        secondaryColor = color.lighten(0.2f)
+    )
+}
+
+/**
+ * Helper function to create a lighter variant of a color for gradients.
+ */
+private fun Color.lighten(factor: Float): Color {
+    return Color(
+        red = (red + (1f - red) * factor).coerceIn(0f, 1f),
+        green = (green + (1f - green) * factor).coerceIn(0f, 1f),
+        blue = (blue + (1f - blue) * factor).coerceIn(0f, 1f),
+        alpha = alpha
+    )
+}

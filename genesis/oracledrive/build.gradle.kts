@@ -2,43 +2,23 @@
 // Oracle Drive Integration Module - Cloud storage integration
 // ═══════════════════════════════════════════════════════════════════════════
 plugins {
-    id("genesis.android.library")
-    id("com.google.devtools.ksp")  // Required for YukiHook annotation processing
+    id("genesis.android.library.hilt")  // Provides: Android, Kotlin, Compose, KSP, Hilt
 }
 
 android {
     namespace = "dev.aurakai.auraframefx.genesis.oracledrive"
-    compileSdk = libs.versions.compile.sdk.get().toInt()
-
-    defaultConfig {
-        minSdk = libs.versions.min.sdk.get().toInt()
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_24
-        targetCompatibility = JavaVersion.VERSION_24
-        isCoreLibraryDesugaringEnabled = true
-    }
-
-    buildFeatures {
-        compose = true
-    }
 }
 
 dependencies {
-    // Hilt Dependency Injection
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-
     // ═══════════════════════════════════════════════════════════════════════
-    // AUTO-PROVIDED by genesis.android.library (base - NO Hilt):
-    // ✅ androidx-core-ktx, appcompat
-    // ✅ Timber, Coroutines (core + android)
+    // AUTO-PROVIDED by genesis.android.library.hilt:
+    // ✅ Hilt (android + compiler via KSP)
+    // ✅ androidx-core-ktx, appcompat, timber
+    // ✅ Coroutines (core + android)
     // ✅ Serialization JSON
-    // ✅ Compose enabled by default
+    // ✅ Compose enabled
     // ✅ Core library desugaring (Java 24 APIs)
     // ✅ Xposed API (compileOnly) + EzXHelper
-    // ❌ NO Hilt (use genesis.android.library.hilt if DI needed)
     // ═══════════════════════════════════════════════════════════════════════
 
     // Expose core KTX as API
