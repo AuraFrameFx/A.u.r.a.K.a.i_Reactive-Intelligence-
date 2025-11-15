@@ -65,6 +65,7 @@ dependencies {
 
     implementation("com.google.devtools.ksp:symbol-processing-gradle-plugin:2.3.2")
     implementation("com.google.gms:google-services:4.4.4")
+    testImplementation(kotlin("test"))
 }
 
 // After applying plugins

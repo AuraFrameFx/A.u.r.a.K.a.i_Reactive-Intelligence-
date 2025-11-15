@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -72,6 +73,7 @@ data class LayerItem(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ZOrderEditor(
+    modifier: Modifier = Modifier,
     layers: List<LayerItem>,
     selectedLayerId: String? = null,
     onLayerReorder: (fromIndex: Int, toIndex: Int) -> Unit = { _, _ -> },
@@ -81,7 +83,6 @@ fun ZOrderEditor(
     onMoveToFront: (String) -> Unit = {},
     onMoveToBack: (String) -> Unit = {},
     onGroupToggle: (String) -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     var draggedItemIndex by remember { mutableStateOf<Int?>(null) }
     var dragOffset by remember { mutableStateOf(0f) }
@@ -219,7 +220,6 @@ fun ZOrderEditor(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .animateItemPlacement()
                     )
                 }
             }
@@ -313,7 +313,7 @@ private fun LayerItemRow(
                             imageVector = if (layer.isExpanded) {
                                 Icons.Default.KeyboardArrowDown
                             } else {
-                                Icons.Default.KeyboardArrowRight
+                                Icons.AutoMirrored.Filled.KeyboardArrowRight
                             },
                             contentDescription = if (layer.isExpanded) "Collapse" else "Expand",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -433,7 +433,7 @@ private fun LayerStackPreview(
                 contentAlignment = Alignment.Center
             ) {
                 visibleLayers.forEachIndexed { index, layer ->
-                    val offset = index * 6.dp
+                    val offset = (index * 6).dp
                     val isSelected = layer.id == selectedLayerId
 
                     Surface(

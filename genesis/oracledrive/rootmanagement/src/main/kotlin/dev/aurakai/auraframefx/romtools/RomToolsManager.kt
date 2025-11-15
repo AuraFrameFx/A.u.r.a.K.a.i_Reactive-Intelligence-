@@ -20,7 +20,7 @@ import javax.inject.Singleton
  * RIDE OR DIE - This is the real implementation!
  */
 @Singleton
-class RomToolsManager @Inject constructor(
+open class RomToolsManager @Inject constructor(
     private val bootloaderManager: BootloaderManager,
     private val recoveryManager: RecoveryManager,
     private val systemModificationManager: SystemModificationManager,

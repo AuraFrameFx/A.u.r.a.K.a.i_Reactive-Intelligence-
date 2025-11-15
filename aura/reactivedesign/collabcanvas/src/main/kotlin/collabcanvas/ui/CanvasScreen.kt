@@ -5,7 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -20,8 +27,15 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Rectangle
 import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Straighten
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,23 +47,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
-import java.lang.Math.PI
-import kotlin.math.cos
-import kotlin.math.roundToInt
-import kotlin.math.sin
-import kotlin.math.sqrt
 
 // LocalWindowInfo extension for keyboard and mouse state
 data class WindowInfo(
-    val keyboardModifiers: KeyboardModifiers? = null,
-    val mousePosition: Offset? = null
+    val keyboardModifiers: KeyboardModifiers? = null, val mousePosition: Offset? = null
 )
 
 data class KeyboardModifiers(
@@ -64,18 +76,11 @@ private fun getWindowInfo(): WindowInfo {
 
 sealed class DrawingOperation {
     data class PathOp(
-        val path: Path,
-        val color: Color,
-        val strokeWidth: Dp,
-        val tool: DrawingTool
+        val path: Path, val color: Color, val strokeWidth: Dp, val tool: DrawingTool
     ) : DrawingOperation()
 
     data class ShapeOp(
-        val start: Offset,
-        val end: Offset,
-        val color: Color,
-        val strokeWidth: Dp,
-        val tool: DrawingTool
+        val start: Offset, val end: Offset, val color: Color, val strokeWidth: Dp, val tool: DrawingTool
     ) : DrawingOperation()
 
     companion object
@@ -122,80 +127,20 @@ fun CanvasScreen(
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        // Main drawing canvas
-        Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .pointerInput(Unit) {
-                    detectDragGestures(
-                        onDragStart = { offset ->
-                            startPosition = offset
-                            when (currentTool) {
-                                DrawingTool.PEN, DrawingTool.ERASER, DrawingTool.HIGHLIGHTER -> {
-                                    currentPath = Path().apply {
-                                        moveTo(offset.x, offset.y)
-                                    }
-                                }
-                                else -> { /* Shape tools handle this in onDrag */ }
-                            }
-                        },
-                        onDrag = { change, _ ->
-                            when (currentTool) {
-                                DrawingTool.PEN, DrawingTool.ERASER, DrawingTool.HIGHLIGHTER -> {
-                                    currentPath?.lineTo(change.position.x, change.position.y)
-                                }
-                                else -> { /* Update preview */ }
-                            }
-                        },
-                        onDragEnd = {
-                            val endPosition = startPosition
-                            when (currentTool) {
-                                DrawingTool.PEN, DrawingTool.ERASER, DrawingTool.HIGHLIGHTER -> {
-                                    currentPath?.let { path ->
-                                        val op = DrawingOperation.PathOp(
-                                            path = path,
-                                            color = if (currentTool == DrawingTool.ERASER)
-                                                colorScheme.background else currentColor,
-                                            strokeWidth = if (currentTool == DrawingTool.HIGHLIGHTER)
-                                                16.dp else currentStrokeWidth,
-                                            tool = currentTool
-                                        )
-                                        paths.add(op)
-                                        collaborationEvents?.tryEmit(op)
-                                    }
-                                }
-                                else -> {
-                                    val op = DrawingOperation.ShapeOp(
-                                        start = startPosition,
-                                        end = endPosition,
-                                        color = currentColor,
-                                        strokeWidth = currentStrokeWidth,
-                                        tool = currentTool
-                                    )
-                                    paths.add(op)
-                                    collaborationEvents?.tryEmit(op)
-                                }
-                            }
-                            currentPath = null
-                            undonePaths.clear()
-                        }
-                    )
-                }
-        ) {
-            // Draw all saved paths
+        // --- Drawing elements are now placed in Composable scopes (Canvas) ---
+
+        // Canvas 1: Draw all saved paths (Immutable history)
+        Canvas(modifier = Modifier.fillMaxSize()) {
             paths.forEach { operation ->
                 when (operation) {
                     is DrawingOperation.PathOp -> {
                         drawPath(
-                            path = operation.path,
-                            color = operation.color,
-                            style = Stroke(
-                                width = operation.strokeWidth.toPx(),
-                                cap = StrokeCap.Round,
-                                join = StrokeJoin.Round
+                            path = operation.path, color = operation.color, style = Stroke(
+                                width = operation.strokeWidth.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round
                             )
                         )
                     }
+
                     is DrawingOperation.ShapeOp -> {
                         when (operation.tool) {
                             DrawingTool.LINE -> {
@@ -207,6 +152,7 @@ fun CanvasScreen(
                                     cap = StrokeCap.Round
                                 )
                             }
+
                             DrawingTool.RECTANGLE -> {
                                 drawRect(
                                     color = operation.color,
@@ -215,6 +161,7 @@ fun CanvasScreen(
                                     style = Stroke(width = operation.strokeWidth.toPx())
                                 )
                             }
+
                             DrawingTool.CIRCLE -> {
                                 val radius = (operation.end - operation.start).getDistance()
                                 drawCircle(
@@ -224,79 +171,93 @@ fun CanvasScreen(
                                     style = Stroke(width = operation.strokeWidth.toPx())
                                 )
                             }
-                            else -> { /* Other tools */ }
+
+                            else -> { /* Other tools */
+                            }
                         }
                     }
                 }
             }
+        }
 
-            // Draw current path (preview)
-            currentPath?.let { path ->
+        // Canvas 2: Draw current path (State-dependent preview)
+        currentPath?.let { path ->
+            Canvas(modifier = Modifier.fillMaxSize()) {
                 drawPath(
-                    path, if (currentTool == DrawingTool.ERASER)
-                        colorScheme.background else currentColor, style = Stroke(
-                        width = if (currentTool == DrawingTool.HIGHLIGHTER)
-                            16.dp.toPx() else currentStrokeWidth.toPx(),
+                    path,
+                    if (currentTool == DrawingTool.ERASER) colorScheme.background else currentColor,
+                    style = Stroke(
+                        width = if (currentTool == DrawingTool.HIGHLIGHTER) 16.dp.toPx() else currentStrokeWidth.toPx(),
                         cap = StrokeCap.Round,
                         join = StrokeJoin.Round
                     )
                 )
             }
-
-            // Get window info at the composable level
-            val windowInfo = getWindowInfo()
-            val mousePos = windowInfo.mousePosition ?: startPosition
-
-            // Draw shape preview
-            if (currentPath == null && currentTool in listOf(
-                    DrawingTool.LINE,
-                    DrawingTool.RECTANGLE,
-                    DrawingTool.CIRCLE
-                ) && startPosition != Offset.Zero
-            ) {
-                val endPosition = windowInfo.keyboardModifiers?.takeIf { it.isShiftPressed }?.let {
-                    // Snap to 45-degree angles when shift is held
-                    val delta = mousePos.minus(startPosition)
-                    val angle = kotlin.math.atan2(delta.y.toDouble(), delta.x.toDouble())
-                    val snappedAngle = (angle / (PI / 4)).roundToInt() * (PI / 4)
-                    val distance = delta.getDistance()
-                    startPosition + Offset(
-                        (distance * cos(snappedAngle)).toFloat(),
-                        (distance * sin(snappedAngle)).toFloat()
-                    )
-                } ?: mousePos
-
-                when (currentTool) {
-                    DrawingTool.LINE -> {
-                        drawLine(
-                            color = currentColor,
-                            start = startPosition,
-                            end = endPosition,
-                            strokeWidth = currentStrokeWidth.toPx(),
-                            cap = StrokeCap.Round
-                        )
-                    }
-                    DrawingTool.RECTANGLE -> {
-                        drawRect(
-                            color = currentColor,
-                            topLeft = startPosition,
-                            size = (endPosition - startPosition).toSize(),
-                            style = Stroke(width = currentStrokeWidth.toPx())
-                        )
-                    }
-                    DrawingTool.CIRCLE -> {
-                        val radius = (endPosition - startPosition).getDistance()
-                        drawCircle(
-                            color = currentColor,
-                            radius = radius,
-                            center = startPosition,
-                            style = Stroke(width = currentStrokeWidth.toPx())
-                        )
-                    }
-                    else -> { /* Other tools */ }
-                }
-            }
         }
+
+        // Removed logic that called getWindowInfo()
+
+        // Gesture handling Canvas (Input only)
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectDragGestures(onDragStart = { offset ->
+                        startPosition = offset
+                        when (currentTool) {
+                            DrawingTool.PEN, DrawingTool.ERASER, DrawingTool.HIGHLIGHTER -> {
+                                currentPath = Path().apply {
+                                    moveTo(offset.x, offset.y)
+                                }
+                            }
+
+                            else -> { /* Shape tools handle this in onDrag */
+                            }
+                        }
+                    }, onDrag = { change, _ ->
+                        when (currentTool) {
+                            DrawingTool.PEN, DrawingTool.ERASER, DrawingTool.HIGHLIGHTER -> {
+                                currentPath?.lineTo(change.position.x, change.position.y)
+                            }
+
+                            else -> { /* Update preview */
+                            }
+                        }
+                    }, onDragEnd = {
+                        val endPosition = startPosition
+                        when (currentTool) {
+                            DrawingTool.PEN, DrawingTool.ERASER, DrawingTool.HIGHLIGHTER -> {
+                                currentPath?.let { path ->
+                                    val op = DrawingOperation.PathOp(
+                                        path = path,
+                                        color = if (currentTool == DrawingTool.ERASER) colorScheme.background else currentColor,
+                                        strokeWidth = if (currentTool == DrawingTool.HIGHLIGHTER) 16.dp else currentStrokeWidth,
+                                        tool = currentTool
+                                    )
+                                    paths.add(op)
+                                    collaborationEvents?.tryEmit(op)
+                                }
+                            }
+
+                            else -> {
+
+                                val op = DrawingOperation.ShapeOp(
+                                    start = startPosition,
+                                    end = endPosition,
+                                    color = currentColor,
+                                    strokeWidth = currentStrokeWidth,
+                                    tool = currentTool
+                                )
+                                paths.add(op)
+                                collaborationEvents?.tryEmit(op)
+                            }
+                        }
+                        currentPath = null
+                        undonePaths.clear()
+                    })
+                }
+        ) { /* Gesture handling only */ }
+
 
         // Top app bar
         TopAppBar(
@@ -338,7 +299,7 @@ fun CanvasScreen(
                 }
 
                 // Color picker toggle
-                IconButton(onClick = { showColorPicker = !showColorPicker }) {
+                IconButton(onClick = { (!showColorPicker).also { showColorPicker = it } }) {
                     Icon(Icons.Default.Palette, "Colors")
                 }
             }
@@ -366,8 +327,7 @@ fun CanvasScreen(
                             .size(48.dp)
                             .background(
                                 if (isSelected) colorScheme.primaryContainer
-                                else Color.Transparent,
-                                CircleShape
+                                else Color.Transparent, CircleShape
                             )
                     ) {
                         val icon = when (tool) {
@@ -422,8 +382,7 @@ fun CanvasScreen(
                     .align(Alignment.TopEnd)
                     .padding(top = 56.dp, end = 8.dp)
                     .background(
-                        colorScheme.surfaceVariant,
-                        MaterialTheme.shapes.medium
+                        colorScheme.surfaceVariant, MaterialTheme.shapes.medium
                     )
                     .padding(8.dp)
             ) {
@@ -448,8 +407,7 @@ fun CanvasScreen(
                                     .padding(4.dp)
                                     .size(32.dp)
                                     .background(
-                                        color,
-                                        CircleShape
+                                        color, CircleShape
                                     )
                                     .border(
                                         width = if (isSelected) 2.dp else 1.dp,
@@ -458,7 +416,7 @@ fun CanvasScreen(
                                         shape = CircleShape
                                     )
                                     .clickable {
-                                        currentColor = color
+                                        color.also { currentColor = it }
                                         showColorPicker = false
                                     }
                             )
@@ -475,8 +433,7 @@ fun CanvasScreen(
                     .align(Alignment.TopStart)
                     .padding(top = 64.dp, start = 8.dp)
                     .background(
-                        colorScheme.primaryContainer,
-                        MaterialTheme.shapes.small
+                        colorScheme.primaryContainer, MaterialTheme.shapes.small
                     )
                     .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
@@ -493,5 +450,15 @@ fun CanvasScreen(
 // Extension functions
 private fun Offset.toSize() = Size(x, y)
 private fun Size.toOffset() = Offset(width, height)
-private fun Offset.plus(other: Offset) = Offset(x + other.x, y + other.y)
-private fun Offset.getDistance() = sqrt(x * x + y * y)
+
+@Preview(showBackground = true)
+@Composable
+private fun CanvasScreenPreview() {
+    MaterialTheme {
+        CanvasScreen(
+            onBack = {},
+            isCollaborative = false,
+            collaborationEvents = null
+        )
+    }
+}

@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Redo
+import androidx.compose.material.icons.automirrored.filled.RotateRight
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -113,7 +114,7 @@ class UndoRedoManager {
 
     fun undo() {
         if (undoStack.isNotEmpty()) {
-            val command = undoStack.removeLast()
+            val command = undoStack.removeAt(undoStack.lastIndex)
             command.undo()
             redoStack.add(command)
         }
@@ -121,7 +122,7 @@ class UndoRedoManager {
 
     fun redo() {
         if (redoStack.isNotEmpty()) {
-            val command = redoStack.removeLast()
+            val command = redoStack.removeAt(redoStack.lastIndex)
             command.execute()
             undoStack.add(command)
         }
@@ -150,14 +151,14 @@ class UndoRedoManager {
  */
 @Composable
 fun ComponentEditor(
+    modifier: Modifier = Modifier,
     componentId: String,
     initialProperties: ComponentProperties = ComponentProperties(),
     presets: List<PropertyPreset> = emptyList(),
     onPropertyChanged: (String, Float) -> Unit = { _, _ -> },
     onPresetSave: (PropertyPreset) -> Unit = {},
     onPresetLoad: (PropertyPreset) -> Unit = {},
-    onPresetDelete: (String) -> Unit = {},
-    modifier: Modifier = Modifier
+    onPresetDelete: (String) -> Unit = {}
 ) {
     // Current property values (bound to actual component)
     var properties by remember { mutableStateOf(initialProperties) }
@@ -417,7 +418,7 @@ fun ComponentEditor(
                 // Transform Section
                 PropertySection(
                     title = "Transform",
-                    icon = Icons.Default.ThreeDRotation
+                    icon = Icons.AutoMirrored.Filled.RotateRight
                 ) {
                     PropertySlider(
                         label = "Rotation",
@@ -631,3 +632,6 @@ private fun PresetCard(
         }
     }
 }
+
+// provide a lightweight placeholder for 3D rotation concept (was unresolved)
+data class ThreeDRotation(val x: Float = 0f, val y: Float = 0f, val z: Float = 0f)
