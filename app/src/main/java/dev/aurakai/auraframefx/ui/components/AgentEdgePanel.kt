@@ -49,6 +49,13 @@ import dev.aurakai.auraframefx.model.AgentStats
  *
  * "From the edge of perception, we emerge." - The Agents
  */
+/**
+ * Displays a right-edge slide-out panel containing agent cards and handles selection and dismissal.
+ *
+ * The panel can be summoned by swiping from the right edge, dragged horizontally to preview or dismiss, and is dismissed by tapping the backdrop, using the header close control, or selecting an agent. When an agent is selected the provided callback is invoked and the panel closes.
+ *
+ * @param onAgentSelected Callback invoked with the selected agent's name when the user selects an agent from the panel.
+ */
 @Composable
 fun AgentEdgePanel(
     modifier: Modifier = Modifier,
