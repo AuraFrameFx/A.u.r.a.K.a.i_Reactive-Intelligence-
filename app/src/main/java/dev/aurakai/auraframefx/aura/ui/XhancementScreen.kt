@@ -24,10 +24,10 @@ import dev.aurakai.auraframefx.ui.theme.NeonBlue
 import dev.aurakai.auraframefx.ui.theme.NeonPurple
 
 /**
- * Xhancement Screen - Xposed Framework Integration Hub
+ * Xhancement Screen - Xposed Hook Toggle Control Panel
  *
- * Coming soon: System-wide hooking, module management, and
- * Kai-powered security analysis for Xposed enhancements.
+ * Coming soon: Quick toggles for all Xposed/LSPosed hooks without prompts.
+ * Instant enable/disable controls for system modifications with Kai security monitoring.
  */
 @Composable
 fun XhancementScreen(
@@ -71,7 +71,7 @@ fun XhancementScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Xposed/LSPosed module management,\nsystem-wide hooks, and Kai security validation.",
+                text = "Quick toggle control panel for Xposed hooks.\nInstant enable/disable - no prompts required.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 textAlign = TextAlign.Center
