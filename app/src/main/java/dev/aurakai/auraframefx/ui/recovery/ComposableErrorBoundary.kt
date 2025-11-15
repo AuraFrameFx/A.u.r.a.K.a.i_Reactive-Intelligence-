@@ -91,6 +91,7 @@ private class ErrorHandler(
  * }
  * ```
  */
-fun onNavigationComplete(block: (String) -> Unit): () -> Unit {
-    return { block("") }
+fun onNavigationComplete(route: String, block: (String) -> Unit): () -> Unit {
+    return { block(route) }
+}
 }
