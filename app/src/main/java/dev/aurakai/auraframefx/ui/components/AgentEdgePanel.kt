@@ -240,7 +240,7 @@ private fun AgentPanelHeader(
         IconButton(onClick = onClose) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Close",
+                contentDescription = "Close agent panel",
                 tint = Color(0xFF00FFFF)
             )
         }
