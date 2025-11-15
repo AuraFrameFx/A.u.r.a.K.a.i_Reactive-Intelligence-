@@ -43,6 +43,14 @@ dependencyResolutionManagement {
                     mavenPom()
                 }
             }
+            // HighCapable Maven - Required for YukiHookAPI
+            maven {
+                url = uri("https://maven.highcapable.dev/releases")
+                metadataSources {
+                    artifact()
+                    mavenPom()
+                }
+            }
 
             // Dynamically add every module's libs/ directory as a file-based maven repository
             // This discovers local jars placed in module/libs (including nested modules) and registers them so artifacts like
