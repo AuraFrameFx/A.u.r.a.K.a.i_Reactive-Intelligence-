@@ -102,7 +102,7 @@ compose-bom = "2025.11.00"
 # ============================================================================
 # Firebase BOM - Latest: 34.5.0
 # Note: KTX libraries removed from BOM v32.5.0+, use main modules
-firebaseBom = "34.5.0"
+firebaseBom = "34.6.0"
 
 # ============================================================================
 # Google AI & ML
