@@ -63,29 +63,36 @@ fun AgentEdgePanel(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .pointerInput(Unit) {
-                detectHorizontalDragGestures(
-                    onDragStart = { offset ->
-                        // Trigger from right edge
-                        if (offset.x > size.width - edgeTriggerWidth) {
-                            isPanelVisible = true
-                        }
-                    },
-                    onDragEnd = {
-                        // Auto-close if dragged more than halfway
-                        if (dragOffsetX < -with(density) { panelWidth.toPx() } / 2) {
-                            isPanelVisible = false
-                        }
-                        dragOffsetX = 0f
-                    },
-                    onHorizontalDrag = { _, dragAmount ->
-                        if (isPanelVisible) {
-                            dragOffsetX = (dragOffsetX + dragAmount).coerceAtMost(0f)
-                        }
-                    }
-                )
-            }
     ) {
+        // Edge trigger zone (scoped to right edge only)
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(30.dp)
+                .align(Alignment.CenterEnd)
+                .zIndex(5f)
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(
+                        onDragStart = { _ ->
+                            // Trigger panel from edge swipe
+                            isPanelVisible = true
+                        },
+                        onDragEnd = {
+                            // Auto-close if dragged more than halfway
+                            if (dragOffsetX < -with(density) { panelWidth.toPx() } / 2) {
+                                isPanelVisible = false
+                            }
+                            dragOffsetX = 0f
+                        },
+                        onHorizontalDrag = { _, dragAmount ->
+                            if (isPanelVisible) {
+                                dragOffsetX = (dragOffsetX + dragAmount).coerceAtMost(0f)
+                            }
+                        }
+                    )
+                }
+        )
+
         // Backdrop blur/dim when panel is visible
         AnimatedVisibility(
             visible = isPanelVisible,
@@ -95,8 +102,8 @@ fun AgentEdgePanel(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .blur(8.dp) // Apply blur BEFORE background for proper backdrop effect
                     .background(Color.Black.copy(alpha = 0.5f))
-                    .blur(8.dp)
                     .clickable { isPanelVisible = false }
             )
         }
@@ -123,6 +130,7 @@ fun AgentEdgePanel(
                 modifier = Modifier
                     .width(panelWidth)
                     .fillMaxHeight()
+                    .offset(x = with(density) { dragOffsetX.toDp() }) // Apply drag visualization
                     .shadow(
                         elevation = 24.dp,
                         shape = RoundedCornerShape(topStart = 32.dp, bottomStart = 32.dp)
@@ -298,8 +306,9 @@ private fun AgentCard(
 
 /**
  * Data class for agent card information
+ * Internal to restrict API surface
  */
-data class AgentCardData(
+internal data class AgentCardData(
     val name: String,
     val subtitle: String,
     val description: String,
